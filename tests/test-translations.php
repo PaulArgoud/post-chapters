@@ -90,7 +90,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	public function test_bundled_file_wins_over_language_pack() {
 		$this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
 
-		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'sgr-nextpage-titles', 'fr_FR' ), 'The registry should resolve the language pack first.' );
+		$this->assert_registry_resolves_pack();
 		$this->assertSame( 'Commentaires', __( 'Comments', 'sgr-nextpage-titles' ) );
 		$this->assertSame( 'Navigation des sous-pages', __( 'Subpage navigation', 'sgr-nextpage-titles' ) );
 	}
@@ -102,7 +102,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	public function test_deleted_pack_still_cached_by_the_registry() {
 		$files = $this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
 
-		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'sgr-nextpage-titles', 'fr_FR' ) );
+		$this->assert_registry_resolves_pack();
 
 		foreach ( $files as $file ) {
 			unlink( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink -- Test fixture.
@@ -170,6 +170,21 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The registry resolves the language pack folder, not the bundled one.
+	 *
+	 * Only on WordPress 6.5+, where the registry stops at the first folder holding the
+	 * file (WP_LANG_DIR/plugins): that is the order that made the packs win. WordPress
+	 * 6.3 and 6.4 keep the last folder found, so the bundled folder already wins there.
+	 */
+	private function assert_registry_resolves_pack() {
+		if ( version_compare( $GLOBALS['wp_version'], '6.5', '<' ) ) {
+			return;
+		}
+
+		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'sgr-nextpage-titles', 'fr_FR' ), 'The registry should resolve the language pack first.' );
+	}
+
+	/**
 	 * Install a fake language pack translating "Comments" (and nothing else), in both formats.
 	 *
 	 * @param string $locale      Locale.
@@ -217,7 +232,10 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	 */
 	private function reset_registry() {
 		$registry = new WP_Textdomain_Registry();
-		$registry->init();
+		if ( method_exists( $registry, 'init' ) ) {
+			// WordPress 6.5+ (hooks the cache invalidation on upgrades).
+			$registry->init();
+		}
 		$GLOBALS['wp_textdomain_registry'] = $registry; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restored in tear_down().
 
 		self::unload_all_locales();
