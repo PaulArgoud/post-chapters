@@ -18,11 +18,21 @@ License: GPL v3
 
 /**
  * 1.0 - Elements
+ *
+ * Sizes are in rem, and the typography is reset, so that the table of contents and
+ * the navigation look the same wherever a theme or the content puts them (even
+ * inside a heading).
  */
 
 .mpp-post-navigation,
 .mpp-toc-container {
-	margin-bottom: 1.75em;
+	margin-bottom: 1.75rem;
+	font-size: 1rem;
+	font-weight: 400;
+	font-style: normal;
+	line-height: 1.5;
+	text-transform: none;
+	letter-spacing: normal;
 }
 
 /**
@@ -32,26 +42,26 @@ License: GPL v3
 .mpp-toc-container {
 	min-width: 260px;
 	max-width: 60%;
-	font-size: 95%;
-	padding: 1em 1.25em;
+	font-size: 0.95rem;
+	padding: 0.95rem 1.2rem;
 	border: 1px solid rgba( 0, 0, 0, 0.1 );
 	display: table;
 }
 
 .mpp-toc-container.top-left {
 	float: left;
-	margin-top: 0.75em;
-	margin-right: 1.75em;
+	margin-top: 0.7rem;
+	margin-right: 1.65rem;
 }
 
 .mpp-toc-container.top-right {
 	float: right;
-	margin-top: 0.75em;
-	margin-left: 1.75em;
+	margin-top: 0.7rem;
+	margin-left: 1.65rem;
 }
 
 .mpp-toc-title h2 {
-	font-size: 120%;
+	font-size: 1.15rem;
 	text-align: center;
 	margin-top: 0;
 }
@@ -75,8 +85,8 @@ License: GPL v3
 }
 
 nav.mpp-post-navigation.next-previous .nav-links a[rel="next"] {
-    text-align: right;
-    float: right;
+	text-align: right;
+	float: right;
 }
 
 nav.mpp-post-navigation .nav-links a {
@@ -85,8 +95,8 @@ nav.mpp-post-navigation .nav-links a {
 }
 
 nav.mpp-post-navigation.next-previous .nav-links a {
-    width: 50%;
-    display: inline-block;
+	width: 50%;
+	display: inline-block;
 }
 
 nav.mpp-post-navigation.continue {

@@ -10,6 +10,11 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * Multipage shortcodes.
+ *
+ * @since 1.1
+ */
 class Multipage_Plugin_Shortcodes {
 
 	/**
@@ -20,15 +25,25 @@ class Multipage_Plugin_Shortcodes {
 	public static function init() {
 		add_shortcode( 'nextpage', array( 'Multipage_Plugin_Shortcodes', 'nextpage' ) );
 	}
-	
+
 	/**
-	 * Generate HTML elements
+	 * Render the [nextpage] shortcode.
+	 *
+	 * On multipage views the shortcodes are removed before rendering (the content is
+	 * split into subpages beforehand). The handler only runs where the content was not
+	 * split (feeds, REST API, excerpts, any other do_shortcode() caller): it renders
+	 * nothing, so no stray page break marker or attribute text leaks into the output.
 	 *
 	 * @since 0.6
-	 * @param array $attributes shortcode attributes. overrides site options for specific button attributes
-	 * @param string $content shortcode content. no effect
+	 * @since 1.7.0 Returns an empty string instead of a `<!--nextpage-->` marker.
+	 *
+	 * @param array|string $attributes Shortcode attributes. No effect.
+	 * @param string|null  $content    Shortcode content. No effect.
+	 * @return string
 	 */
 	public static function nextpage( $attributes, $content = null ) {
-		return '<!--nextpage-->';
+		unset( $attributes, $content );
+
+		return '';
 	}
 }

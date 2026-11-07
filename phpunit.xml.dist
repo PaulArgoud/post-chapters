@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+	PHPUnit configuration for the Multipage plugin.
+
+	The tests need the WordPress PHPUnit test library: run them inside the
+	wp-env "tests-cli" container, e.g. "composer test:wp-env" once
+	"npx wp-env start" is running (see .wp-env.json).
+	See tests/bootstrap.php for the environment variables that are read.
+-->
+<phpunit
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+	bootstrap="tests/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	beStrictAboutOutputDuringTests="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="true"
+	failOnRisky="true"
+	failOnWarning="true"
+	>
+	<testsuites>
+		<testsuite name="multipage">
+			<directory prefix="test-" suffix=".php">./tests/</directory>
+		</testsuite>
+	</testsuites>
+
+	<coverage>
+		<include>
+			<directory suffix=".php">./</directory>
+		</include>
+		<exclude>
+			<directory>./.claude</directory>
+			<directory>./.git</directory>
+			<directory>./.github</directory>
+			<directory>./.wp-env</directory>
+			<directory>./bin</directory>
+			<directory>./build</directory>
+			<directory>./node_modules</directory>
+			<directory>./tests</directory>
+			<directory>./vendor</directory>
+		</exclude>
+	</coverage>
+</phpunit>

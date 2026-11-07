@@ -3,8 +3,14 @@
 /node_modules/
 
 # Composer
+# composer.lock IS committed: the dependencies are dev-only (never shipped, see
+# .distignore) and the lock, resolved for the PHP 7.4 platform declared in
+# composer.json, gives every contributor and CI job the same PHPCS/WPCS/PHPUnit
+# versions. Run "composer update" to refresh it.
 composer.phar
-composer.lock
+
+# Build output (bin/build-zip.sh)
+/build/
 
 # npm (package-lock.json is committed for reproducible CI builds)
 
@@ -16,13 +22,17 @@ composer.lock
 # OS
 .DS_Store
 Thumbs.db
+# Placeholders left by macOS for files deleted while open on an SMB share
+.smbdelete*
 
-# PHPCS (local override of .phpcs.xml.dist)
+# PHPCS (local overrides of phpcs.xml.dist)
 .phpcs.xml
+phpcs.xml
 
 # PHPUnit
 .phpunit.result.cache
 .phpunit.cache/
+phpunit.xml
 
 # PHPStan
 /tmp/phpstan/
@@ -36,3 +46,6 @@ messages.po
 
 # Environment / Secrets
 .env
+
+# Browser automation artifacts (Playwright MCP).
+.playwright-mcp/
