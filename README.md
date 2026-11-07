@@ -40,9 +40,11 @@ Split your WordPress posts into multiple subpages, each with its own title and a
 3. Activate **Multipage** through the **Plugins** menu in WordPress
 4. Configure the plugin under **Settings > Multipage**
 
-### From WordPress.org
+### WordPress.org
 
-Search for **Multipage** in **Plugins > Add New** and click **Install Now**.
+The [WordPress.org listing](https://wordpress.org/plugins/sgr-nextpage-titles/) is still the original author's version 1.5.12 (2021), so searching for **Multipage** in **Plugins > Add New** installs that older version, not 1.7.0. Install from the GitHub release above.
+
+The GitHub version declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles` in its header, so WordPress never replaces it with the WordPress.org version of the same slug. Updates come from new GitHub releases: download the new zip and upload it again (WordPress offers to replace the installed version).
 
 ### Updating to 1.7.0
 

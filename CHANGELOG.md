@@ -74,6 +74,7 @@ Major rewrite of the Subpage block, the content parser and the frontend renderin
 - **Rebuild subpage index** button (Settings > Multipage > Advanced), see Changed
 - RTL stylesheets `css/multipage-rtl[.min].css` (frontend) and `admin/css/multipage-admin-rtl[.min].css` (admin)
 - Translated fallback title "Page N" for untitled subpages
+- `readme.txt` for the WordPress.org plugin directory (description, FAQ, changelog, upgrade notice, credits to the original author). It is shipped in the release archive
 
 ### Developer
 
@@ -85,9 +86,10 @@ Major rewrite of the Subpage block, the content parser and the frontend renderin
 - New filters: `mpp_untitled_subpage_title`, `mpp_comment_block_names`, `mpp_subpage_title_allowed_html`, `mpp_parser_is_meaningful_content`, `mpp_get_option_definitions`, `mpp_get_option_choice_labels`, `mpp_rebuild_postmeta_batch_size`, `mpp_rebuild_cron_time_limit`, `mpp_rebuild_admin_time_limit`
 - New files: `blocks/subpage/` (`block.json`, `index.js`, `index.asset.php`, `editor.css`), `inc/mpp-blocks.php` (`mpp_register_blocks()`, bundled JS translations fallback), `inc/mpp-cli.php` (`MPP_CLI_Command`)
 - `_mpp_data` is kept as an index for third-party code (written on `save_post` and by the rebuild); untitled subpages are stored with title `''` and slug `page-N`. `MPP_PATTERN` and `MPP_GUTENBERG_PATTERN` are kept for backward compatibility only
-- Removed: `admin/js/mpp-editor-blocks.js`, `admin/css/mpp-editor-blocks[.min].css` (replaced by `blocks/subpage/`) and the global `prompt_subtitle()` JavaScript function of the Quicktags button
+- Removed: `admin/js/mpp-editor-blocks.js`, `admin/css/mpp-editor-blocks[.min].css` (replaced by `blocks/subpage/`), the global `prompt_subtitle()` JavaScript function of the Quicktags button, and the unused `sgr-nextpage-titles.code-workspace` editor file
 - **Tooling**: `composer.json` with dev-only dependencies (WPCS 3, PHPCompatibilityWP, PHPUnit 9.6, Yoast PHPUnit Polyfills) and the `lint`, `phpcs`, `phpcbf`, `test` and `test:wp-env` scripts; `phpcs.xml.dist` (WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+), with 0 errors on the codebase
-- **Tests**: PHPUnit integration suite (about 380 tests) running in `wp-env` (`.wp-env.json`: WordPress 7.1.4, PHP 8.4): parser corpus, HTML balance of every split, full requests of every subpage, rendering, titles, SEO, comments, options, rebuild, upgrade, blocks, uninstall
+- **Plugin Check** 2.2.0 (WordPress.org's submission checker) reports no error apart from the `Update URI` header, which must be removed from any build published to WordPress.org
+- **Tests**: PHPUnit integration suite (381 tests) running in `wp-env` (`.wp-env.json`: WordPress 7.1.4, PHP 8.4): parser corpus, HTML balance of every split, full requests of every subpage, rendering, titles, SEO, comments, options, rebuild, upgrade, blocks, uninstall
 - **CI**: GitHub Actions workflow (PHP 7.4–8.4 lint, PHPCS, i18n check, PHPUnit on WordPress 6.3 / PHP 7.4, 7.1.4 / PHP 7.4 and 7.1.4 / PHP 8.4, release zip)
 - **Release and i18n scripts**: `bin/build-zip.sh` (zip of the files known to git, filtered by `.distignore`), `bin/php-lint.php`, `bin/check-i18n.sh` (POT, `.po`, `.mo`, `.json` and `.l10n.php` files in sync with the code); `.distignore` and `.gitattributes` keep development files out of the release
 

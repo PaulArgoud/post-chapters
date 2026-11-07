@@ -7,11 +7,15 @@ This document describes the internal structure and data flow of the Multipage pl
 ```
 sgr-nextpage-titles/
 │
-├── sgr-nextpage-titles.php          # Plugin entry point: header, MPP_VERSION / MPP__PLUGIN_FILE, loads class-mpp.php
+├── sgr-nextpage-titles.php          # Plugin entry point: header (incl. Update URI), MPP_VERSION / MPP__PLUGIN_FILE,
+│                                    #   loads class-mpp.php
 ├── class-mpp.php                    # Main Multipage class (singleton): bootstrap, request setup,
 │                                    #   frontend rendering, SEO integrations, 404/redirect handling
 ├── uninstall.php                    # Cleanup on deletion (every site of a multisite network)
 ├── index.php                        # "Silence is golden" (one in every shipped folder)
+├── readme.txt                       # WordPress.org directory readme (Stable tag, FAQ, changelog)
+├── README.md / CHANGELOG.md / LICENSE  # GitHub readme, full history, GPL v3 (shipped)
+├── screenshot-[1-3].png             # WordPress.org screenshots (not shipped)
 │
 ├── blocks/
 │   └── subpage/                     # "Subpage" block (multipage/subpage), no build step
@@ -106,6 +110,8 @@ sgr-nextpage-titles/
 ```
 
 Hooks registered at file load: `init` → `mpp_load_multipage_textdomain()` and `mpp_register_blocks()`; `load_script_translation_file` → `mpp_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `mpp_maybe_clear_options_cache()`; `mpp_rebuild_postmeta_batch` (WP-Cron) → `mpp_cron_rebuild_postmeta()`. No string is translated before `init`.
+
+The header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so the older WordPress.org listing of the same slug (owned by the original author) can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
 
 ## Request Lifecycle (Frontend)
 
