@@ -1,6 +1,7 @@
 # Multipage for WordPress
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](CHANGELOG.md)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/tag/1.7.0)
+[![CI](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.4%E2%80%938.4-777BB4.svg)](https://www.php.net/)
@@ -34,8 +35,8 @@ Split your WordPress posts into multiple subpages, each with its own title and a
 
 ### From GitHub
 
-1. Download the [latest release](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/latest)
-2. Upload the `sgr-nextpage-titles` folder to `/wp-content/plugins/`
+1. Download `sgr-nextpage-titles.zip` from the [latest release](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/latest) (use this archive, not GitHub's "Source code" archives, which contain the development files and a differently named folder)
+2. In WordPress, go to **Plugins > Add New > Upload Plugin** and upload the zip, or unzip it so that the plugin sits in `/wp-content/plugins/sgr-nextpage-titles/`
 3. Activate **Multipage** through the **Plugins** menu in WordPress
 4. Configure the plugin under **Settings > Multipage**
 
