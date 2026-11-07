@@ -19,5 +19,5 @@ return array(
 		'wp-i18n',
 		'wp-primitives',
 	),
-	'version'      => defined( 'MPP_VERSION' ) ? MPP_VERSION : '1.7.0',
+	'version'      => defined( 'MPP_VERSION' ) ? MPP_VERSION : '1.7.1',
 );

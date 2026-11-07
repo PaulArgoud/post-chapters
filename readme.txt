@@ -4,7 +4,7 @@ Tags: multi-page, table-of-contents, nextpage, subpages, seo
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -80,6 +80,13 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 
 == Changelog ==
 
+= 1.7.1 =
+Release Date: November 8th, 2026
+
+* Bug fixes:
+	* The bundled French, German, Italian and Spanish translations are now used even when an old language pack of the original plugin is installed (strings such as "Continue:" stayed in English). The `mpp_prefer_bundled_translations` filter gives the language packs precedence back.
+	* With a persistent object cache (Redis, Memcached), pages are no longer served from a parse made by another build of the same version.
+
 = 1.7.0 =
 Release Date: November 7th, 2026
 
@@ -114,6 +121,9 @@ Release Date: Jun, 16th, 2021
 The full history, including older versions and developer notes, is in [CHANGELOG.md](https://github.com/PaulArgoud/sgr-nextpage-titles/blob/main/CHANGELOG.md).
 
 == Upgrade Notice ==
+
+= 1.7.1 =
+Uses the bundled translations instead of the outdated language packs of the original plugin. No database change.
 
 = 1.7.0 =
 Major rewrite, compatible with WordPress 7.1. Requires WordPress 6.3 or later. Existing content keeps working; the subpage index is rebuilt in the background after the update.

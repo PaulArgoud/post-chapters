@@ -831,4 +831,59 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		do_action( 'wp_enqueue_scripts' );
 		$this->assertFalse( wp_style_is( 'multipage', 'enqueued' ) );
 	}
+
+	/**
+	 * A classic shortcode wrapped in a styled paragraph (TinyMCE "justify") leaves no
+	 * paragraph open on either side of the cut, after wpautop().
+	 */
+	public function test_shortcode_in_styled_paragraph_is_balanced() {
+		$content = "<p style=\"text-align: justify;\">Intro BODY-1</p>\n<p style=\"text-align: justify;\">[nextpage title=\"Mazda: un moteur essence suralimenté\"]</p>\n<p style=\"text-align: justify;\">BODY-2</p>\n\nBODY-2b";
+		$post_id = $this->create_post( $content );
+
+		foreach ( array( 1, 2 ) as $page ) {
+			$html = $this->render_subpage( $post_id, $page );
+			$this->assertStringContainsString( 'BODY-' . $page, $html );
+			$this->assertTagBalanced( 'p', $html, "Page {$page}." );
+		}
+	}
+
+	/**
+	 * With a persistent object cache, a parse stored by another build of the same version
+	 * (key "parse-{MPP_VERSION}-{md5}" up to 1.7.0) is never served.
+	 */
+	public function test_stale_parse_cache_entry_is_ignored() {
+		$post_id = $this->create_post( self::CLASSIC );
+		$content = get_post( $post_id )->post_content;
+
+		$stale = array(
+			'is_multipage' => true,
+			'has_intro'    => true,
+			'pages'        => array(
+				array(
+					'slug'    => 'intro',
+					'title'   => '%%intro%%',
+					'content' => 'STALE-1',
+					'kind'    => 'intro',
+				),
+				array(
+					'slug'    => 'deux',
+					'title'   => 'Deux',
+					'content' => '<p style="text-align: justify;">STALE-2',
+					'kind'    => 'shortcode',
+				),
+			),
+		);
+
+		// go_to() flushes the object cache: store the entry during the request.
+		add_action(
+			'parse_request',
+			static function () use ( $content, $stale ) {
+				wp_cache_set( 'parse-' . MPP_VERSION . '-' . md5( $content ), $stale, 'multipage' );
+			}
+		);
+
+		$html = $this->render_subpage( $post_id, 2 );
+		$this->assertStringContainsString( 'BODY-2', $html );
+		$this->assertStringNotContainsString( 'STALE', $html );
+	}
 }

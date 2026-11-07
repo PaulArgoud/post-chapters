@@ -5,6 +5,15 @@ All notable changes to the Multipage plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-11-08
+
+Translation and object cache fixes. No database change.
+
+### Fixed
+
+- **Translations ignored when a language pack is installed** (user-reported on a production site): the language packs that translate.wordpress.org delivers for the `sgr-nextpage-titles` slug (de_DE, en_GB, es_ES, fr_FR, it_IT, nb_NO, nl_NL, tr_TR) translate the original plugin, without the strings of this version, and WordPress loaded them instead of the bundled files (e.g. "Continue:" and "Subpage navigation" stayed in English in French). For the bundled locales (fr_FR, de_DE, es_ES, it_IT), the bundled `.l10n.php`/`.mo` files and the block editor JSON files now replace the files of `wp-content/languages/plugins`; other locales still use their language pack. New filter `mpp_prefer_bundled_translations` (default `true`) to give the language packs precedence back
+- **Persistent object cache** (Redis, Memcached): the parse cache key now depends on the parser code, not only on `MPP_VERSION`, so a page cut by another build of the same version (e.g. a pre-release 1.7.0) is no longer served for up to a day after an update
+
 ## [1.7.0] - 2026-11-07
 
 Major rewrite of the Subpage block, the content parser and the frontend rendering. Existing content needs no change: blocks saved by earlier versions stay valid, and the subpage index of every post is rebuilt in the background after the update.
