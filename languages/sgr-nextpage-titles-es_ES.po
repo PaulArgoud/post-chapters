@@ -1,0 +1,432 @@
+# Translation of Multipage in Spanish (Spain).
+# Copyright (C) 2015-2026 the Multipage contributors.
+# This file is distributed under the same license as the Multipage package (GPL v3).
+msgid ""
+msgstr ""
+"Project-Id-Version: Multipage 1.7.0\n"
+"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/sgr-nextpage-titles/issues\n"
+"POT-Creation-Date: 2026-11-07T21:52:12+00:00\n"
+"PO-Revision-Date: 2026-11-07 20:54+0000\n"
+"Last-Translator: Multipage contributors\n"
+"Language-Team: Spanish (Spain)\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GNU gettext msgmerge + reviewed translations\n"
+"X-Domain: sgr-nextpage-titles\n"
+
+#. Plugin Name of the plugin
+#: sgr-nextpage-titles.php classes/class-mpp-admin.php:159
+msgid "Multipage"
+msgstr "Multipage"
+
+#. Plugin URI of the plugin
+#: sgr-nextpage-titles.php
+msgid "https://wordpress.org/plugins/sgr-nextpage-titles/"
+msgstr "https://es.wordpress.org/plugins/sgr-nextpage-titles/"
+
+#. Description of the plugin
+#: sgr-nextpage-titles.php
+msgid "Split your WordPress posts into multiple subpages, each with its own title and an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation."
+msgstr "Divide tus entradas de WordPress en varias subpáginas, cada una con su propio título y una tabla de contenidos automática. Compatible con los bloques de Gutenberg, los shortcodes del editor clásico, un marcado optimizado para SEO y una navegación personalizable."
+
+#. Author of the plugin
+#: sgr-nextpage-titles.php
+msgid "Paul ARGOUD, based on an original idea by SGr33n (aka Sergio De Falco, Envire Web Solutions)."
+msgstr "Paul ARGOUD, basado en una idea original de SGr33n (alias Sergio De Falco, Envire Web Solutions)."
+
+#. Author URI of the plugin
+#: sgr-nextpage-titles.php
+msgid "https://paul.argoud.net"
+msgstr "https://paul.argoud.net"
+
+#: class-mpp.php:513 classes/class-mpp-admin.php:231
+msgid "Intro"
+msgstr "Introducción"
+
+#. translators: %d: subpage number.
+#: class-mpp.php:521
+#, php-format
+msgid "Page %d"
+msgstr "Página %d"
+
+#. translators: %: subpage number (literal percent sign, replaced by the number).
+#: class-mpp.php:1354
+msgid "Page %"
+msgstr "Página %"
+
+#: class-mpp.php:1371
+msgid "Subpage navigation"
+msgstr "Navegación de subpáginas"
+
+#: class-mpp.php:1405 classes/class-mpp-admin.php:246
+msgid "Table of contents"
+msgstr "Tabla de contenidos"
+
+#: classes/class-mpp-admin.php:158
+msgid "Multipage Options"
+msgstr "Opciones de Multipage"
+
+#: classes/class-mpp-admin.php:167 classes/class-mpp-admin.php:168
+msgid "Multipage Advanced Settings"
+msgstr "Ajustes avanzados de Multipage"
+
+#: classes/class-mpp-admin.php:228
+msgid "Main Settings"
+msgstr "Ajustes principales"
+
+#: classes/class-mpp-admin.php:234 inc/admin/admin-settings.php:149
+msgid "Display comments on"
+msgstr "Mostrar los comentarios en"
+
+#: classes/class-mpp-admin.php:237
+msgid "Pagination"
+msgstr "Paginación"
+
+#: classes/class-mpp-admin.php:240
+msgid "Navigation type"
+msgstr "Tipo de navegación"
+
+#: classes/class-mpp-admin.php:243
+msgid "Disable the standard pagination"
+msgstr "Desactivar la paginación estándar"
+
+#: classes/class-mpp-admin.php:249
+msgid "Only on the first page"
+msgstr "Solo en la primera página"
+
+#: classes/class-mpp-admin.php:252
+msgid "Position"
+msgstr "Posición"
+
+#: classes/class-mpp-admin.php:255 inc/admin/admin-settings.php:218
+msgid "Row labels"
+msgstr "Etiquetas de las filas"
+
+#: classes/class-mpp-admin.php:258
+msgid "Hide header"
+msgstr "Ocultar la cabecera"
+
+#: classes/class-mpp-admin.php:261
+msgid "Comments link"
+msgstr "Enlace a los comentarios"
+
+#: classes/class-mpp-admin.php:269
+msgid "Rewrite Title Priority"
+msgstr "Prioridad de reescritura del título"
+
+#: classes/class-mpp-admin.php:272
+msgid "Rewrite Content Priority"
+msgstr "Prioridad de reescritura del contenido"
+
+#: classes/class-mpp-admin.php:275 inc/admin/admin-advanced-settings.php:87
+msgid "Disable TinyMCE Buttons"
+msgstr "Desactivar los botones de TinyMCE"
+
+#: classes/class-mpp-admin.php:320
+msgid "Settings"
+msgstr "Ajustes"
+
+#: classes/class-mpp-admin.php:357
+msgid "subpage"
+msgstr "subpágina"
+
+#: classes/class-mpp-admin.php:358 classes/class-mpp-admin.php:537
+#: inc/admin/tinymce/languages.php:34
+msgid "Start a new Subpage"
+msgstr "Empezar una nueva subpágina"
+
+#: classes/class-mpp-admin.php:359 classes/class-mpp-admin.php:538
+#: inc/admin/tinymce/languages.php:35
+msgid "Enter the subpage title"
+msgstr "Introduce el título de la subpágina"
+
+#: inc/admin/admin-advanced-settings.php:36
+msgid "Some plugins need this higher in order to correctly show the subpage title instead of \"Page # of #\". If the title works good please leave this to normal."
+msgstr "Algunos plugins necesitan un valor más alto para mostrar correctamente el título de la subpágina en lugar de «Página # de #». Si el título se muestra correctamente, deja este valor en «Normal»."
+
+#. translators: %1$s: URL of the_content filter documentation.
+#: inc/admin/admin-advanced-settings.php:55
+#, php-format
+msgid "This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal."
+msgstr "Este valor determina la posición en la que se muestra la tabla de contenidos respecto a otros plugins que usan el filtro <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code>, por ejemplo, encima o debajo de los botones para compartir en redes sociales o de las entradas relacionadas. Si la posición de la tabla de contenidos es correcta, deja este valor en «Normal»."
+
+#: inc/admin/admin-advanced-settings.php:88
+msgid "Disable the TinyMCE Subpage button in the classic editor. Leave unchecked unless you experience editor conflicts."
+msgstr "Desactiva el botón Subpágina de TinyMCE en el editor clásico. Déjalo sin marcar salvo que tengas conflictos con el editor."
+
+#. translators: %s: date and time of the last rebuild.
+#: inc/admin/admin-advanced-settings.php:123
+#, php-format
+msgid "Last rebuilt: %s."
+msgstr "Última reconstrucción: %s."
+
+#: inc/admin/admin-advanced-settings.php:127
+msgid "Last rebuilt: unknown date."
+msgstr "Última reconstrucción: fecha desconocida."
+
+#: inc/admin/admin-advanced-settings.php:129
+msgid "The subpage index has never been rebuilt on this site."
+msgstr "El índice de subpáginas nunca se ha reconstruido en este sitio."
+
+#: inc/admin/admin-advanced-settings.php:132
+msgid "Subpage index"
+msgstr "Índice de subpáginas"
+
+#: inc/admin/admin-advanced-settings.php:134
+msgid "Multipage stores the list of subpages of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
+msgstr "Multipage guarda la lista de subpáginas de cada entrada cuando se guarda la entrada. Reconstruye este índice después de una actualización o de una importación, o si la tabla de contenidos de una entrada parece desactualizada. Las entradas se procesan por lotes; en sitios grandes, las entradas restantes se procesan en segundo plano."
+
+#. translators: %s: number of posts already checked.
+#: inc/admin/admin-advanced-settings.php:144
+#, php-format
+msgid "A rebuild is in progress in the background: %s post checked so far."
+msgid_plural "A rebuild is in progress in the background: %s posts checked so far."
+msgstr[0] "Hay una reconstrucción en curso en segundo plano: %s entrada comprobada hasta ahora."
+msgstr[1] "Hay una reconstrucción en curso en segundo plano: %s entradas comprobadas hasta ahora."
+
+#: inc/admin/admin-advanced-settings.php:160
+msgid "Rebuild subpage index"
+msgstr "Reconstruir el índice de subpáginas"
+
+#: inc/admin/admin-advanced-settings.php:176
+msgid "Sorry, you are not allowed to manage options for this site."
+msgstr "Lo siento, no tienes permisos para gestionar las opciones de este sitio."
+
+#. translators: %s: number of posts checked.
+#: inc/admin/admin-advanced-settings.php:256
+#, php-format
+msgid "%s post checked"
+msgid_plural "%s posts checked"
+msgstr[0] "%s entrada comprobada"
+msgstr[1] "%s entradas comprobadas"
+
+#. translators: %s: number of posts whose subpage index was updated.
+#: inc/admin/admin-advanced-settings.php:261
+#, php-format
+msgid "%s post updated"
+msgid_plural "%s posts updated"
+msgstr[0] "%s entrada actualizada"
+msgstr[1] "%s entradas actualizadas"
+
+#. translators: %s: number of stale subpage indexes removed.
+#: inc/admin/admin-advanced-settings.php:266
+#, php-format
+msgid "%s stale entry removed"
+msgid_plural "%s stale entries removed"
+msgstr[0] "%s registro obsoleto eliminado"
+msgstr[1] "%s registros obsoletos eliminados"
+
+#. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
+#: inc/admin/admin-advanced-settings.php:277
+#, php-format
+msgid "Subpage index rebuilt: %1$s, %2$s, %3$s."
+msgstr "Índice de subpáginas reconstruido: %1$s, %2$s, %3$s."
+
+#. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
+#: inc/admin/admin-advanced-settings.php:286
+#, php-format
+msgid "Subpage index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background."
+msgstr "Reconstrucción del índice de subpáginas iniciada: hasta ahora, %1$s, %2$s, %3$s. Las entradas restantes se procesan en segundo plano."
+
+#: inc/admin/admin-advanced-settings.php:293
+msgid "A subpage index rebuild is already running. Please try again in a few minutes."
+msgstr "Ya hay una reconstrucción del índice de subpáginas en curso. Inténtalo de nuevo dentro de unos minutos."
+
+#: inc/admin/admin-advanced-settings.php:333 inc/admin/admin-settings.php:269
+msgid "Multipage Settings"
+msgstr "Ajustes de Multipage"
+
+#: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-settings.php:272
+msgid "Multipage settings sections"
+msgstr "Secciones de los ajustes de Multipage"
+
+#: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-functions.php:126
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: inc/admin/admin-advanced-settings.php:338
+msgid "Advanced Settings"
+msgstr "Ajustes avanzados"
+
+#: inc/admin/admin-advanced-settings.php:340
+msgid "Please leave this settings to their default values, change only if you really know what to do."
+msgstr "Deja estos ajustes con sus valores predeterminados y cámbialos solo si sabes realmente lo que haces."
+
+#: inc/admin/admin-advanced-settings.php:348 inc/admin/admin-settings.php:280
+msgid "Save Settings"
+msgstr "Guardar ajustes"
+
+#: inc/admin/admin-functions.php:122 inc/admin/admin-settings.php:272
+msgid "Options"
+msgstr "Opciones"
+
+#. translators: %s: custom value.
+#: inc/admin/admin-settings.php:87
+#, php-format
+msgid "Custom (%s)"
+msgstr "Personalizado (%s)"
+
+#: inc/admin/admin-settings.php:135
+msgid "Hide the default intro title"
+msgstr "Ocultar el título predeterminado de la introducción"
+
+#: inc/admin/admin-settings.php:176
+msgid "Disable the WordPress standard pagination"
+msgstr "Desactivar la paginación estándar de WordPress"
+
+#: inc/admin/admin-settings.php:177
+msgid "WordPress, by default, displays a pagination with only numbers on standard multipage posts. Please uncheck this if you still want the standard pagination to display on multipage posts."
+msgstr "De forma predeterminada, WordPress muestra en las entradas de varias páginas una paginación compuesta solo por números. Desmarca esta opción si aun así quieres que se muestre la paginación estándar en las entradas de varias páginas."
+
+#: inc/admin/admin-settings.php:191
+msgid "Display the table of contents only on the first page of the post"
+msgstr "Mostrar la tabla de contenidos solo en la primera página de la entrada"
+
+#: inc/admin/admin-settings.php:232
+msgid "Hide the table of contents header"
+msgstr "Ocultar la cabecera de la tabla de contenidos"
+
+#: inc/admin/admin-settings.php:246
+msgid "Add a link for the comments inside the table of contents"
+msgstr "Añadir un enlace a los comentarios dentro de la tabla de contenidos"
+
+#: inc/admin/admin-settings.php:247
+msgid "If comments are enabled, this will display, inside the table of contents, a link for the comments list."
+msgstr "Si los comentarios están activados, se mostrará un enlace a la lista de comentarios dentro de la tabla de contenidos."
+
+#: inc/mpp-options.php:170
+msgid "Highest"
+msgstr "Muy alta"
+
+#: inc/mpp-options.php:171
+msgid "High"
+msgstr "Alta"
+
+#: inc/mpp-options.php:172
+msgid "Normal"
+msgstr "Normal"
+
+#: inc/mpp-options.php:173
+msgid "Low"
+msgstr "Baja"
+
+#: inc/mpp-options.php:174
+msgid "Lowest"
+msgstr "Muy baja"
+
+#: inc/mpp-options.php:179
+msgid "All pages — Display comments on all post pages"
+msgstr "Todas las páginas — Mostrar los comentarios en todas las páginas de la entrada"
+
+#: inc/mpp-options.php:180
+msgid "First page — Display comments only on the first page"
+msgstr "Primera página — Mostrar los comentarios solo en la primera página"
+
+#: inc/mpp-options.php:181
+msgid "Last page — Display comments only on the last page"
+msgstr "Última página — Mostrar los comentarios solo en la última página"
+
+#: inc/mpp-options.php:184
+msgid "Continue or back to intro"
+msgstr "Continuar o volver a la introducción"
+
+#: inc/mpp-options.php:185
+msgid "Next and previous"
+msgstr "Siguiente y anterior"
+
+#: inc/mpp-options.php:186
+msgid "Hidden"
+msgstr "Oculta"
+
+#: inc/mpp-options.php:189
+msgid "above the post content, align left"
+msgstr "encima del contenido de la entrada, alineada a la izquierda"
+
+#: inc/mpp-options.php:190
+msgid "above the post content, align right"
+msgstr "encima del contenido de la entrada, alineada a la derecha"
+
+#: inc/mpp-options.php:191
+msgid "above the post content"
+msgstr "encima del contenido de la entrada"
+
+#: inc/mpp-options.php:192
+msgid "below the post content"
+msgstr "debajo del contenido de la entrada"
+
+#: inc/mpp-options.php:193
+msgid "hidden"
+msgstr "oculta"
+
+#: inc/mpp-options.php:196
+msgid "number — Display numbers before the subpage title"
+msgstr "número — Mostrar el número antes del título de la subpágina"
+
+#: inc/mpp-options.php:197
+msgid "page # — Display \"Page #\" before the subpage title"
+msgstr "página # — Mostrar «Página #» antes del título de la subpágina"
+
+#: inc/mpp-options.php:198
+msgid "hidden — Hide subpage labels, display only the title"
+msgstr "oculto — Ocultar las etiquetas de las subpáginas y mostrar solo el título"
+
+#. translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type").
+#: inc/mpp-options.php:380
+#, php-format
+msgid "An invalid value was submitted for the %s setting. The previous value was kept."
+msgstr "Se ha enviado un valor no válido para el ajuste %s. Se ha mantenido el valor anterior."
+
+#: inc/mpp-template.php:215
+msgid "Next page"
+msgstr "Página siguiente"
+
+#: inc/mpp-template.php:216
+msgid "Previous page"
+msgstr "Página anterior"
+
+#. translators: %s: link to the next subpage.
+#: inc/mpp-template.php:244
+#, php-format
+msgid "Continue: %s"
+msgstr "Continuar: %s"
+
+#. translators: %s: link to the first subpage.
+#: inc/mpp-template.php:248
+#, php-format
+msgid "Back to: %s"
+msgstr "Volver a: %s"
+
+#: inc/mpp-template.php:397
+msgid "Comments"
+msgstr "Comentarios"
+
+#: inc/mpp-template.php:419
+msgid "Contents"
+msgstr "Contenidos"
+
+#: blocks/subpage/index.js:119
+msgid "Write subpage title…"
+msgstr "Escribe el título de la subpágina…"
+
+#: blocks/subpage/block.json
+msgctxt "block title"
+msgid "Subpage"
+msgstr "Subpágina"
+
+#: blocks/subpage/block.json
+msgctxt "block description"
+msgid "Add a subpage break to split your post into multiple pages."
+msgstr "Añade un salto de subpágina para dividir tu entrada en varias páginas."
+
+#: blocks/subpage/block.json
+msgctxt "block keyword"
+msgid "multipage"
+msgstr "multipágina"
+
+#: blocks/subpage/block.json
+msgctxt "block keyword"
+msgid "page"
+msgstr "página"

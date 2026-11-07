@@ -1,0 +1,24 @@
+/**
+ * Multipage - Subpage block, editor styles.
+ *
+ * Loaded through block.json "editorStyle", so WordPress also adds it inside
+ * the iframed editor canvas.
+ *
+ * @package Multipage
+ * @since   1.7.0
+ */
+
+/* The subpage title (the block wrapper itself, apiVersion 3). */
+.mpp-block-subpage {
+	position: relative;
+	max-width: 100%;
+	padding-top: 0.75em;
+	border-top: 2px dashed rgba(127, 127, 127, 0.5);
+	text-align: center;
+}
+
+/* Subpage placeholder in the Classic block, when it is edited inline (older WordPress versions). */
+.wp-block-freeform.block-library-rich-text__tinymce .wp-more-tag.mce-wp-subpage {
+	background-image: url(../../inc/admin/tinymce/images/subpage-2x.png);
+	background-size: 1900px 20px;
+}

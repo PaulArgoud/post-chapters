@@ -1,32 +1,34 @@
 # Multipage for WordPress
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.6.0-blue.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/tag/1.6.0)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](CHANGELOG.md)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![WordPress](https://img.shields.io/badge/WordPress-5.0%2B-0073aa.svg)](https://wordpress.org/)
-[![PHP](https://img.shields.io/badge/PHP-7.4%2B-777BB4.svg)](https://www.php.net/)
-[![Tested up to](https://img.shields.io/badge/tested%20up%20to-WordPress%206.7-0073aa.svg)](https://wordpress.org/)
+[![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
+[![PHP](https://img.shields.io/badge/PHP-7.4%E2%80%938.4-777BB4.svg)](https://www.php.net/)
+[![Tested up to](https://img.shields.io/badge/tested%20up%20to-WordPress%207.1.4-0073aa.svg)](https://wordpress.org/)
 
 Split your WordPress posts into multiple subpages, each with its own title and a table of contents.
 
 ## Features
 
-- **Subpage block** for the Gutenberg block editor
-- **`[nextpage title="..."]` shortcode** for the classic editor
-- **Table of contents** with configurable position, labels, and header visibility
-- **SEO-friendly**: subpage titles in `<title>`, `rel=prev`/`rel=next` links in `<head>`
-- **Navigation**: "Continue" or "Previous/Next" navigation between subpages
-- **Custom CSS**: override styles from your theme by placing a `multipage.css` in your theme's `/css/` directory
-- **RTL support**
-- **Internationalized**: translatable via `.pot` file (German, Italian, Spanish, French included)
+- **Subpage block** for the block editor (works in the iframed editor; posts saved by earlier versions stay valid)
+- **`[nextpage title="..."]` shortcode** for the classic editor, with a **Subpage** button in the Visual editor (TinyMCE), the Text editor (Quicktags) and the Classic block
+- **Reliable splitting**: blocks, shortcodes and core page breaks can be mixed; every subpage is valid, balanced HTML, even when a shortcode sits inside a paragraph or a heading
+- **Table of contents** with configurable position, labels, header visibility and an optional comments link
+- **Navigation**: "Continue / Back to" or "Previous / Next" links between subpages
+- **Comments** on all subpages, the first one or the last one, in classic and block themes
+- **SEO-friendly**: subpage titles in `<title>`, `rel=prev` / `rel=next` links, integrations with Yoast SEO (title variable, canonical URL of each subpage), Rank Math and SEOPress (title variable)
+- **Block and classic themes**: the table of contents and the navigation are added once, only to the post being viewed (never to excerpts, related posts or Query Loop blocks)
+- **Custom CSS**: override the plugin styles from your theme
+- **RTL support** (frontend and admin)
+- **Internationalized**: French, German, Italian and Spanish included; language packs from translate.wordpress.org take precedence
+- **Subpage index tools**: a "Rebuild subpage index" button and the `wp multipage` WP-CLI commands
 
 ## Requirements
 
-| Requirement | Minimum | Recommended |
-|-------------|---------|-------------|
-| WordPress   | 5.0     | 6.x        |
-| PHP         | 7.4     | 8.2+       |
-
-Tested with PHP 8.4 and WordPress 6.7.
+| Requirement | Minimum | Tested up to |
+|-------------|---------|--------------|
+| WordPress   | 6.3     | 7.1.4        |
+| PHP         | 7.4     | 8.4          |
 
 ## Installation
 
@@ -41,21 +43,27 @@ Tested with PHP 8.4 and WordPress 6.7.
 
 Search for **Multipage** in **Plugins > Add New** and click **Install Now**.
 
+### Updating to 1.7.0
+
+No content change is needed. After the update, the subpage index of every post is rebuilt in the background (WP-Cron). On large sites you can also run `wp multipage rebuild`, or click **Rebuild subpage index** under **Settings > Multipage > Advanced**. See the [changelog](CHANGELOG.md) for the behaviour changes.
+
 ## Usage
 
-### Block editor (Gutenberg)
+### Block editor
 
-Add a **Subpage** block to mark the beginning of a new subpage. Each block has a title field.
+Add a **Subpage** block where a new subpage starts and type its title. Press Enter at the end of the title to continue writing below it.
 
 ### Classic editor
 
-Insert the shortcode anywhere in your post content:
+Use the **Subpage** button of the toolbar, or insert the shortcode anywhere in your post content:
 
 ```
 [nextpage title="My subpage title"]
 ```
 
-The content before the first shortcode becomes the intro page (titled "Intro" by default).
+An optional `slug` attribute sets the subpage slug: `[nextpage title="My subpage title" slug="my-slug"]`.
+
+The content before the first subpage becomes the intro page (titled "Intro", translated). A subpage without a title is titled "Page N".
 
 ## Settings
 
@@ -63,21 +71,21 @@ Navigate to **Settings > Multipage** to configure:
 
 | Setting | Description |
 |---------|-------------|
-| **Intro title** | Show or hide the default intro title |
-| **Comments** | Display comments on all pages, first page only, or last page only |
-| **Navigation** | Choose between "Continue/Back" or "Previous/Next" navigation |
-| **Standard pagination** | Show or hide the default WordPress page numbers |
-| **Table of contents** | Position (top-left, top-right, top, bottom, hidden), row labels, header visibility |
-| **Comments link** | Add a link to comments inside the table of contents |
+| **Intro** | Hide the title of the automatic intro page |
+| **Display comments on** | All pages, the first page only, or the last page only |
+| **Navigation type** | "Continue or back to intro", "Next and previous", or hidden |
+| **Disable the standard pagination** | Hide the WordPress page numbers (`wp_link_pages()`) |
+| **Table of contents** | Only on the first page, position (top left, top right, top, bottom, hidden), row labels, header visibility |
+| **Comments link** | Add a link to the comments inside the table of contents |
 
-Advanced settings are available under the **Advanced** tab (title/content rewrite priority, TinyMCE buttons).
+The **Advanced** tab holds the title and content rewrite priorities, the option to disable the TinyMCE Subpage button, and the **Rebuild subpage index** action.
 
 ## Custom CSS
 
-Multipage loads a minimal stylesheet. To override it, create one of these files in your theme:
+Multipage loads a minimal stylesheet on multipage posts only. To override it, add one of these files to your theme:
 
-- `css/multipage.css` (or `css/multipage.min.css`)
-- `css/multipage-rtl.css` for RTL layouts
+- `css/multipage.min.css` (or `css/multipage.css` when `SCRIPT_DEBUG` is enabled)
+- `css/multipage-rtl.min.css` / `css/multipage-rtl.css` for RTL languages
 
 The plugin checks the child theme first, then the parent theme, then falls back to its own styles.
 
@@ -85,26 +93,52 @@ The plugin checks the child theme first, then the parent theme, then falls back 
 
 | Filter | Description |
 |--------|-------------|
-| `mpp_the_content` | Modify the full multipage content output |
+| `mpp_the_content` | Modify the multipage content output (title + table of contents + content) |
 | `mpp_page_title_template` | Change the subpage title HTML template (default: `<h2>%s</h2>`) |
-| `mpp_link_pages` | Modify the navigation links HTML |
-| `mpp_toc` | Modify the table of contents HTML |
-| `mpp_toc_pages_row` | Modify individual TOC row HTML |
-| `mpp_link_pages_args` | Filter navigation link arguments |
-| `mpp_toc_args` | Filter TOC arguments |
+| `mpp_link_pages` / `mpp_link_pages_args` / `mpp_link_pages_link` | Navigation HTML, arguments and individual links |
+| `mpp_toc` / `mpp_toc_args` / `mpp_toc_pages_row` | Table of contents HTML, arguments and individual rows |
+| `mpp_untitled_subpage_title` | Fallback title of untitled subpages (default: "Page N") |
+| `mpp_subpage_title_allowed_html` | Inline HTML allowed in subpage titles |
+| `mpp_comment_block_names` | Comment blocks hidden on subpages without comments (block themes) |
 | `mpp_get_admin_tabs` | Add or remove admin settings tabs |
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete hooks reference.
+
+## WP-CLI
+
+```bash
+wp multipage status                 # State of the subpage index and of the background rebuild
+wp multipage rebuild                # Rebuild the subpage index of every post
+wp multipage rebuild --dry-run      # Report what would change, without writing
+```
 
 ## Languages
 
 Translation files are located in `/languages/`. Available languages:
 
 - English (default)
-- German (de_DE)
-- Spanish (es_ES)
 - French (fr_FR)
+- German (de_DE)
 - Italian (it_IT)
+- Spanish (es_ES)
 
-To contribute a translation, use the `.pot` file as a template.
+Language packs from [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/sgr-nextpage-titles/) are used first; the bundled files are the fallback. To contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
+
+## Development
+
+The plugin itself needs no build step. The development tools are installed with Composer and the tests run in [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (Docker and Node.js 22.13+ required). Clone the repository into a folder named `sgr-nextpage-titles`.
+
+```bash
+composer install          # PHPCS, WPCS, PHPCompatibilityWP, PHPUnit (dev only)
+composer lint             # php -l on every PHP file
+composer phpcs            # WordPress Coding Standards (composer phpcbf to fix)
+npx wp-env start          # WordPress 7.1.4 / PHP 8.4 at http://localhost:8888
+composer test:wp-env      # PHPUnit suite inside wp-env
+bin/check-i18n.sh         # Translation files in sync with the code (WP-CLI + gettext)
+bin/build-zip.sh          # Release archive: build/sgr-nextpage-titles.zip
+```
+
+`composer test` runs PHPUnit directly when the WordPress test library is available (`WP_TESTS_DIR`). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and [ARCHITECTURE.md](ARCHITECTURE.md) for the internals.
 
 ## History
 

@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Multipage" xsi:noNamespaceSchemaLocation="./vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+	<description>Coding standards for the Multipage (sgr-nextpage-titles) WordPress plugin.</description>
+
+	<!--
+	#############################################################################
+	COMMAND LINE ARGUMENTS
+	https://github.com/PHPCSStandards/PHP_CodeSniffer/wiki/Annotated-Ruleset
+	#############################################################################
+	-->
+
+	<file>.</file>
+
+	<!--
+	Third-party code, build output and minified assets.
+	Exclude patterns are regular expressions (only "*" is translated to ".*"):
+	the dots of the minified extensions are escaped and the patterns anchored,
+	otherwise "*.min.css" / "*.min.js" also match the "admin/css/" and
+	"admin/js/" folders ("ad-min/css") and silently skip their PHP files.
+	-->
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
+	<exclude-pattern>\.min\.js$</exclude-pattern>
+	<exclude-pattern>\.min\.css$</exclude-pattern>
+
+	<!--
+	PHP translation files (languages/*.l10n.php) are generated from the .po files
+	by "wp i18n make-php" in the compact format read by WordPress 6.5+ core:
+	they must not be hand-edited nor reformatted by phpcbf.
+	-->
+	<exclude-pattern>/languages/*\.l10n\.php$</exclude-pattern>
+
+	<!--
+	Top-level dot folders (.git, .github, .claude/worktrees, .wp-env, .idea...):
+	they can hold full copies of the plugin (git worktrees) that must be neither
+	reported nor rewritten by phpcbf. The pattern is "relative" (matched against
+	the path below the scanned folder) so that a checkout which itself lives
+	inside a dot folder, such as .claude/worktrees/<name>, is still checked.
+	-->
+	<exclude-pattern type="relative">^\.[^/]+/*</exclude-pattern>
+
+	<!-- WPCS 3 only ships PHP sniffs. -->
+	<arg name="extensions" value="php"/>
+
+	<!-- Show sniff codes and progress, strip the file paths down to the plugin root. -->
+	<arg value="sp"/>
+	<arg name="basepath" value="./"/>
+	<arg name="colors"/>
+	<arg name="parallel" value="8"/>
+
+	<!--
+	#############################################################################
+	PHP AND WORDPRESS VERSIONS
+	#############################################################################
+	-->
+
+	<!-- Minimum PHP version supported by the plugin (Requires PHP header). -->
+	<config name="testVersion" value="7.4-"/>
+
+	<!-- Minimum WordPress version supported by the plugin (Requires at least header). -->
+	<config name="minimum_wp_version" value="6.3"/>
+
+	<!--
+	#############################################################################
+	RULESETS
+	#############################################################################
+	-->
+
+	<rule ref="WordPress"/>
+
+	<rule ref="PHPCompatibilityWP"/>
+
+	<!-- Every translatable string must use the plugin text domain. -->
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="sgr-nextpage-titles"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!--
+	Every global (function, class, constant, hook, variable) must be prefixed.
+	Prefixes are compared case-insensitively, so "mpp_" also covers MPP_* classes
+	and constants and "multipage" covers Multipage, Multipage_* and multipage().
+	WPCS rejects prefixes shorter than 4 characters, hence "mpp_" instead of "mpp".
+	"_mpp_" is the plugin prefix of its internal (@access private) helpers, a
+	WordPress core convention; _mpp_link_page() and _mpp_link_page_url() already
+	existed in 1.6.0 and cannot be renamed without breaking their callers.
+	-->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" type="array">
+				<element value="mpp_"/>
+				<element value="_mpp_"/>
+				<element value="multipage"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!--
+	#############################################################################
+	JUSTIFIED EXCLUSIONS
+	#############################################################################
+	-->
+
+	<!--
+	These class files predate the WordPress "class-{class-name}.php" naming rule
+	and are part of the public loading path (class-mpp.php holds Multipage,
+	class-mpp-shortcodes.php holds Multipage_Plugin_Shortcodes). Renaming them
+	would break themes or plugins that require them directly.
+	-->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/class-mpp\.php$</exclude-pattern>
+		<exclude-pattern>/classes/class-mpp-shortcodes\.php$</exclude-pattern>
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!--
+	The inc/ modules follow the plugin "inc/mpp-{module}.php" naming, whatever
+	they hold: inc/mpp-parser.php (Multipage_Parser) is loaded by that path since
+	1.4 (renaming it would break code that requires it directly) and
+	inc/mpp-cli.php is the sibling module that defines the "wp multipage"
+	command class when WP-CLI runs.
+	-->
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/inc/mpp-parser\.php$</exclude-pattern>
+		<exclude-pattern>/inc/mpp-cli\.php$</exclude-pattern>
+	</rule>
+
+	<!--
+	The public option getters (mpp_get_option(), mpp_hide_intro_title(),
+	mpp_get_toc_position()...) take a "$default" parameter since 1.4: renaming
+	it would break PHP 8 callers that use named arguments ("default: ...").
+	-->
+	<rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames.defaultFound">
+		<exclude-pattern>/inc/mpp-options\.php$</exclude-pattern>
+	</rule>
+
+	<!--
+	"{script}.asset.php" is the name WordPress looks for next to a block script
+	(register_block_script_handle() reads blocks/subpage/index.asset.php for the
+	block.json "editorScript": "file:./index.js").
+	-->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>\.asset\.php$</exclude-pattern>
+	</rule>
+
+	<!--
+	The tests read and write the raw database rows on purpose (to check what is
+	really stored, or to bypass the APIs and their caches when setting up a state).
+	-->
+	<rule ref="WordPress.DB.DirectDatabaseQuery">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- PHPUnit test files follow the "test-*.php" naming of the WordPress scaffold. -->
+	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!--
+	Development scripts in bin/ run from the command line, outside WordPress:
+	the WordPress file system, escaping and system call rules do not apply.
+	bin/ is never shipped (see .distignore).
+	-->
+	<rule ref="WordPress.WP.AlternativeFunctions">
+		<exclude-pattern>/bin/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec">
+		<exclude-pattern>/bin/*</exclude-pattern>
+	</rule>
+	<rule ref="WordPress.Security.EscapeOutput">
+		<exclude-pattern>/bin/*</exclude-pattern>
+	</rule>
+
+</ruleset>

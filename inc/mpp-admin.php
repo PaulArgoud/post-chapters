@@ -14,9 +14,7 @@ defined( 'ABSPATH' ) || exit;
  * Setup Multipage Admin.
  *
  * @since 1.4
- *
  */
 function mpp_admin() {
 	multipage()->admin = new MPP_Admin();
-	return;
 }

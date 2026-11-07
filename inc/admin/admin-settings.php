@@ -2,12 +2,102 @@
 /**
  * Multipage Admin Settings.
  *
+ * Fields of the main settings screen (Settings > Multipage). The settings are
+ * saved by the WordPress Settings API (options.php), see
+ * MPP_Admin::register_admin_settings().
+ *
  * @package Multipage
  * @since 1.4
  */
 
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
+
+/** Field helpers *************************************************************/
+
+/**
+ * Output a checkbox setting field.
+ *
+ * @since 1.7.0
+ *
+ * @param string $option_name The option name (input name).
+ * @param string $input_id    The input id.
+ * @param bool   $checked     Whether the box is checked.
+ * @param string $label       The label displayed next to the checkbox.
+ * @param string $description Optional. Help text displayed below the field.
+ */
+function mpp_admin_render_checkbox_field( $option_name, $input_id, $checked, $label, $description = '' ) {
+	$description_id = $input_id . '-description';
+	?>
+	<input id="<?php echo esc_attr( $input_id ); ?>" name="<?php echo esc_attr( $option_name ); ?>" type="checkbox" value="1" <?php checked( (bool) $checked ); ?><?php echo '' !== $description ? ' aria-describedby="' . esc_attr( $description_id ) . '"' : ''; ?> />
+	<label for="<?php echo esc_attr( $input_id ); ?>"><?php echo esc_html( $label ); ?></label>
+	<?php if ( '' !== $description ) : ?>
+		<p id="<?php echo esc_attr( $description_id ); ?>" class="description"><?php echo esc_html( $description ); ?></p>
+	<?php endif; ?>
+	<?php
+}
+
+/**
+ * Output a radio group setting field, with choices from the option definitions.
+ *
+ * @since 1.7.0
+ *
+ * @param string $option_name The option name (input name).
+ * @param string $fieldset_id The fieldset id.
+ * @param string $current     The current value.
+ * @param string $legend      The (screen reader) legend of the group.
+ */
+function mpp_admin_render_radio_field( $option_name, $fieldset_id, $current, $legend ) {
+	$choices = mpp_get_option_choice_labels( $option_name );
+	?>
+	<fieldset id="<?php echo esc_attr( $fieldset_id ); ?>">
+		<legend class="screen-reader-text"><span><?php echo esc_html( $legend ); ?></span></legend>
+		<?php foreach ( $choices as $value => $label ) : ?>
+			<label>
+				<input type="radio" name="<?php echo esc_attr( $option_name ); ?>" value="<?php echo esc_attr( $value ); ?>" <?php checked( (string) $value, (string) $current ); ?> />
+				<?php echo esc_html( $label ); ?>
+			</label>
+			<br />
+		<?php endforeach; ?>
+	</fieldset>
+	<?php
+}
+
+/**
+ * Output a select setting field, with choices from the option definitions.
+ *
+ * A current value that is valid but not part of the offered choices (e.g. a
+ * custom priority) is kept as an extra option so saving does not change it.
+ *
+ * @since 1.7.0
+ *
+ * @param string $option_name    The option name (select name).
+ * @param string $select_id      The select id.
+ * @param mixed  $current        The current value.
+ * @param string $description_id Optional. Id of the element describing the field.
+ */
+function mpp_admin_render_select_field( $option_name, $select_id, $current, $description_id = '' ) {
+	$choices = mpp_get_option_choice_labels( $option_name );
+
+	$values = array_map( 'strval', array_keys( $choices ) );
+
+	if ( ! in_array( (string) $current, $values, true ) ) {
+		$choices[ (string) $current ] = sprintf(
+			/* translators: %s: custom value. */
+			__( 'Custom (%s)', 'sgr-nextpage-titles' ),
+			(string) $current
+		);
+	}
+	?>
+	<select id="<?php echo esc_attr( $select_id ); ?>" name="<?php echo esc_attr( $option_name ); ?>" class="<?php echo esc_attr( $select_id ); ?>"<?php echo '' !== $description_id ? ' aria-describedby="' . esc_attr( $description_id ) . '"' : ''; ?>>
+		<?php foreach ( $choices as $value => $label ) : ?>
+			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( (string) $value, (string) $current ); ?>><?php echo esc_html( $label ); ?></option>
+		<?php endforeach; ?>
+	</select>
+	<?php
+}
+
+/** Sections ******************************************************************/
 
 /**
  * Main settings section description for the settings page.
@@ -30,259 +120,179 @@ function mpp_admin_settings_callback_pagination_section() { }
  */
 function mpp_admin_settings_callback_toc_section() { }
 
+/** Fields ********************************************************************/
+
 /**
  * Hide the intro title.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_hide_intro_title() {
-?>
-
-	<input id="hide-intro-title" name="mpp-hide-intro-title" type="checkbox" value="1" <?php checked( mpp_hide_intro_title( false ) ); ?> />
-	<label for="hide-intro-title"><?php esc_html_e( 'Hide the default intro title', 'sgr-nextpage-titles' ); ?></label>
-
-<?php
+	mpp_admin_render_checkbox_field(
+		'mpp-hide-intro-title',
+		'hide-intro-title',
+		mpp_hide_intro_title( false ),
+		__( 'Hide the default intro title', 'sgr-nextpage-titles' )
+	);
 }
 
 /**
  * Show the post comments on specific pages.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_comments_on_page() {
-	// Set the choices.
-	$comments_choices = array(
-		__( 'All pages — Display comments on all post pages', 'sgr-nextpage-titles' ) => 'all',
-		__( 'First page — Display comments only on the first page', 'sgr-nextpage-titles' ) => 'first-page',
-		__( 'Last page — Display comments only on the last page', 'sgr-nextpage-titles' ) => 'last-page' );
-?>
-	<fieldset id="comments-on-page">
-		<legend class="screen-reader-text">
-			<span><?php esc_html_e( 'Display comments on', 'sgr-nextpage-titles' ); ?></span>
-		</legend>
-		<?php foreach ( $comments_choices as $comments => $value) : ?>
-		<label>
-			<input type="radio" name="mpp-comments-on-page" value="<?php echo esc_attr( $value ); ?>" <?php checked( $value, mpp_get_comments_on_page() ); ?> />
-				<?php echo esc_html( $comments ); ?>
-		</label>
-		<br />
-		<?php endforeach; ?>
-	</fieldset>
-	
-<?php
+	mpp_admin_render_radio_field(
+		'mpp-comments-on-page',
+		'comments-on-page',
+		mpp_get_comments_on_page(),
+		__( 'Display comments on', 'sgr-nextpage-titles' )
+	);
 }
 
 /**
  * Display the navigation type.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_continue_or_prev_next() {
-	// Set the position choice values.
-	$pagination_choices = array( 
-		__( 'Continue or back to intro',	'sgr-nextpage-titles' )	=> 'continue',
-		__( 'Next and previous',			'sgr-nextpage-titles' )	=> 'next-previous',
-		__( 'Hidden',						'sgr-nextpage-titles' )	=> 'hidden'
+	mpp_admin_render_select_field(
+		'mpp-continue-or-prev-next',
+		'continue-or-prev-next',
+		mpp_get_continue_or_prev_next()
 	);
-?>
-
-	<select id="continue-or-prev-next" name="mpp-continue-or-prev-next" class="continue-or-prev-next">
-		<?php foreach ( $pagination_choices as $pagination => $value) : ?>
-			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mpp_get_continue_or_prev_next() ); ?>><?php echo esc_html( $pagination ); ?></option>
-		<?php endforeach; ?>
-	</select>
-
-<?php
 }
 
 /**
- * Disable the TinyMCE buttons in order to preserve the compatibilty with older WP versions.
+ * Disable the standard WordPress pagination on multipage posts.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_disable_standard_pagination() {
-?>
-
-	<input id="disable-standard-pagination" name="mpp-disable-standard-pagination" type="checkbox" value="1" <?php checked( mpp_disable_standard_pagination( true ) ); ?> />
-	<label for="disable-standard-pagination"><?php esc_html_e( 'Disable the WordPress standard pagination', 'sgr-nextpage-titles' ); ?></label>
-	<p id="mpp-disable-standard-pagination-description" class="description"><?php esc_html_e( 'WordPress, by default, displays a pagination with only numbers on standard multipage posts. Please uncheck this if you still want the standard pagination to display on multipage posts.', 'sgr-nextpage-titles' ); ?></p>
-
-<?php
+	mpp_admin_render_checkbox_field(
+		'mpp-disable-standard-pagination',
+		'disable-standard-pagination',
+		mpp_disable_standard_pagination( true ),
+		__( 'Disable the WordPress standard pagination', 'sgr-nextpage-titles' ),
+		__( 'WordPress, by default, displays a pagination with only numbers on standard multipage posts. Please uncheck this if you still want the standard pagination to display on multipage posts.', 'sgr-nextpage-titles' )
+	);
 }
 
 /**
- * Decide if the table of content must be visible only on the first page of a multipage post.
+ * Decide if the table of contents must be visible only on the first page of a multipage post.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_toc_only_on_the_first_page() {
-?>
-
-	<input id="toc-only-on-the-first-page" name="mpp-toc-only-on-the-first-page" type="checkbox" value="1" <?php checked( mpp_toc_only_on_the_first_page( false ) ); ?> />
-	<label for="toc-only-on-the-first-page"><?php esc_html_e( 'Display the table of contents only on the first page of the post', 'sgr-nextpage-titles' ); ?></label>
-
-<?php
+	mpp_admin_render_checkbox_field(
+		'mpp-toc-only-on-the-first-page',
+		'toc-only-on-the-first-page',
+		mpp_toc_only_on_the_first_page( false ),
+		__( 'Display the table of contents only on the first page of the post', 'sgr-nextpage-titles' )
+	);
 }
 
 /**
- * Set the Table of Contents position.
+ * Set the table of contents position.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_toc_position() {
-	// Set the position choice values.
-	$position_choices = array( 
-		__( 'above the post content, align left', 'sgr-nextpage-titles' )	=> 'top-left',
-		__( 'above the post content, align right', 'sgr-nextpage-titles' )	=> 'top-right',
-		__( 'above the post content', 'sgr-nextpage-titles' )				=> 'top',
-		__( 'below the post content', 'sgr-nextpage-titles' )				=> 'bottom',
-		__( 'hidden', 'sgr-nextpage-titles' )								=> 'hidden'
+	mpp_admin_render_select_field(
+		'mpp-toc-position',
+		'toc-position',
+		mpp_get_toc_position()
 	);
-?>
-
-	<select id="toc-position" name="mpp-toc-position" class="toc-position">
-		<?php foreach ( $position_choices as $position => $value) : ?>
-			<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, mpp_get_toc_position() ); ?>><?php echo esc_html( $position ); ?></option>
-		<?php endforeach; ?>
-	</select>
-	
-<?php
 }
 
 /**
- * Set the page row labels.
+ * Set the table of contents row labels.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_toc_row_labels() {
-	// Set the row labels.
-	$label_choices = array(
-		__( 'number — Display numbers before the subpage title', 'sgr-nextpage-titles' ) => 'number',
-		__( 'page # — Display "Page #" before the subpage title', 'sgr-nextpage-titles' ) => 'page',
-		__( 'hidden — Hide subpage labels, display only the title', 'sgr-nextpage-titles' ) => 'hidden'
+	mpp_admin_render_radio_field(
+		'mpp-toc-row-labels',
+		'row-labels',
+		mpp_get_toc_row_labels(),
+		__( 'Row labels', 'sgr-nextpage-titles' )
 	);
-?>
-	<fieldset id="row-labels">
-		<legend class="screen-reader-text">
-			<span><?php esc_html_e( 'Row labels', 'sgr-nextpage-titles' ); ?></span>
-		</legend>
-		<?php foreach ( $label_choices as $label => $value) : ?>
-		<label>
-			<input type="radio" name="mpp-toc-row-labels" value="<?php echo esc_attr( $value ); ?>" <?php checked( $value, mpp_get_toc_row_labels() ); ?> />
-				<?php echo esc_html( $label ); ?>
-		</label>
-		<br />
-		<?php endforeach; ?>
-	</fieldset>
-	
-<?php
 }
 
 /**
- * Decide if hide the table of contents header.
+ * Decide whether to hide the table of contents header.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_hide_toc_header() {
-?>
-
-	<input id="hide-toc-header" name="mpp-hide-toc-header" type="checkbox" value="1" <?php checked( mpp_hide_toc_header( false ) ); ?> />
-	<label for="hide-toc-header"><?php esc_html_e( 'Hide the table of contents header', 'sgr-nextpage-titles' ); ?></label>
-	
-<?php
+	mpp_admin_render_checkbox_field(
+		'mpp-hide-toc-header',
+		'hide-toc-header',
+		mpp_hide_toc_header( false ),
+		__( 'Hide the table of contents header', 'sgr-nextpage-titles' )
+	);
 }
 
 /**
- * Decide if the table of content must have a link for comments.
+ * Decide if the table of contents must have a link for comments.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings_callback_comments_toc_link() {
-?>
-
-	<input id="comments-toc-link" name="mpp-comments-toc-link" type="checkbox" value="1" <?php checked( mpp_comments_toc_link( false ) ); ?> />
-	<label for="comments-toc-link"><?php esc_html_e( 'Add a link for the comments inside the table of contents', 'sgr-nextpage-titles' ); ?></label>
-	<p id="mpp-comments-toc-link-description" class="description"><?php esc_html_e( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'sgr-nextpage-titles' ); ?></p>
-
-<?php
+	mpp_admin_render_checkbox_field(
+		'mpp-comments-toc-link',
+		'comments-toc-link',
+		mpp_comments_toc_link( false ),
+		__( 'Add a link for the comments inside the table of contents', 'sgr-nextpage-titles' ),
+		__( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'sgr-nextpage-titles' )
+	);
 }
 
 /** Settings Page *************************************************************/
 
 /**
- * The main settings page
+ * The main settings page.
+ *
+ * Notices ("Settings saved.", validation errors) are displayed automatically
+ * by wp-admin/options-head.php on Settings sub-pages.
  *
  * @since 1.4
- *
  */
 function mpp_admin_settings() {
-	// We're saving our own options, until the WP Settings API is updated to work with Multisite.
-	$form_action = add_query_arg( 'page', 'mpp-settings',  mpp_get_admin_url( 'options-general.php' ) );
-
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
 	?>
 
 	<div class="wrap">
 
-		<h1><?php esc_html_e( 'Multipage Settings', 'sgr-nextpage-titles' ); ?> </h1>
-		
-		<h2 class="nav-tab-wrapper"><?php mpp_admin_tabs( __( 'Options', 'sgr-nextpage-titles' ) ); ?></h2>
+		<h1><?php esc_html_e( 'Multipage Settings', 'sgr-nextpage-titles' ); ?></h1>
+		<hr class="wp-header-end" />
 
-		<form action="<?php echo esc_url( $form_action ) ?>" method="post">
-		
-			<?php settings_fields( 'multipage' ); ?>
+		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Multipage settings sections', 'sgr-nextpage-titles' ); ?>"><?php mpp_admin_tabs( __( 'Options', 'sgr-nextpage-titles' ) ); ?></nav>
+
+		<form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
+
+			<?php settings_fields( 'mpp-settings' ); ?>
 
 			<?php do_settings_sections( 'multipage' ); ?>
-		
-			<p class="submit">
-				<input type="submit" name="submit" class="button-primary" value="<?php esc_attr_e( 'Save Settings', 'sgr-nextpage-titles' ); ?>" />
-			</p>
+
+			<?php submit_button( __( 'Save Settings', 'sgr-nextpage-titles' ) ); ?>
 		</form>
-		
+
 	</div><!-- .wrap -->
-	
-<?php
+
+	<?php
 }
 
 /**
- * Save our settings.
+ * Save the main settings.
+ *
+ * Settings are now saved by the WordPress Settings API (options.php).
  *
  * @since 1.4
+ * @deprecated 1.7.0 No longer used, settings are saved through options.php.
  */
 function mpp_admin_settings_save() {
-	global $wp_settings_fields;
-
-	if ( isset( $_GET['page'] ) && 'mpp-settings' === $_GET['page'] && !empty( $_POST['submit'] ) ) {
-		check_admin_referer( 'multipage-options' );
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-		
-		// Because many settings are saved with checkboxes, and thus will have no values
-		// in the $_POST array when unchecked, we loop through the registered settings.
-		if ( isset( $wp_settings_fields['multipage'] ) ) {
-			foreach( (array) $wp_settings_fields['multipage'] as $section => $settings ) {
-				foreach( $settings as $setting_name => $setting ) {
-					$value = isset( $_POST[$setting_name] ) ? sanitize_text_field( wp_unslash( $_POST[$setting_name] ) ) : '';
-
-					update_option( $setting_name, $value );
-				}
-			}
-		}
-		
-		mpp_clear_options_cache();
-
-		wp_safe_redirect( add_query_arg( array( 'page' => 'mpp-settings', 'updated' => 'true' ), mpp_get_admin_url( 'options-general.php' ) ) );
-		exit;
-	}
+	_deprecated_function( __FUNCTION__, '1.7.0' );
 }
-add_action( 'admin_init', 'mpp_admin_settings_save', 100 );

@@ -1,22 +1,31 @@
 <?php
+/**
+ * Multipage Admin Functions.
+ *
+ * @package Multipage
+ * @since 1.4
+ */
+
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
 
 /**
- * This tells WP to highlight the Settings > Multipage menu item,
- * regardless of which actual Multipage admin screen we are on.
- *
- * @global string $plugin_page
- * @global array $submenu
+ * Highlight the Settings > Multipage menu item, regardless of which actual
+ * Multipage admin screen we are on.
  *
  * @since 1.4
+ *
+ * @global string $plugin_page  The current plugin page.
+ * @global string $submenu_file The submenu item to highlight.
  */
 function mpp_modify_admin_menu_highlight() {
 	global $plugin_page, $submenu_file;
 
 	// This tweaks the Settings subnav menu to show only one Multipage menu item.
 	if ( in_array( $plugin_page, array( 'mpp-advanced-settings' ), true ) ) {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intended.
 		$submenu_file = 'mpp-settings';
 	}
-	
 }
 
 /**
@@ -24,31 +33,28 @@ function mpp_modify_admin_menu_highlight() {
  *
  * @since 1.4
  *
- *
  * @param string $path   See {@link mpp_get_admin_url()}.
  * @param string $scheme See {@link mpp_get_admin_url()}.
  */
 function mpp_admin_url( $path = '', $scheme = 'admin' ) {
 	echo esc_url( mpp_get_admin_url( $path, $scheme ) );
 }
-	/**
-	 * Return the correct admin URL based on WordPress configuration.
-	 *
-	 * @since 1.4
-	 *
-	 *
-	 * @param string $path   Optional. The sub-path under /wp-admin to be
-	 *                       appended to the admin URL.
-	 * @param string $scheme The scheme to use. Default is 'admin', which
-	 *                       obeys {@link force_ssl_admin()} and {@link is_ssl()}. 'http'
-	 *                       or 'https' can be passed to force those schemes.
-	 * @return string Admin url link with optional path appended.
-	 */
-	function mpp_get_admin_url( $path = '', $scheme = 'admin' ) {
-		$url = admin_url( $path, $scheme );
 
-		return $url;
-	}
+/**
+ * Return the correct admin URL based on WordPress configuration.
+ *
+ * @since 1.4
+ *
+ * @param string $path   Optional. The sub-path under /wp-admin to be
+ *                       appended to the admin URL.
+ * @param string $scheme The scheme to use. Default is 'admin', which
+ *                       obeys {@link force_ssl_admin()} and {@link is_ssl()}. 'http'
+ *                       or 'https' can be passed to force those schemes.
+ * @return string Admin url link with optional path appended.
+ */
+function mpp_get_admin_url( $path = '', $scheme = 'admin' ) {
+	return admin_url( $path, $scheme );
+}
 
 /**
  * Output the tabs in the admin area.
@@ -61,7 +67,7 @@ function mpp_admin_tabs( $active_tab = '' ) {
 	$tabs_html    = '';
 	$idle_class   = 'nav-tab';
 	$active_class = 'nav-tab nav-tab-active';
-	
+
 	/**
 	 * Filters the admin tabs to be displayed.
 	 *
@@ -69,16 +75,29 @@ function mpp_admin_tabs( $active_tab = '' ) {
 	 *
 	 * @param array $value Array of tabs to output to the admin area.
 	 */
-	$tabs         = apply_filters( 'mpp_admin_tabs', mpp_get_admin_tabs( $active_tab ) );
+	$tabs = apply_filters( 'mpp_admin_tabs', mpp_get_admin_tabs( $active_tab ) );
 
 	// Loop through tabs and build navigation.
-	foreach ( array_values( $tabs ) as $tab_data ) {
-		$is_current = (bool) ( $tab_data['name'] === $active_tab );
+	foreach ( array_values( (array) $tabs ) as $tab_data ) {
+		if ( ! is_array( $tab_data ) || ! isset( $tab_data['name'], $tab_data['href'] ) ) {
+			continue;
+		}
+
+		$is_current = ( $tab_data['name'] === $active_tab );
 		$tab_class  = $is_current ? $active_class : $idle_class;
-		$tabs_html .= '<a href="' . esc_url( $tab_data['href'] ) . '" class="' . esc_attr( $tab_class ) . '">' . esc_html( $tab_data['name'] ) . '</a>';
+		$tabs_html .= '<a href="' . esc_url( $tab_data['href'] ) . '" class="' . esc_attr( $tab_class ) . '"' . ( $is_current ? ' aria-current="page"' : '' ) . '>' . esc_html( $tab_data['name'] ) . '</a>';
 	}
 
-	echo $tabs_html;
+	echo wp_kses(
+		$tabs_html,
+		array(
+			'a' => array(
+				'href'         => true,
+				'class'        => true,
+				'aria-current' => true,
+			),
+		)
+	);
 
 	/**
 	 * Fires after the output of tabs for the admin area.
@@ -96,15 +115,15 @@ function mpp_admin_tabs( $active_tab = '' ) {
  * @param string $active_tab Name of the tab that is active. Optional.
  * @return array
  */
-function mpp_get_admin_tabs( $active_tab = '' ) {
+function mpp_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public 1.4+ signature kept for backward compatibility.
 	$tabs = array(
 		'0' => array(
 			'href' => mpp_get_admin_url( add_query_arg( array( 'page' => 'mpp-settings' ), 'options-general.php' ) ),
-			'name' => __( 'Options', 'sgr-nextpage-titles' )
+			'name' => __( 'Options', 'sgr-nextpage-titles' ),
 		),
 		'1' => array(
 			'href' => mpp_get_admin_url( add_query_arg( array( 'page' => 'mpp-advanced-settings' ), 'options-general.php' ) ),
-			'name' => __( 'Advanced', 'sgr-nextpage-titles' )
+			'name' => __( 'Advanced', 'sgr-nextpage-titles' ),
 		),
 	);
 
@@ -119,38 +138,81 @@ function mpp_get_admin_tabs( $active_tab = '' ) {
 }
 
 /**
- * Check if Block Editor is active.
- * Must only be used after plugins_loaded action is fired.
+ * Check if the Block Editor may be used.
  *
- * @link https://wordpress.stackexchange.com/questions/320653/how-to-detect-the-usage-of-gutenberg
+ * Returns false only when the Classic Editor plugin forces the classic
+ * editor for everybody. Must only be used after the plugins_loaded action.
+ *
+ * Mirrors Classic_Editor::get_settings() (Classic Editor 1.6+, checked with
+ * 1.7.0): the `classic_editor_plugin_settings` filter; on multisite, the
+ * network defaults (`classic_editor_network_default_settings` filter),
+ * overridden by the site options when per-site settings are allowed; on a
+ * single site, the `classic-editor-replace` / `classic-editor-allow-users`
+ * options. Per-user choices are not checked: when users may switch editors,
+ * the block editor can be used.
+ *
+ * @since 1.4
+ *
  * @return bool
  */
 function mpp_is_block_editor_active() {
-    // If the Classic Editor plugin forces the classic editor, block editor is not active.
-    if ( mpp_is_classic_editor_plugin_active() ) {
-        $editor_option       = get_option( 'classic-editor-replace' );
-        $block_editor_active = array( 'no-replace', 'block' );
+	if ( ! mpp_is_classic_editor_plugin_active() ) {
+		return true;
+	}
 
-        return in_array( $editor_option, $block_editor_active, true );
-    }
+	/** This filter is documented in the Classic Editor plugin. */
+	$settings = apply_filters( 'classic_editor_plugin_settings', false ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Classic Editor plugin hook.
 
-    return true;
+	if ( is_array( $settings ) ) {
+		$editor      = ( isset( $settings['editor'] ) && 'block' === $settings['editor'] ) ? 'block' : 'classic';
+		$allow_users = ! empty( $settings['allow-users'] );
+	} elseif ( is_multisite() ) {
+		// Network defaults.
+		$defaults = array(
+			'editor'      => 'block' === get_network_option( null, 'classic-editor-replace' ) ? 'block' : 'classic',
+			'allow-users' => false,
+		);
+
+		/** This filter is documented in the Classic Editor plugin. */
+		$defaults = apply_filters( 'classic_editor_network_default_settings', $defaults ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Classic Editor plugin hook.
+
+		if ( 'allow' === get_network_option( null, 'classic-editor-allow-sites' ) ) {
+			// Per-site settings are allowed: the site options override the network defaults when set.
+			$editor_option      = get_option( 'classic-editor-replace' );
+			$allow_users_option = get_option( 'classic-editor-allow-users' );
+
+			if ( $editor_option ) {
+				$defaults['editor'] = $editor_option;
+			}
+			if ( $allow_users_option ) {
+				$defaults['allow-users'] = ( 'allow' === $allow_users_option );
+			}
+		}
+
+		$editor      = ( is_array( $defaults ) && isset( $defaults['editor'] ) && 'block' === $defaults['editor'] ) ? 'block' : 'classic';
+		$allow_users = is_array( $defaults ) && ! empty( $defaults['allow-users'] );
+	} else {
+		// Single site. Normalize the old 'no-replace' value as the Classic Editor plugin does.
+		$editor_option = get_option( 'classic-editor-replace' );
+		$editor        = in_array( $editor_option, array( 'block', 'no-replace' ), true ) ? 'block' : 'classic';
+		$allow_users   = ( 'allow' === get_option( 'classic-editor-allow-users' ) );
+	}
+
+	// When users may switch editors, the block editor can be used.
+	return 'block' === $editor || $allow_users;
 }
 
 /**
  * Check if Classic Editor plugin is active.
  *
- * @link https://wordpress.stackexchange.com/questions/320653/how-to-detect-the-usage-of-gutenberg
+ * @since 1.4
+ *
  * @return bool
  */
 function mpp_is_classic_editor_plugin_active() {
-    if ( ! function_exists( 'is_plugin_active' ) ) {
-        include_once ABSPATH . 'wp-admin/includes/plugin.php';
-    }
+	if ( ! function_exists( 'is_plugin_active' ) ) {
+		include_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
 
-    if ( is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
-        return true;
-    }
-
-    return false;
+	return is_plugin_active( 'classic-editor/classic-editor.php' );
 }

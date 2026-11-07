@@ -1,5 +1,23 @@
 <?php
+/**
+ * Multipage Admin Class.
+ *
+ * Admin menus, settings registration and editor integrations
+ * (TinyMCE button and Quicktags button).
+ *
+ * @package Multipage
+ * @subpackage CoreAdministration
+ * @since 1.4
+ */
 
+// Exit if accessed directly.
+defined( 'ABSPATH' ) || exit;
+
+/**
+ * Loads the Multipage admin area.
+ *
+ * @since 1.4
+ */
 class MPP_Admin {
 
 	/** Directory *************************************************************/
@@ -31,15 +49,22 @@ class MPP_Admin {
 	 * @var string $settings_page
 	 */
 	public $settings_page = '';
-	
+
+	/**
+	 * Whether the Quicktags button script has already been added.
+	 *
+	 * @since 1.7.0
+	 * @var bool
+	 */
+	private static $quicktags_added = false;
+
 	/** Methods ***************************************************************/
 
 	/**
 	 * The main Multipage admin loader.
 	 *
 	 * @since 1.4
-	 *
-	 */	
+	 */
 	public function __construct() {
 		$this->setup_globals();
 		$this->includes();
@@ -54,14 +79,14 @@ class MPP_Admin {
 	private function setup_globals() {
 		$mpp = multipage();
 
-		// Paths and URLs
-		$this->admin_dir  = trailingslashit( $mpp->plugin_dir  . 'inc/admin' ); // Admin path.
-		$this->admin_url  = trailingslashit( $mpp->plugin_url  . 'inc/admin' ); // Admin url.
+		// Paths and URLs.
+		$this->admin_dir = trailingslashit( $mpp->plugin_dir . 'inc/admin' ); // Admin path.
+		$this->admin_url = trailingslashit( $mpp->plugin_url . 'inc/admin' ); // Admin url.
 
 		// Main settings page.
 		$this->settings_page = 'options-general.php';
 	}
-	
+
 	/**
 	 * Include required files.
 	 *
@@ -77,45 +102,46 @@ class MPP_Admin {
 	/**
 	 * Set up the admin hooks, actions, and filters.
 	 *
-	 * @since 1.4
+	 * The Subpage block is registered for every request by mpp_register_blocks()
+	 * (inc/mpp-blocks.php), whatever the editor in use.
 	 *
+	 * @since 1.4
 	 */
-	private function setup_actions() { 
+	private function setup_actions() {
 		// Add some page specific output to the <head>.
-		add_action( 'admin_head',            			 array( $this, 'admin_head'  ), 999 );
+		add_action( 'admin_head', array( $this, 'admin_head' ), 999 );
 
 		// Add menu item to settings menu.
-		add_action( 'admin_menu',						 array( $this, 'admin_menus' ), 5 ); # Priority 5.
-		
+		add_action( 'admin_menu', array( $this, 'admin_menus' ), 5 ); // Priority 5.
+
 		// Add settings.
-		add_action( 'mpp_register_admin_settings',		 array( $this, 'register_admin_settings' ) );
-		
+		add_action( 'mpp_register_admin_settings', array( $this, 'register_admin_settings' ) );
+
 		// Add styles to the admin.
-		add_action( 'admin_enqueue_scripts',			 array( $this, 'enqueue_scripts' ) );
-		
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
 		// Add link to settings page.
-		add_filter( 'plugin_action_links',               array( $this, 'modify_plugin_action_links' ), 10, 2 );
+		add_filter( 'plugin_action_links', array( $this, 'modify_plugin_action_links' ), 10, 2 );
 		add_filter( 'network_admin_plugin_action_links', array( $this, 'modify_plugin_action_links' ), 10, 2 );
 
-		// Check if TinyMCE is enabled (disabled if Gutenberg is running)
-		if ( get_user_option( 'rich_editing' ) === 'true' && ! mpp_disable_tinymce_buttons() ) {
-
-			// Add TinyMCE Plugin
+		/*
+		 * TinyMCE "Subpage" button: classic editor (Classic Editor plugin, post
+		 * types without block editor support) and the Classic block.
+		 *
+		 * These filters only run when WordPress actually loads TinyMCE, which
+		 * core already restricts with user_can_richedit() (it honors the user
+		 * "rich_editing" option, the browser and the 'user_can_richedit' filter).
+		 */
+		if ( ! mpp_disable_tinymce_buttons() ) {
 			add_filter( 'mce_css', array( $this, 'mpp_mce_css' ) );
 			add_filter( 'mce_buttons', array( $this, 'mpp_mce_button' ) );
 			add_filter( 'mce_external_plugins', array( $this, 'mpp_mce_external_plugin' ) );
-			add_filter( 'wp_mce_translation', array( $this, 'mpp_wp_mce_translation' ), 10, 2 ); // Used on the Gutenberg Classic Editor
+			add_filter( 'wp_mce_translation', array( $this, 'mpp_wp_mce_translation' ), 10, 2 );
+			add_filter( 'tiny_mce_before_init', array( $this, 'mpp_classic_block_mce_css' ), 10, 2 );
 		}
 
-		// If Gutenberg is running add the Classic Editor Button
-		if ( mpp_is_block_editor_active() ) {
-			
-			// Enqueue block editor assets
-			add_action( 'enqueue_block_editor_assets', array( $this, 'mpp_enqueue_block_editor_assets' ), 9 );
-		}
-		
-		// Add HTML Editor button
-		add_action( 'admin_print_footer_scripts',		 array( $this, 'editor_add_quicktags' ) );
+		// Add the HTML (Text) editor button, printed along with the quicktags script.
+		add_action( 'admin_enqueue_scripts', array( $this, 'editor_add_quicktags' ) );
 	}
 
 	/**
@@ -125,7 +151,7 @@ class MPP_Admin {
 	 */
 	public function admin_menus() {
 		$hooks = array();
-	
+
 		// Add the option pages.
 		$hooks[] = add_submenu_page(
 			$this->settings_page,
@@ -145,8 +171,10 @@ class MPP_Admin {
 			'mpp_admin_advanced'
 		);
 
-		foreach( $hooks as $hook ) {
-			add_action( "admin_head-$hook", 'mpp_modify_admin_menu_highlight' );
+		foreach ( $hooks as $hook ) {
+			if ( $hook ) {
+				add_action( "admin_head-$hook", 'mpp_modify_admin_menu_highlight' );
+			}
 		}
 	}
 
@@ -154,10 +182,46 @@ class MPP_Admin {
 	 * Register the settings.
 	 *
 	 * @since 1.5
-	 *
 	 */
 	public function register_admin_settings() {
-		
+		/* Settings registration **********************************************/
+
+		/*
+		 * Every option is registered in the group of its settings screen and
+		 * saved by the Settings API (options.php). Options missing from the
+		 * submitted form (unchecked checkboxes) are saved as null and run
+		 * through the sanitize callback, which stores 0.
+		 */
+		foreach ( mpp_get_option_definitions() as $option_name => $definition ) {
+			if ( empty( $definition['group'] ) || empty( $definition['type'] ) ) {
+				continue;
+			}
+
+			if ( 'boolean' === $definition['type'] ) {
+				$type    = 'boolean';
+				$default = $definition['default'] ? 1 : 0;
+			} elseif ( 'priority' === $definition['type'] ) {
+				$type    = 'integer';
+				$default = (int) $definition['default'];
+			} else {
+				$type    = 'string';
+				$default = (string) $definition['default'];
+			}
+
+			register_setting(
+				$definition['group'],
+				$option_name,
+				array(
+					'type'              => $type,
+					'sanitize_callback' => static function ( $value ) use ( $option_name ) {
+						return mpp_sanitize_option( $value, $option_name );
+					},
+					'default'           => $default,
+					'show_in_rest'      => false,
+				)
+			);
+		}
+
 		/* Main Settings ******************************************************/
 
 		// Add the main section.
@@ -165,73 +229,52 @@ class MPP_Admin {
 
 		// Hide default intro title.
 		add_settings_field( 'mpp-hide-intro-title', __( 'Intro', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_hide_intro_title', 'multipage', 'mpp_main', array( 'label_for' => 'hide-intro-title' ) );
-		register_setting( 'mpp-settings', 'mpp-hide-intro-title', 'intval' );
-		
-		// Display comments on pages.
-		add_settings_field( 'mpp-comments-on-page', __( 'Display comments on', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_comments_on_page', 'multipage', 'mpp_main', array( 'label_for' => 'comments-on-page' ) );
-		register_setting( 'mpp-settings', 'mpp-comments-on-page', 'sanitize_text_field' );
-		
-		// Hide default intro title.
-		//add_settings_field( 'mpp-prettylinks', __( 'Pretty Links', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_prettylinks', 'multipage', 'mpp_main', array( 'label_for' => 'prettylinks' ) );
-		//register_setting( 'mpp-settings', 'mpp-prettylinks', 'intval' );
+
+		// Display comments on pages (radio group labelled by its fieldset legend).
+		add_settings_field( 'mpp-comments-on-page', __( 'Display comments on', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_comments_on_page', 'multipage', 'mpp_main' );
 
 		// Add the pagination section.
 		add_settings_section( 'mpp_pagination', __( 'Pagination', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_pagination_section', 'multipage' );
 
-		// Display the previous page link.
+		// Navigation type.
 		add_settings_field( 'mpp-continue-or-prev-next', __( 'Navigation type', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_continue_or_prev_next', 'multipage', 'mpp_pagination', array( 'label_for' => 'continue-or-prev-next' ) );
-		register_setting( 'mpp-advanced-settings', 'mpp-continue-or-prev-next', 'sanitize_text_field' );
 
 		// Disable the standard WordPress pagination.
-		add_settings_field( 'mpp-disable-standard-pagination', __( 'Disable the standard pagination', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_disable_standard_pagination', 'multipage', 'mpp_pagination', array( 'label_for' => 'mpp-disable-standard-pagination' ) );
-		register_setting( 'mpp-advanced-settings', 'mpp-disable-standard-pagination', 'intval' );
+		add_settings_field( 'mpp-disable-standard-pagination', __( 'Disable the standard pagination', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_disable_standard_pagination', 'multipage', 'mpp_pagination', array( 'label_for' => 'disable-standard-pagination' ) );
 
 		// Add the table of contents section.
 		add_settings_section( 'mpp_toc', __( 'Table of contents', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_toc_section', 'multipage' );
 
-		// Disable the standard WordPress pagination.
+		// Display the table of contents only on the first page.
 		add_settings_field( 'mpp-toc-only-on-the-first-page', __( 'Only on the first page', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_toc_only_on_the_first_page', 'multipage', 'mpp_toc', array( 'label_for' => 'toc-only-on-the-first-page' ) );
-		register_setting( 'mpp_toc', 'mpp-toc-only-on-the-first-page', 'intval' );
 
 		// Set the table of contents position.
 		add_settings_field( 'mpp-toc-position', __( 'Position', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_toc_position', 'multipage', 'mpp_toc', array( 'label_for' => 'toc-position' ) );
-		register_setting( 'mpp_toc', 'mpp-toc-position', 'sanitize_text_field' );
 
-		// Define row labels.
-		add_settings_field( 'mpp-toc-row-labels', __( 'Row labels', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_toc_row_labels', 'multipage', 'mpp_toc', array( 'label_for' => 'toc-row-labels' ) );
-		register_setting( 'mpp_toc', 'mpp-toc-row-labels', 'sanitize_text_field' );
+		// Define row labels (radio group labelled by its fieldset legend).
+		add_settings_field( 'mpp-toc-row-labels', __( 'Row labels', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_toc_row_labels', 'multipage', 'mpp_toc' );
 
 		// Hide the table of contents header.
 		add_settings_field( 'mpp-hide-toc-header', __( 'Hide header', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_hide_toc_header', 'multipage', 'mpp_toc', array( 'label_for' => 'hide-toc-header' ) );
-		register_setting( 'mpp_toc', 'mpp-hide-toc-header', 'intval' );
 
 		// Add a link to comments inside the table of contents.
 		add_settings_field( 'mpp-comments-toc-link', __( 'Comments link', 'sgr-nextpage-titles' ), 'mpp_admin_settings_callback_comments_toc_link', 'multipage', 'mpp_toc', array( 'label_for' => 'comments-toc-link' ) );
-		register_setting( 'mpp_toc', 'mpp-comments-toc-link', 'intval' );
-		
-		/* Advanced Settings ******************************************************/
+
+		/* Advanced Settings **************************************************/
 
 		// Add the main section.
 		add_settings_section( 'mpp_advanced', '', 'mpp_admin_advanced_settings_callback_main_section', 'mpp-advanced-settings' );
-	
-		// Set the title rewrite rule.
+
+		// Set the title rewrite priority.
 		add_settings_field( '_mpp-rewrite-title-priority', __( 'Rewrite Title Priority', 'sgr-nextpage-titles' ), 'mpp_admin_advanced_callback_rewrite_title_priority', 'mpp-advanced-settings', 'mpp_advanced', array( 'label_for' => 'rewrite-title-priority' ) );
-		register_setting( 'mpp-advanced-settings', '_mpp-rewrite-title-priority', 'intval' );
-		
-		// Set the content rewrite rule.
+
+		// Set the content rewrite priority.
 		add_settings_field( '_mpp-rewrite-content-priority', __( 'Rewrite Content Priority', 'sgr-nextpage-titles' ), 'mpp_admin_advanced_callback_rewrite_content_priority', 'mpp-advanced-settings', 'mpp_advanced', array( 'label_for' => 'rewrite-content-priority' ) );
-		register_setting( 'mpp-advanced-settings', '_mpp-rewrite-content-priority', 'intval' );
 
-		// Disable TinyMCE Buttons inside the editor to preserve older WordPress versions to work.
-		add_settings_field( 'mpp-disable-tinymce-buttons', __( 'Disable TinyMCE Buttons', 'sgr-nextpage-titles' ), 'mpp_admin_advanced_callback_disable_tinymce_buttons', 'mpp-advanced-settings', 'mpp_advanced' );
-		register_setting( 'mpp-advanced-settings', 'mpp-disable-tinymce-buttons', 'intval' );
+		// Disable the TinyMCE buttons of the classic editor.
+		add_settings_field( 'mpp-disable-tinymce-buttons', __( 'Disable TinyMCE Buttons', 'sgr-nextpage-titles' ), 'mpp_admin_advanced_callback_disable_tinymce_buttons', 'mpp-advanced-settings', 'mpp_advanced', array( 'label_for' => 'disable-tinymce-buttons' ) );
 
-		// Build Multipage postmetas. We only showing this if the update process didn't run the postmetas building.
-		if ( ! get_option( '_mpp-postmeta-built' ) ) {
-			add_settings_field( '_mpp-postmeta-built', __( 'Build Multipage postmetas', 'sgr-nextpage-titles' ), 'mpp_admin_advanced_callback_build_mpp_postmeta_data', 'mpp-advanced-settings', 'mpp_advanced' );
-			register_setting( 'mpp-advanced-settings', '_mpp-postmeta-built', 'intval' );
-		}
-		
+		// The subpage index rebuild is an action (admin-post.php), see mpp_admin_rebuild_postmeta_section().
 	}
 
 	/**
@@ -245,14 +288,14 @@ class MPP_Admin {
 	public static function enqueue_scripts() {
 		$handle = 'multipage-admin';
 
-		// LTR or RTL
-		$file = is_rtl() ? 'admin/css/'. $handle . '-rtl' : 'admin/css/' . $handle;
+		// LTR or RTL.
+		$file = is_rtl() ? 'admin/css/' . $handle . '-rtl' : 'admin/css/' . $handle;
 
-		// Use minified libraries if SCRIPT_DEBUG is turned off
-		$suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-		$file = $file . $suffix . '.css';
+		// Use minified libraries if SCRIPT_DEBUG is turned off.
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$file   = $file . $suffix . '.css';
 
-		// Enqueue the Multipage Plugin styling
+		// Enqueue the Multipage Plugin styling.
 		wp_enqueue_style( $handle, trailingslashit( MPP_PLUGIN_URL ) . $file, array(), MPP_VERSION, 'screen' );
 	}
 
@@ -272,9 +315,12 @@ class MPP_Admin {
 		}
 
 		// Add a few links to the existing links array.
-		return array_merge( array(
-			'settings' => '<a href="' . esc_url( add_query_arg( array( 'page' => 'mpp-settings' ), mpp_get_admin_url( 'options-general.php' ) ) ) . '">' . esc_html__( 'Settings', 'sgr-nextpage-titles' ) . '</a>',
-		), $links );
+		return array_merge(
+			array(
+				'settings' => '<a href="' . esc_url( add_query_arg( array( 'page' => 'mpp-settings' ), mpp_get_admin_url( 'options-general.php' ) ) ) . '">' . esc_html__( 'Settings', 'sgr-nextpage-titles' ) . '</a>',
+			),
+			$links
+		);
 	}
 
 	/**
@@ -288,49 +334,147 @@ class MPP_Admin {
 	}
 
 	/**
-	 * Add HTML Text Editor Subpage button
+	 * Add the "subpage" button to the HTML (Text) editor toolbar.
+	 *
+	 * Since 1.7.0 the button is attached as an inline script to the core
+	 * 'quicktags' script (hooked on 'admin_enqueue_scripts'), so it is only
+	 * printed when quicktags is, right after it and before the editors are
+	 * initialized. No global function is defined anymore.
 	 *
 	 * @since 1.3
+	 * @since 1.7.0 Uses wp_add_inline_script() and escapes the title.
+	 *
+	 * @return void
 	 */
 	public static function editor_add_quicktags() {
-		if ( wp_script_is( 'quicktags' ) ) {
-	?>
-	<script type="text/javascript">
-		QTags.addButton( 'eg_subpage', '<?php echo esc_js( __( 'subpage', 'sgr-nextpage-titles' ) ); ?>', prompt_subtitle, '', '', '<?php echo esc_js( __( 'Start a new Subpage', 'sgr-nextpage-titles' ) ); ?>', 121 );
-
-		function prompt_subtitle(e, c, ed) {
-			var subtitle = prompt( '<?php echo esc_js( __( 'Enter the subpage title', 'sgr-nextpage-titles' ) ); ?>' ),
-				t = this;
-
-			if (subtitle === null || subtitle.length < 2) return;
-
-			t.tagStart = '[nextpage title="' + subtitle + '"]\n\n';
-			t.tagEnd = false;
-			
-			// now we've defined all the tagStart, tagEnd and openTags we process it all to the active window
-			QTags.TagButton.prototype.callback.call(t, e, c, ed);
-		};
-	</script>
-	<?php
+		if ( self::$quicktags_added || ! wp_script_is( 'quicktags', 'registered' ) ) {
+			return;
 		}
+
+		self::$quicktags_added = true;
+
+		$l10n = array(
+			'button' => __( 'subpage', 'sgr-nextpage-titles' ),
+			'title'  => __( 'Start a new Subpage', 'sgr-nextpage-titles' ),
+			'prompt' => __( 'Enter the subpage title', 'sgr-nextpage-titles' ),
+		);
+
+		$script = <<<'JS'
+( function( window ) {
+	'use strict';
+
+	var QTags = window.QTags;
+	var l10n = __MPP_QTAGS_L10N__;
+
+	if ( ! QTags || ! QTags.addButton || ! QTags.TagButton ) {
+		return;
 	}
-	
+
+	// Same encoding as the TinyMCE plugin: & < > are stored as HTML, " [ ] would break the shortcode.
+	function escapeShortcodeAttribute( text ) {
+		return String( text )
+			.replace( /&/g, '&amp;' )
+			.replace( /"/g, '&quot;' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /\[/g, '&#91;' )
+			.replace( /\]/g, '&#93;' );
+	}
+
+	QTags.addButton( 'eg_subpage', l10n.button, function( element, canvas, ed ) {
+		var title = window.prompt( l10n.prompt );
+
+		if ( 'string' !== typeof title ) {
+			return;
+		}
+
+		title = title.trim();
+		if ( ! title.length ) {
+			return;
+		}
+
+		this.tagStart = '[nextpage title="' + escapeShortcodeAttribute( title ) + '"]\n\n';
+		this.tagEnd = false;
+
+		QTags.TagButton.prototype.callback.call( this, element, canvas, ed );
+	}, '', '', l10n.title, 121 );
+}( window ) );
+JS;
+
+		$script = str_replace( '__MPP_QTAGS_L10N__', wp_json_encode( $l10n ), $script );
+
+		wp_add_inline_script( 'quicktags', $script );
+	}
+
 	/**
 	 * Add a new TinyMCE css.
 	 *
 	 * @since 1.3
 	 *
+	 * @param string $mce_css Comma-separated list of editor stylesheets.
 	 * @return string
 	 */
 	public static function mpp_mce_css( $mce_css ) {
-		// Use minified libraries if SCRIPT_DEBUG is turned off
-		$suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-		if ( ! empty( $mce_css ) )
+		if ( ! empty( $mce_css ) ) {
 			$mce_css .= ',';
+		}
 
-		$mce_css .= MPP_PLUGIN_URL . 'inc/admin/tinymce/css/multipage' . $suffix . '.css';
+		$mce_css .= self::get_mce_css_url();
+
 		return $mce_css;
+	}
+
+	/**
+	 * Return the URL of the stylesheet loaded inside the TinyMCE content iframe.
+	 *
+	 * It shows the [nextpage] placeholder image in the Visual editor.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @return string
+	 */
+	private static function get_mce_css_url() {
+		// Use minified libraries if SCRIPT_DEBUG is turned off.
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+
+		return add_query_arg( 'ver', rawurlencode( MPP_VERSION ), MPP_PLUGIN_URL . 'inc/admin/tinymce/css/multipage' . $suffix . '.css' );
+	}
+
+	/**
+	 * Load the placeholder stylesheet in the Classic block of the block editor.
+	 *
+	 * The 'mce_css' filter only runs for the classic editor (wp_editor()). The
+	 * Classic block builds its TinyMCE settings in wp_tinymce_inline_scripts()
+	 * (editor id 'classic-block') and, since WordPress 6.3, edits its content
+	 * in a modal whose iframe only loads the default editor stylesheets: without
+	 * this, the [nextpage] placeholder is an invisible image.
+	 *
+	 * The default stylesheets (_WP_Editors::default_settings()) are kept, as the
+	 * Classic block settings override them when they set 'content_css'.
+	 *
+	 * @since 1.7.0
+	 *
+	 * @param array  $mce_init  TinyMCE settings.
+	 * @param string $editor_id Editor id, 'classic-block' for the Classic block.
+	 * @return array
+	 */
+	public static function mpp_classic_block_mce_css( $mce_init, $editor_id = '' ) {
+		if ( 'classic-block' !== $editor_id || ! is_array( $mce_init ) ) {
+			return $mce_init;
+		}
+
+		if ( isset( $mce_init['content_css'] ) && is_string( $mce_init['content_css'] ) && '' !== trim( $mce_init['content_css'], ' ,' ) ) {
+			$content_css = trim( $mce_init['content_css'], ' ,' );
+		} else {
+			// Same defaults as _WP_Editors::default_settings().
+			$suffix      = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+			$version     = 'ver=' . get_bloginfo( 'version' );
+			$content_css = includes_url( "css/dashicons$suffix.css?$version" ) . ',' . includes_url( "js/tinymce/skins/wordpress/wp-content.css?$version" );
+		}
+
+		$mce_init['content_css'] = $content_css . ',' . self::get_mce_css_url();
+
+		return $mce_init;
 	}
 
 	/**
@@ -338,13 +482,18 @@ class MPP_Admin {
 	 *
 	 * @since 1.3
 	 *
+	 * @param array $buttons First-row list of buttons.
 	 * @return array $buttons
 	 */
 	public static function mpp_mce_button( $buttons ) {
+		if ( ! is_array( $buttons ) ) {
+			return $buttons;
+		}
+
 		// Insert 'Subpage' button after the 'WP More' button.
 		$wp_more_key = array_search( 'wp_more', $buttons, true );
 		if ( false !== $wp_more_key ) {
-			$wp_more_key++;
+			++$wp_more_key;
 		} else {
 			$wp_more_key = count( $buttons );
 		}
@@ -352,9 +501,7 @@ class MPP_Admin {
 
 		array_unshift( $buttons_after, 'subpage' );
 
-		$buttons = array_merge( $buttons, $buttons_after );
-
-		return $buttons;
+		return array_merge( $buttons, $buttons_after );
 	}
 
 	/**
@@ -362,82 +509,48 @@ class MPP_Admin {
 	 *
 	 * @since 1.3
 	 *
+	 * @param array $plugin_array An array of external TinyMCE plugins.
 	 * @return array $plugin_array
 	 */
 	public static function mpp_mce_external_plugin( $plugin_array ) {
-		// Use minified libraries if SCRIPT_DEBUG is turned off
-		$suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		// Use minified libraries if SCRIPT_DEBUG is turned off.
+		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
 		$plugin_array['multipage'] = MPP_PLUGIN_URL . 'inc/admin/tinymce/js/plugin' . $suffix . '.js';
+
 		return $plugin_array;
 	}
-	
+
 	/**
 	 * Add the new TinyMCE plugin locale.
 	 *
+	 * Used by the classic editor and by the Classic block.
+	 *
 	 * @since 1.5
 	 *
+	 * @param array  $mce_translation Key/value pairs of strings.
+	 * @param string $mce_locale      Locale.
 	 * @return array $mce_translation
 	 */
-	public static function mpp_wp_mce_translation( $mce_translation, $mce_locale ) {
+	public static function mpp_wp_mce_translation( $mce_translation, $mce_locale ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Filter signature.
 		$mpp_wp_mce_strings = array(
-			'Start a new Subpage'		=> __( 'Start a new Subpage', 'sgr-nextpage-titles' ),
-			'Enter the subpage title'	=> __( 'Enter the subpage title', 'sgr-nextpage-titles' ),
+			'Start a new Subpage'     => __( 'Start a new Subpage', 'sgr-nextpage-titles' ),
+			'Enter the subpage title' => __( 'Enter the subpage title', 'sgr-nextpage-titles' ),
 		);
-		
-		$mce_translation = array_merge( $mce_translation, $mpp_wp_mce_strings );
 
-		return $mce_translation;
+		return array_merge( (array) $mce_translation, $mpp_wp_mce_strings );
 	}
 
 	/**
-	 * Enqueue filters for extending core blocks attributes.
-	 * Has to be loaded before registering the blocks in registerCoreBlocks.
+	 * Former registration of the Subpage block assets.
+	 *
+	 * @since 1.3.9
+	 * @deprecated 1.7.0 The block is registered from blocks/subpage/block.json
+	 *                   by mpp_register_blocks() on 'init'.
+	 *
+	 * @return void
 	 */
 	public static function mpp_enqueue_block_editor_assets() {
-		// Use minified libraries if SCRIPT_DEBUG is turned off
-		$suffix  = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
-
-		// Register block editor script for backend.
-		wp_register_script(
-			'mpp-editor-blocks', // Handle.
-			MPP_PLUGIN_URL . 'admin/js/mpp-editor-blocks.js', //MPP_PLUGIN_URL . 'admin/js/mpp-editor-blocks' . $suffix . '.js',
-			array( 'wp-blocks', 'wp-i18n', 'wp-element', 'wp-block-editor' ), // Dependencies, defined above.
-			MPP_VERSION, // filemtime( plugin_dir_path( __DIR__ ) . 'dist/blocks.build.js' ), // Version: filemtime — Gets file modification time.
-			true // Enqueue the script in the footer.
-		);
-
-		// Register block editor styles for backend.
-		wp_register_style(
-			'mpp-editor-blocks-style', // Handle.
-			MPP_PLUGIN_URL . 'admin/css/mpp-editor-blocks' . $suffix . '.css', // Block style CSS.
-			array( 'wp-edit-blocks' ), // Dependency to include the CSS after it.
-			MPP_VERSION // filemtime( plugin_dir_path( __DIR__ ) . 'dist/blocks.editor.build.css' ) // Version: File modification time.
-		);
-
-		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( 'mpp-editor-blocks', 'sgr-nextpage-titles' );
-		}
-
-		/**
-		 * Register Gutenberg block on server-side.
-		 *
-		 * Register the block on server-side to ensure that the block
-		 * scripts and styles for both frontend and backend are
-		 * enqueued when the editor loads.
-		 *
-		 * @link https://wordpress.org/gutenberg/handbook/blocks/writing-your-first-block-type#enqueuing-block-scripts
-		 * @since 1.3.9
-		 */
-		register_block_type(
-			'multipage/subpage', array(
-				// Enqueue blocks.style.build.css on both frontend & backend.
-				//'style'         => 'mpp-style-css',
-				// Enqueue blocks.build.js in the editor only.
-				'editor_script' => 'mpp-editor-blocks',
-				// Enqueue blocks.editor.build.css in the editor only.
-				'editor_style'  => 'mpp-editor-blocks-style',
-			)
-		);
+		_deprecated_function( __METHOD__, '1.7.0', 'mpp_register_blocks()' );
 	}
 }

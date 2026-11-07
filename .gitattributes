@@ -1,0 +1,36 @@
+# Normalize line endings: LF in the repository and working tree.
+* text=auto eol=lf
+
+# Binary files: never diff, merge or convert them.
+*.mo   binary
+*.png  binary
+*.jpg  binary
+*.gif  binary
+*.zip  binary
+
+# Development files excluded from "git archive" (GitHub release zips).
+# Keep this list in sync with .distignore (used by bin/build-zip.sh).
+/.claude                export-ignore
+/.distignore            export-ignore
+/.gitattributes         export-ignore
+/.github                export-ignore
+/.gitignore             export-ignore
+/.wp-env.json           export-ignore
+/ARCHITECTURE.md        export-ignore
+/CLAUDE.md              export-ignore
+/CONTRIBUTING.md        export-ignore
+/bin                    export-ignore
+/build                  export-ignore
+/composer.json          export-ignore
+/composer.lock          export-ignore
+/node_modules           export-ignore
+/package.json           export-ignore
+/package-lock.json      export-ignore
+/phpcs.xml.dist         export-ignore
+/phpstan.neon.dist      export-ignore
+/phpunit.xml.dist       export-ignore
+/screenshot-*.png       export-ignore
+/tests                  export-ignore
+/vendor                 export-ignore
+/*.code-workspace       export-ignore
+/languages/*.po         export-ignore

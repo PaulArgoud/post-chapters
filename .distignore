@@ -1,0 +1,59 @@
+# Files and folders excluded from the distributed plugin zip.
+# Used by bin/build-zip.sh (rsync --exclude-from, applied to the files known to
+# git) and by "wp dist-archive".
+# Keep this list in sync with the export-ignore rules of .gitattributes.
+
+# Version control, CI and local tooling.
+/.git
+/.github
+/.claude
+/.distignore
+/.gitattributes
+/.gitignore
+/.wp-env.json
+/.wp-env.override.json
+/.env
+/.env.*
+/*.code-workspace
+/.vscode
+/.idea
+
+# Development scripts, tests and build output.
+/bin
+/build
+/tests
+/vendor
+/node_modules
+/composer.json
+/composer.lock
+/composer.phar
+/phpcs.xml
+/phpcs.xml.dist
+/.phpcs.xml
+/.phpcs.xml.dist
+/phpunit.xml
+/phpunit.xml.dist
+/.phpunit.result.cache
+/.phpunit.cache
+/phpstan.neon
+/phpstan.neon.dist
+/tmp
+/package.json
+/package-lock.json
+
+# Contributor documentation and wordpress.org assets.
+/CLAUDE.md
+/ARCHITECTURE.md
+/CONTRIBUTING.md
+/screenshot-*.png
+
+# Translation sources (the compiled .mo files and the .pot template are shipped).
+/languages/*.po
+
+# OS and editor junk.
+.DS_Store
+Thumbs.db
+.smbdelete*
+*.swp
+*.log
+*~

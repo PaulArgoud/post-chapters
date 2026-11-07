@@ -1,0 +1,60 @@
+{
+	"name": "paulargoud/sgr-nextpage-titles",
+	"description": "Multipage: split WordPress posts into multiple subpages, each with its own title and an automatic table of contents.",
+	"type": "wordpress-plugin",
+	"license": "GPL-3.0-or-later",
+	"homepage": "https://wordpress.org/plugins/sgr-nextpage-titles/",
+	"authors": [
+		{
+			"name": "Paul ARGOUD",
+			"homepage": "https://paul.argoud.net"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/PaulArgoud/sgr-nextpage-titles/issues",
+		"source": "https://github.com/PaulArgoud/sgr-nextpage-titles"
+	},
+	"require": {
+		"php": ">=7.4"
+	},
+	"require-dev": {
+		"dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+		"phpcompatibility/phpcompatibility-wp": "^2.1",
+		"phpunit/phpunit": "^9.6",
+		"wp-coding-standards/wpcs": "^3.1",
+		"yoast/phpunit-polyfills": "^3.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		},
+		"platform": {
+			"php": "7.4.33"
+		},
+		"sort-packages": true
+	},
+	"scripts": {
+		"lint": [
+			"@php ./bin/php-lint.php"
+		],
+		"phpcs": [
+			"@php ./vendor/bin/phpcs"
+		],
+		"phpcbf": [
+			"@php ./vendor/bin/phpcbf"
+		],
+		"test": [
+			"@php ./vendor/bin/phpunit"
+		],
+		"test:wp-env": [
+			"npx -y @wordpress/env@12 run tests-cli --env-cwd=wp-content/plugins/sgr-nextpage-titles vendor/bin/phpunit"
+		]
+	},
+	"scripts-descriptions": {
+		"lint": "Run php -l on every PHP file of the plugin with the current PHP binary.",
+		"phpcs": "Check the code against the WordPress Coding Standards and PHPCompatibilityWP.",
+		"phpcbf": "Automatically fix the coding standard violations that can be fixed.",
+		"test": "Run the PHPUnit test suite (needs the WordPress test library, e.g. inside wp-env tests-cli).",
+		"test:wp-env": "Run the PHPUnit test suite inside a started wp-env (plugin folder must be named sgr-nextpage-titles)."
+	}
+}

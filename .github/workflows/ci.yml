@@ -1,0 +1,182 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Syntax check of every PHP file on each supported PHP version.
+  lint:
+    name: PHP ${{ matrix.php }} lint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.4', '8.0', '8.1', '8.2', '8.3', '8.4' ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+          ini-values: error_reporting=E_ALL, display_errors=On
+
+      - name: Lint PHP files
+        run: php bin/php-lint.php
+
+  # WordPress Coding Standards + PHPCompatibilityWP (see phpcs.xml.dist).
+  phpcs:
+    name: PHPCS
+    runs-on: ubuntu-latest
+    # Blocking: any PHPCS error fails the workflow (warnings are reported and
+    # annotated, but do not fail it).
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: cs2pr
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Run PHPCS
+        run: vendor/bin/phpcs -q --no-colors --report-full --report-checkstyle=./phpcs-report.xml --runtime-set ignore_warnings_on_exit 1
+
+      - name: Annotate the pull request
+        if: ${{ always() && hashFiles('phpcs-report.xml') != '' }}
+        run: cs2pr ./phpcs-report.xml --graceful-warnings
+
+  # Translations: POT in sync with the code, .po files complete, compiled
+  # .mo / .l10n.php / .json files up to date (see bin/check-i18n.sh).
+  i18n:
+    name: i18n
+    runs-on: ubuntu-latest
+    env:
+      WP_CLI_VERSION: '2.12.0'
+      WP_CLI_SHA512: be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c98605e6172e6d014dda2e27f88c98befc16c040cbb2bd1bfa121510ea5cdf5f6a30fe8832
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: none
+
+      - name: Install gettext
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq --no-install-recommends gettext
+
+      - name: Install WP-CLI ${{ env.WP_CLI_VERSION }} (phar)
+        run: |
+          curl -fsSL -o wp-cli.phar "https://github.com/wp-cli/wp-cli/releases/download/v${WP_CLI_VERSION}/wp-cli-${WP_CLI_VERSION}.phar"
+          echo "${WP_CLI_SHA512}  wp-cli.phar" | sha512sum -c -
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+          wp --version
+          msgfmt --version | head -n 1
+
+      - name: Check translations
+        run: bash bin/check-i18n.sh
+
+  # PHPUnit through @wordpress/env, on the minimum and the latest WordPress.
+  phpunit:
+    name: PHPUnit (WP ${{ matrix.wp }}, PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Minimum supported WordPress ("Requires at least") on the minimum PHP.
+          - wp: '6.3'
+            php: '7.4'
+          # Latest WordPress on the minimum and the latest supported PHP.
+          - wp: '7.1.4'
+            php: '7.4'
+          - wp: '7.1.4'
+            php: '8.4'
+    env:
+      # Override "core" and "phpVersion" of .wp-env.json (both environments).
+      WP_ENV_CORE: https://downloads.wordpress.org/release/wordpress-${{ matrix.wp }}.zip
+      WP_ENV_PHP_VERSION: ${{ matrix.php }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      # vendor/ is mounted into the containers; composer.json pins the
+      # platform to PHP 7.4 so the same dependencies run on every PHP version.
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Start wp-env
+        run: npx -y @wordpress/env@12 start
+
+      - name: Show versions
+        run: |
+          npx -y @wordpress/env@12 run tests-cli php -v
+          npx -y @wordpress/env@12 run tests-cli wp core version
+
+      - name: Run PHPUnit
+        run: npx -y @wordpress/env@12 run tests-cli --env-cwd="wp-content/plugins/$(basename "$GITHUB_WORKSPACE")" vendor/bin/phpunit
+
+      - name: Stop wp-env
+        if: ${{ always() }}
+        run: npx -y @wordpress/env@12 stop || true
+
+  # Distributable zip, honoring .distignore.
+  build:
+    name: Build zip
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Build the plugin zip
+        run: bash bin/build-zip.sh
+
+      - name: List the archive content
+        run: unzip -l build/sgr-nextpage-titles.zip
+
+      - name: Upload the plugin zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: sgr-nextpage-titles
+          path: build/sgr-nextpage-titles.zip
+          if-no-files-found: error
