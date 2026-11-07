@@ -12,6 +12,7 @@ Major rewrite of the Subpage block, the content parser and the frontend renderin
 ### Compatibility
 
 - Tested up to **WordPress 7.1.4** (iframed block editor, block themes such as Twenty Twenty-Five, classic themes such as Twenty Twenty-One) and **PHP 7.4 to 8.4**
+- The plugin header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles`: WordPress.org no longer offers updates from the listing of the same slug (owned by the original author, currently 1.5.12), so a future release there can never overwrite this version. Added after the 1.7.0 tag, and included in the 1.7.0 release archive together with `readme.txt`
 - **Minimum WordPress version raised from 5.0 to 6.3** (`Requires at least: 6.3`), required by the `block.json` registration and block `apiVersion` 3. PHP 7.4 is still the minimum
 - **Subpage block rewritten** for the current block editor: registered from `blocks/subpage/block.json` (`apiVersion` 3, so it works in the iframed editor), plain ES5 script using the `wp.*` globals with no build step, translatable placeholder. Its `save()` output is **byte-identical** to previous versions, so every existing post stays valid (no "This block contains unexpected or invalid content" warning, no block recovery)
 - The block is now registered on every request (`init`), whatever the editor in use, and still registers on third-party editor screens that do not bootstrap the server-side block definitions

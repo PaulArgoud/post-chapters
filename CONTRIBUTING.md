@@ -169,6 +169,8 @@ bin/build-zip.sh
 
 The archive `build/sgr-nextpage-titles.zip` holds one top-level `sgr-nextpage-titles/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `MPP_VERSION` in `sgr-nextpage-titles.php` and `version` in `blocks/subpage/block.json`, and the database version in `Multipage::setup_globals()` when an upgrade routine is added.
 
+The plugin header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles`, so WordPress never offers to replace this version with the older WordPress.org listing of the same slug (owned by its original author). Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
+
 ## Submitting a Pull Request
 
 1. Push your branch to your fork

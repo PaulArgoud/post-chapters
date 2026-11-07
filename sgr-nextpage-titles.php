@@ -12,6 +12,7 @@
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Requires at least: 6.3
  * Requires PHP:      7.4
+ * Update URI:        https://github.com/PaulArgoud/sgr-nextpage-titles
  *
  * @package Multipage
  */
