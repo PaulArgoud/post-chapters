@@ -130,7 +130,7 @@ Also check your change by hand in the browser: the block editor, the classic edi
 
 - Text domain: `sgr-nextpage-titles`. Every string with a placeholder needs a `/* translators: */` comment, and counts use `_n()`
 - `languages/sgr-nextpage-titles.pot` is the template; `.po` files are the sources (not shipped); `.mo`, `.l10n.php` and `.json` (JavaScript, named after the md5 of `blocks/subpage/index.js`) are generated and committed
-- Language packs from translate.wordpress.org take precedence over the bundled files
+- The bundled files take precedence over the language packs installed in `wp-content/languages/plugins` (those of translate.wordpress.org belong to the original plugin), for the bundled locales only; see `mpp_prefer_bundled_translations()`
 
 To refresh the files after changing strings, from the plugin root:
 

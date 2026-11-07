@@ -36,14 +36,13 @@ if ( ! function_exists( 'mpp_register_blocks' ) ) {
 		}
 
 		/*
-		 * JS translations. No $path on purpose: with a path, core reads that
-		 * folder BEFORE WP_LANG_DIR, so the bundled JSON would override the
-		 * language packs from translate.wordpress.org. Without it, core reads
-		 * WP_LANG_DIR/plugins first (WP 6.9+ via WP_Textdomain_Registry, which
-		 * also falls back to the folder registered by load_plugin_textdomain()),
-		 * and mpp_load_bundled_script_translation_file() provides the bundled
-		 * file as the last resort on every version (6.3 to 6.8 never look into
-		 * the plugin folder by themselves).
+		 * JS translations. No $path on purpose: core resolves the files itself
+		 * (WP_LANG_DIR/plugins first; WP 6.9+ also falls back to the folder
+		 * registered by load_plugin_textdomain()), and
+		 * mpp_load_bundled_script_translation_file() swaps a language pack of
+		 * the original plugin for the bundled file, or provides the bundled
+		 * file as the last resort (6.3 to 6.8 never look into the plugin folder
+		 * by themselves).
 		 */
 		$handles = ! empty( $block_type->editor_script_handles )
 			? (array) $block_type->editor_script_handles
@@ -59,17 +58,18 @@ add_action( 'init', 'mpp_register_blocks' );
 
 if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 	/**
-	 * Fall back to the JS translations bundled in /languages.
+	 * Use the JS translations bundled in /languages.
 	 *
-	 * Hooked to 'load_script_translation_file'. load_script_textdomain() calls
-	 * load_script_translations() with $file = false only after every regular
-	 * location failed (WP_LANG_DIR/plugins, then the registered text domain
-	 * path on WP 6.9+). Only then, and only for a script of this plugin that
-	 * uses the plugin text domain, the bundled
-	 * "sgr-nextpage-titles-{locale}-{md5}.json" file is returned, so official
-	 * language packs always win.
+	 * Hooked to 'load_script_translation_file', for a script of this plugin that
+	 * uses the plugin text domain only. A file of WP_LANG_DIR/plugins (a language
+	 * pack of the original plugin, see mpp_prefer_bundled_translations()) is
+	 * replaced by the bundled "sgr-nextpage-titles-{locale}-{md5}.json" file of
+	 * the same locale, when there is one. load_script_textdomain() calls
+	 * load_script_translations() with $file = false once every regular location
+	 * failed: the bundled file is then the last resort.
 	 *
 	 * @since 1.7.0
+	 * @since 1.7.1 Replaces the language packs installed in WP_LANG_DIR/plugins.
 	 *
 	 * @param string|false $file   Path to the translation file to load, false if there isn't one.
 	 * @param string       $handle Name of the script to register a translation domain to.
@@ -77,7 +77,12 @@ if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 	 * @return string|false Path to the translation file, or the original value.
 	 */
 	function mpp_load_bundled_script_translation_file( $file, $handle, $domain ) {
-		if ( false !== $file || 'sgr-nextpage-titles' !== $domain || ! defined( 'MPP_PLUGIN_DIR' ) || ! defined( 'MPP__PLUGIN_FILE' ) ) {
+		if ( 'sgr-nextpage-titles' !== $domain || ! defined( 'MPP_PLUGIN_DIR' ) || ! defined( 'MPP__PLUGIN_FILE' ) ) {
+			return $file;
+		}
+
+		// A file of a custom location (not a language pack) is never replaced.
+		if ( false !== $file && ( ! is_string( $file ) || 0 !== strpos( wp_normalize_path( $file ), trailingslashit( wp_normalize_path( WP_LANG_DIR ) ) . 'plugins/' ) ) ) {
 			return $file;
 		}
 
@@ -102,9 +107,17 @@ if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 			$relative = substr( $relative, 0, -7 ) . '.js';
 		}
 
-		$bundled = MPP_PLUGIN_DIR . 'languages/sgr-nextpage-titles-' . determine_locale() . '-' . md5( $relative ) . '.json';
+		$basename = 'sgr-nextpage-titles-' . determine_locale() . '-' . md5( $relative ) . '.json';
 
-		return is_readable( $bundled ) ? $bundled : $file;
+		if ( false === $file ) {
+			$bundled = MPP_PLUGIN_DIR . 'languages/' . $basename;
+			return is_readable( $bundled ) ? $bundled : $file;
+		}
+
+		// A language pack of the original plugin (see mpp_prefer_bundled_translations()).
+		$bundled = mpp_get_bundled_translation_file( $file, $basename );
+
+		return '' !== $bundled ? $bundled : $file;
 	}
 }
 

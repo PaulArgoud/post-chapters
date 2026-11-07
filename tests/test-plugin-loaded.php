@@ -33,7 +33,7 @@ class MPP_Test_Plugin_Loaded extends WP_UnitTestCase {
 	 */
 	public function test_version() {
 		$this->assertTrue( defined( 'MPP_VERSION' ), 'MPP_VERSION is not defined.' );
-		$this->assertSame( '1.7.0', MPP_VERSION );
+		$this->assertSame( '1.7.1', MPP_VERSION );
 		$this->assertSame( MPP_VERSION, multipage()->version );
 	}
 

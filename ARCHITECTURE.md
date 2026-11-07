@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the internal structure and data flow of the Multipage plugin (version 1.7.0).
+This document describes the internal structure and data flow of the Multipage plugin (version 1.7.1).
 
 ## File Tree
 
@@ -92,7 +92,7 @@ sgr-nextpage-titles/
 ```
 1. WordPress loads sgr-nextpage-titles.php
    │
-   ├── Defines MPP_VERSION ('1.7.0') and MPP__PLUGIN_FILE
+   ├── Defines MPP_VERSION ('1.7.1') and MPP__PLUGIN_FILE
    ├── require class-mpp.php
    └── multipage() → Multipage::instance()
        │
@@ -122,7 +122,7 @@ The live post content is the single source of truth: every request parses it wit
 `setup( $query = null )` loads the multipage data of the **main query** and is idempotent (keyed by post ID, raw page number and post object), so it can be called from several hooks and still works when another plugin short-circuits one of them.
 
 - Bails out for admin, non-singular, 404, feed, embed, trackback and robots requests
-- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `multipage`, key `parse-{MPP_VERSION}-{md5(content)}`, one day) and skips the parse when the content holds no plugin marker
+- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `multipage`, key `parse-{MPP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/mpp-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
 - Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$mpp_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$mpp_index`, `$mpp_pagename`, `$page_title`
 - Returns whether the post is a multipage post; the requested subpage may still be out of range
 
@@ -400,7 +400,7 @@ The object cache group `multipage` holds the parse results (see `Multipage::setu
 
 The "Subpage" block (`multipage/subpage`) lives in `blocks/subpage/` and needs no build step:
 
-- `mpp_register_blocks()` (`inc/mpp-blocks.php`) runs on `init` for every request and calls `register_block_type( MPP_PLUGIN_DIR . 'blocks/subpage' )`, then `wp_set_script_translations()` on the editor script (handle `multipage-subpage-editor-script`), without a path so that language packs win; `mpp_load_bundled_script_translation_file()` returns the bundled `languages/*.json` file as the last resort
+- `mpp_register_blocks()` (`inc/mpp-blocks.php`) runs on `init` for every request and calls `register_block_type( MPP_PLUGIN_DIR . 'blocks/subpage' )`, then `wp_set_script_translations()` on the editor script (handle `multipage-subpage-editor-script`), without a path; `mpp_load_bundled_script_translation_file()` (`load_script_translation_file`) replaces a JSON file of `WP_LANG_DIR/plugins` with the bundled `languages/*.json` file of the same locale, and returns the bundled file as the last resort when core found none
 - `block.json`: `apiVersion` 3 (iframed editor), category `design`, attribute `title` (string, default `false`), supports `html` but no custom class name. `index.js` holds a copy of the metadata so that the block also registers on screens that do not bootstrap the server definitions (keep both in sync)
 - Edit: a RichText `h2` without formatting; Enter at the end of the title inserts a paragraph after the block
 - Save: `[nextpage title="..."]` (only `"` encoded), byte-identical to every previous version, inside the block comment: `<!-- wp:multipage/subpage {"title":"..."} -->[nextpage title="..."]<!-- /wp:multipage/subpage -->`. The parser also honors an optional `slug` attribute
@@ -427,7 +427,8 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 
 ## Translations
 
-- `mpp_load_multipage_textdomain()` (`init`) calls `load_plugin_textdomain( 'sgr-nextpage-titles', false, '<plugin folder>/languages' )`. WordPress loads `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
+- `mpp_load_multipage_textdomain()` (`init`) calls `load_plugin_textdomain( 'sgr-nextpage-titles', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
+- The language packs of translate.wordpress.org for this slug belong to the original plugin (old strings only). `mpp_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `mpp_prefer_bundled_translations` filter turns the replacement off
 - Block strings come from `block.json` (translated in PHP, contexts "block title", "block description", "block keyword") and from `index.js` (JSON file)
 - See [CONTRIBUTING.md](CONTRIBUTING.md#translations) for the regeneration workflow and `bin/check-i18n.sh`
 

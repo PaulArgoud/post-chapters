@@ -1,6 +1,6 @@
 # Multipage for WordPress
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.0-blue.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/tag/1.7.0)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.1-blue.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/tag/1.7.1)
 [![CI](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
@@ -21,7 +21,7 @@ Split your WordPress posts into multiple subpages, each with its own title and a
 - **Block and classic themes**: the table of contents and the navigation are added once, only to the post being viewed (never to excerpts, related posts or Query Loop blocks)
 - **Custom CSS**: override the plugin styles from your theme
 - **RTL support** (frontend and admin)
-- **Internationalized**: French, German, Italian and Spanish included; language packs from translate.wordpress.org take precedence
+- **Internationalized**: French, German, Italian and Spanish included
 - **Subpage index tools**: a "Rebuild subpage index" button and the `wp multipage` WP-CLI commands
 
 ## Requirements
@@ -42,7 +42,7 @@ Split your WordPress posts into multiple subpages, each with its own title and a
 
 ### WordPress.org
 
-The [WordPress.org listing](https://wordpress.org/plugins/sgr-nextpage-titles/) is still the original author's version 1.5.12 (2021), so searching for **Multipage** in **Plugins > Add New** installs that older version, not 1.7.0. Install from the GitHub release above.
+The [WordPress.org listing](https://wordpress.org/plugins/sgr-nextpage-titles/) is still the original author's version 1.5.12 (2021), so searching for **Multipage** in **Plugins > Add New** installs that older version, not 1.7.1. Install from the GitHub release above.
 
 The GitHub version declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles` in its header, so WordPress never replaces it with the WordPress.org version of the same slug. Updates come from new GitHub releases: download the new zip and upload it again (WordPress offers to replace the installed version).
 
@@ -125,7 +125,7 @@ Translation files are located in `/languages/`. Available languages:
 - Italian (it_IT)
 - Spanish (es_ES)
 
-Language packs from [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/sgr-nextpage-titles/) are used first; the bundled files are the fallback. To contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
+For these four languages the bundled files are always used, even when a language pack is installed: the packs that [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/sgr-nextpage-titles/) delivers for the `sgr-nextpage-titles` slug translate the original plugin and lack the strings of this version. Other languages use the installed language pack, if any. The `mpp_prefer_bundled_translations` filter (`add_filter( 'mpp_prefer_bundled_translations', '__return_false' );`) gives the language packs precedence back. To contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
 
 ## Development
 

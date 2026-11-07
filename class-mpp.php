@@ -433,9 +433,13 @@ class Multipage {
 	 * Parse post content, with an object cache keyed by the content hash.
 	 *
 	 * Without a persistent object cache this only avoids parsing the same content twice
-	 * in a request; with one, the parse is shared across requests until the content changes.
+	 * in a request; with one (Redis, Memcached...), the parse is shared across requests
+	 * until the content changes. The key also depends on the parser code itself, so an
+	 * updated parser never serves a page cut by a previous build, even one released
+	 * under the same version number.
 	 *
 	 * @since 1.7.0
+	 * @since 1.7.1 The cache key depends on the parser code, not only on MPP_VERSION.
 	 *
 	 * @param string $content The post content.
 	 * @return array See Multipage_Parser::parse().
@@ -448,7 +452,7 @@ class Multipage {
 			return Multipage_Parser::parse( '' );
 		}
 
-		$key    = 'parse-' . MPP_VERSION . '-' . md5( $content );
+		$key    = 'parse-' . self::parser_revision() . '-' . md5( $content );
 		$parsed = wp_cache_get( $key, 'multipage' );
 
 		if ( is_array( $parsed ) && isset( $parsed['is_multipage'], $parsed['pages'] ) && is_array( $parsed['pages'] ) ) {
@@ -459,6 +463,24 @@ class Multipage {
 		wp_cache_set( $key, $parsed, 'multipage', DAY_IN_SECONDS );
 
 		return $parsed;
+	}
+
+	/**
+	 * Revision of the parser code, for the parse cache key.
+	 *
+	 * @since 1.7.1
+	 *
+	 * @return string
+	 */
+	private static function parser_revision() {
+		static $revision = null;
+
+		if ( null === $revision ) {
+			$hash     = is_readable( MPP_PLUGIN_DIR . 'inc/mpp-parser.php' ) ? md5_file( MPP_PLUGIN_DIR . 'inc/mpp-parser.php' ) : false;
+			$revision = MPP_VERSION . '-' . ( is_string( $hash ) ? substr( $hash, 0, 12 ) : '0' );
+		}
+
+		return $revision;
 	}
 
 	/**

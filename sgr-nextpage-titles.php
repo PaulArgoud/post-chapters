@@ -4,7 +4,7 @@
  * Plugin URI:        https://wordpress.org/plugins/sgr-nextpage-titles/
  * Description:       Split your WordPress posts into multiple subpages, each with its own title and an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation.
  * Author:            Paul ARGOUD, based on an original idea by SGr33n (aka Sergio De Falco, Envire Web Solutions).
- * Version:           1.7.0
+ * Version:           1.7.1
  * Author URI:        https://paul.argoud.net
  * Text Domain:       sgr-nextpage-titles
  * Domain Path:       /languages/
@@ -20,7 +20,7 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-define( 'MPP_VERSION', '1.7.0' );
+define( 'MPP_VERSION', '1.7.1' );
 define( 'MPP__PLUGIN_FILE', __FILE__ );
 
 /**
