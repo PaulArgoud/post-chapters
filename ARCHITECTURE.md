@@ -1,6 +1,6 @@
 # Architecture
 
-This document describes the internal structure and data flow of the Multipage plugin (version 1.7.1).
+This document describes the internal structure and data flow of the Post Chapters plugin (version 2.0.0), named Multipage (`sgr-nextpage-titles`) up to 1.7.1.
 
 ## File Tree
 
@@ -9,7 +9,7 @@ post-chapters/
 │
 ├── post-chapters.php          # Plugin entry point: header (incl. Update URI), PCHAP_VERSION / PCHAP__PLUGIN_FILE,
 │                                    #   loads class-pchap.php
-├── class-pchap.php                    # Main Multipage class (singleton): bootstrap, request setup,
+├── class-pchap.php                    # Main PChap class (singleton): bootstrap, request setup,
 │                                    #   frontend rendering, SEO integrations, 404/redirect handling
 ├── uninstall.php                    # Cleanup on deletion (every site of a multisite network)
 ├── index.php                        # "Silence is golden" (one in every shipped folder)
@@ -32,7 +32,7 @@ post-chapters/
 ├── inc/
 │   ├── pchap-admin.php                # pchap_admin(): creates the PChap_Admin instance (admin only)
 │   ├── pchap-blocks.php               # pchap_register_blocks() on init, bundled JS translations fallback
-│   ├── pchap-cli.php                  # PChap_CLI_Command: "wp multipage rebuild|status" (WP-CLI only)
+│   ├── pchap-cli.php                  # PChap_CLI_Command: "wp post-chapters rebuild|status" (WP-CLI only)
 │   ├── pchap-functions.php            # Version getters, text domain loading
 │   ├── pchap-options.php              # Option definitions, validation, sanitization, cached getters
 │   ├── pchap-parser.php               # PChap_Parser: splits the content into subpages
@@ -48,14 +48,14 @@ post-chapters/
 │       └── tinymce/
 │           ├── languages.php        # Deprecated, never loaded (see PChap_Admin::pchap_wp_mce_translation())
 │           ├── js/plugin[.min].js   # TinyMCE "Subpage" button and placeholders
-│           ├── css/multipage[.min].css  # TinyMCE content styles (placeholder image)
+│           ├── css/post-chapters[.min].css  # TinyMCE content styles (placeholder image)
 │           └── images/              # Placeholder images (1x and 2x)
 │
 ├── admin/
 │   └── css/post-chapters-admin[-rtl][.min].css  # Admin styles (LTR / RTL)
 │
 ├── css/
-│   └── multipage[-rtl][.min].css    # Frontend styles (LTR / RTL)
+│   └── post-chapters[-rtl][.min].css    # Frontend styles (LTR / RTL)
 │
 ├── languages/
 │   ├── post-chapters.pot                       # Translation template (wp i18n make-pot)
@@ -92,13 +92,14 @@ post-chapters/
 ```
 1. WordPress loads post-chapters.php
    │
-   ├── Defines PCHAP_VERSION ('1.7.1') and PCHAP__PLUGIN_FILE
+   ├── Defines PCHAP_VERSION ('2.0.0') and PCHAP__PLUGIN_FILE
+   ├── pchap_is_multipage_active()? → only an admin notice, nothing else is loaded
    ├── require class-pchap.php
    └── pchap() → PChap::instance()
        │
        ├── constants()       → PCHAP_PLUGIN_DIR, PCHAP_PLUGIN_URL, PCHAP_PATTERN, PCHAP_GUTENBERG_PATTERN
        │                       (the two patterns are kept for backward compatibility only)
-       ├── setup_globals()   → $version, $db_version (1700), paths
+       ├── setup_globals()   → $version, $db_version (2000), paths
        ├── includes()        → versions() (detects a legacy 1.3 install), then:
        │   ├── if is_admin(): add_action( 'init', 'pchap_admin' ) → new PChap_Admin
        │   ├── classes/class-pchap-admin.php, classes/class-pchap-shortcodes.php
@@ -111,7 +112,11 @@ post-chapters/
 
 Hooks registered at file load: `init` → `pchap_load_textdomain()` and `pchap_register_blocks()`; `load_script_translation_file` → `pchap_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `pchap_maybe_clear_options_cache()`; `pchap_rebuild_postmeta_batch` (WP-Cron) → `pchap_cron_rebuild_postmeta()`. No string is translated before `init`.
 
-The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so the older WordPress.org listing of the same slug (owned by the original author) can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
+**Coexistence with Multipage.** Multipage handles the same shortcode, block and options. `pchap_is_multipage_active()` reads the active plugins (site and network) for a file named `sgr-nextpage-titles.php`, and checks the `Multipage` class: the class alone is not enough, because `post-chapters/` loads before `sgr-nextpage-titles/`. When Multipage is active, `post-chapters.php` only hooks `pchap_multipage_active_notice()` to `admin_notices` / `network_admin_notices` and returns. Since every class, function and constant was renamed in 2.0.0, both plugins can be installed (and even active) at the same time without a fatal error.
+
+**Hooks.** Every hook of the plugin is fired through `pchap_apply_filters()` / `pchap_do_action()` (`inc/pchap-functions.php`): they run the `pchap_*` hook, then, when callbacks are attached to it, the matching `mpp_*` name of Multipage through `apply_filters_deprecated()` / `do_action_deprecated()` (deprecated since 2.0.0, same arguments, after the `pchap_*` callbacks).
+
+The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
 
 ## Request Lifecycle (Frontend)
 
@@ -122,7 +127,7 @@ The live post content is the single source of truth: every request parses it wit
 `setup( $query = null )` loads the multipage data of the **main query** and is idempotent (keyed by post ID, raw page number and post object), so it can be called from several hooks and still works when another plugin short-circuits one of them.
 
 - Bails out for admin, non-singular, 404, feed, embed, trackback and robots requests
-- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `multipage`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
+- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `post-chapters`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
 - Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$pchap_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$pchap_index`, `$pchap_pagename`, `$page_title`
 - Returns whether the post is a multipage post; the requested subpage may still be out of range
 
@@ -262,7 +267,7 @@ Related methods:
 | `html` | Block titles, translated fallbacks | `wp_kses()` with the inline allowlist (`pchap_get_subpage_title_allowed_html()`: strong, b, em, i, code, mark, sub, sup, s, span), `force_balance_tags()`, no double encoding | Tags stripped, entities decoded, whitespace collapsed (not escaped) |
 | `text` | Titled `[nextpage]` shortcodes | Same, after encoding every `<` that does not start an allowed tag | Same, after the same encoding |
 
-`PChap::get_title_format( $index )` returns the format of a page. The intro is titled "Intro" and untitled pages "Page N" (`pchap_untitled_subpage_title`), both translated.
+`PChap::get_title_format( $index )` returns the format of a page. The intro is titled "Intro" and untitled pages "Chapter N" (`pchap_untitled_subpage_title`), both translated.
 
 ## Data Model
 
@@ -293,7 +298,7 @@ Defined in `pchap_get_option_definitions()` (type, default, allowed values, Sett
 
 - Both screens post to `options.php`. `pchap_sanitize_option()` stores booleans as `1`/`0` (an unchecked checkbox is posted as `null`), and an invalid value keeps the current valid value and adds one settings error naming the field
 - Getters (`pchap_hide_intro_title()`, `pchap_get_toc_position()`...) read through `pchap_get_option()` (in-memory cache, default applied per call) and `pchap_validate_option_value()`, so they always return a valid value. Legacy stored values (`''`, `'1'`, `'on'`, `'off'`) keep their meaning
-- The cache is cleared automatically when a Multipage option is added, updated or deleted; `pchap_clear_options_cache()` is still available
+- The cache is cleared automatically when a Post Chapters option is added, updated or deleted; `pchap_clear_options_cache()` is still available
 - Third-party fields added to these screens with `add_settings_field()` must also call `register_setting( 'post-chapters', ... )` (or `'post-chapters-advanced'`)
 
 ### Internal options
@@ -307,7 +312,7 @@ Defined in `pchap_get_option_definitions()` (type, default, allowed values, Sett
 | `_mpp-rebuild-lock` | Rebuild lock: a timestamp and an owner token separated by a pipe (written with direct atomic queries) |
 | `multipage` | Legacy 1.3 settings, converted then deleted by `pchap_update_to_1_4()` |
 
-The object cache group `multipage` holds the parse results (see `PChap::setup()`).
+The object cache group `post-chapters` holds the parse results (see `PChap::setup()`).
 
 ## Subpage Index Rebuild
 
@@ -318,15 +323,15 @@ The object cache group `multipage` holds the parse results (see `PChap::setup()`
 - **Lock**: `pchap_rebuild_acquire_lock()` (atomic `INSERT IGNORE`; a lock not refreshed for 5 minutes is taken over with a compare-and-set `UPDATE`), `pchap_rebuild_refresh_lock()`, `pchap_rebuild_release_lock()` (owner only), `pchap_is_rebuild_locked()`
 - **Background (WP-Cron)**: `pchap_schedule_postmeta_rebuild()` saves `_mpp-rebuild-state` and schedules the single event `pchap_rebuild_postmeta_batch`. `pchap_cron_rebuild_postmeta()` takes the lock, schedules a watchdog, processes batches for 15 seconds (`pchap_rebuild_cron_time_limit`), then reschedules itself or completes (`pchap_complete_postmeta_rebuild()`). When locked, it retries a minute later
 - **Admin**: the "Rebuild subpage index" form on the Advanced screen posts to `admin-post.php?action=pchap_rebuild_postmeta` (nonce + `manage_options`). `pchap_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`pchap_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `pchap_admin_rebuild_postmeta_notice()`
-- **WP-CLI**: `wp multipage rebuild [--batch-size=<n>] [--dry-run]` and `wp multipage status [--format=table|json|yaml|csv]` (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
+- **WP-CLI**: `wp post-chapters rebuild [--batch-size=<n>] [--dry-run]` and `wp post-chapters status [--format=table|json|yaml|csv]` (`wp multipage` is an alias) (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
 
 ### Install, upgrade, activation
 
 - `pchap_setup_updater()` runs on `pchap_admin_init` (priority 1000). `pchap_get_installed_db_version()` combines the legacy 1.3 detection with `_mpp_db_version`
 - Fresh install: schedules a background rebuild, fires `pchap_on_install`
-- Update: `pchap_update_to_1_4()` (below 1000: converts the legacy settings, schedules a rebuild) and `pchap_update_to_1_7()` (below 1700: background rebuild), then fires `pchap_on_update`; `pchap_version_bump()` stores the new version
+- Update: `pchap_update_to_1_4()` (below 1000: converts the legacy settings, schedules a rebuild), `pchap_update_to_1_7()` (below 1700: background rebuild) and `pchap_update_to_2_0()` (below 2000: clears the `mpp_rebuild_postmeta_batch` event of Multipage and schedules `pchap_rebuild_postmeta_batch` when a rebuild is pending), then fires `pchap_on_update`; `pchap_version_bump()` stores the new version
 - `pchap_activation()` schedules a rebuild (posts edited while the plugin was inactive) and fires `pchap_activation`; `pchap_deactivation()` clears the cron hook and fires `pchap_deactivation`
-- `uninstall.php` deletes every option above, the cron hook and all `_mpp_data` meta, on every site of a multisite network
+- `uninstall.php` deletes every option above, the cron hook (and its Multipage name) and all `_mpp_data` meta, on every site of a multisite network. These are the names Multipage uses: deleting either plugin from the Plugins screen erases the data of both
 
 ## Hooks Reference
 
@@ -336,7 +341,7 @@ The object cache group `multipage` holds the parse results (see `PChap::setup()`
 |--------|-----------|----------|-------------|
 | `pchap_the_content` | `$output, $page_title, $toc, $content` | `class-pchap.php` | Title + TOC + content (the navigation is appended afterwards) |
 | `pchap_page_title_template` | `$template` | `class-pchap.php` | Subpage title template, `%s` = title HTML (default `<h2>%s</h2>`) |
-| `pchap_untitled_subpage_title` | `$title, $number, $page` | `class-pchap.php` | Fallback title of an untitled subpage (default "Page N") |
+| `pchap_untitled_subpage_title` | `$title, $number, $page` | `class-pchap.php` | Fallback title of an untitled subpage (default "Chapter N") |
 | `pchap_comment_block_names` | `$block_names` | `class-pchap.php` | Blocks hidden on subpages without comments (`core/comments`, `core/post-comments`, `core/post-comments-form`, `core/comments-title`, `core/comments-pagination`, `core/comment-template`, `core/comments-query-loop`) |
 | `pchap_subpage_title_allowed_html` | `$allowed` | `pchap-template.php` | Inline tags allowed in subpage titles (`wp_kses()` format) |
 | `pchap_link_pages_args` | `$params` | `pchap-template.php` | Navigation arguments |
@@ -417,18 +422,20 @@ The "Subpage" block (`multipage/subpage`) lives in `blocks/subpage/` and needs n
 
 ## CSS Loading
 
-`PChap::enqueue_styles()` runs on multipage views only. It looks for `css/multipage[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
+`PChap::enqueue_styles()` runs on multipage views only. It looks for `css/post-chapters[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
 
-1. Child theme
-2. Parent theme
+1. Child theme: `css/post-chapters*.css`, then the Multipage name `css/multipage*.css`
+2. Parent theme: same two names
 3. Plugin default (falls back to the LTR file if the RTL one is missing)
+
+The handle is `{theme}-post-chapters` for a theme file, `post-chapters` for the plugin file.
 
 The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-post-navigation`. In the RTL file, the `top-left` / `top-right` TOC positions keep their physical side. The admin stylesheet is `admin/css/post-chapters-admin[-rtl][.min].css`.
 
 ## Translations
 
 - `pchap_load_textdomain()` (`init`) calls `load_plugin_textdomain( 'post-chapters', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
-- The language packs of translate.wordpress.org for this slug belong to the original plugin (old strings only). `pchap_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `pchap_prefer_bundled_translations` filter turns the replacement off
+- A language pack can lag behind the strings of a release (and, under the old `sgr-nextpage-titles` slug, the packs belonged to the original plugin). `pchap_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `pchap_prefer_bundled_translations` filter turns the replacement off
 - Block strings come from `block.json` (translated in PHP, contexts "block title", "block description", "block keyword") and from `index.js` (JSON file)
 - See [CONTRIBUTING.md](CONTRIBUTING.md#translations) for the regeneration workflow and `bin/check-i18n.sh`
 
@@ -446,8 +453,8 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 
 ## Tests and Tooling
 
-- PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `PChap_UnitTestCase` resets the `Multipage` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `PChap_Test_Corpus` holds real-world contents with their expected pages
-- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap_`, `_pchap_` and `multipage`
+- PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `PChap_UnitTestCase` resets the `PChap` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `PChap_Test_Corpus` holds real-world contents with their expected pages
+- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap`, `pchap_` and `_pchap_`
 - CI (`.github/workflows/ci.yml`): PHP lint 7.4–8.4, PHPCS, i18n check, PHPUnit on WordPress 6.3 / PHP 7.4, 7.1.4 / PHP 7.4 and 7.1.4 / PHP 8.4, release zip
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the commands.

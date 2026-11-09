@@ -1,6 +1,6 @@
-# Contributing to Multipage
+# Contributing to Post Chapters
 
-Thank you for your interest in contributing to the Multipage plugin! This document explains how to set up the development environment, run the checks and tests, and submit changes.
+Thank you for your interest in contributing to Post Chapters! This document explains how to set up the development environment, run the checks and tests, and submit changes.
 
 ## Requirements
 
@@ -31,16 +31,16 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
    ```bash
    npx wp-env start
    ```
-   The site runs at http://localhost:8888 (user `admin`, password `password`), with Multipage active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored.
+   The site runs at http://localhost:8888 (user `admin`, password `password`), with Post Chapters active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored.
 
-You can also use another local environment (Local, DDEV...): symlink or copy the folder into `wp-content/plugins/` and activate **Multipage**.
+You can also use another local environment (Local, DDEV...): symlink or copy the folder into `wp-content/plugins/` and activate **Post Chapters**.
 
 ## Project Structure
 
 ```
 post-chapters/
   post-chapters.php       # Plugin entry point (header, PCHAP_VERSION)
-  class-pchap.php                 # Multipage class: request setup, rendering, SEO
+  class-pchap.php                 # PChap class: request setup, rendering, SEO
   uninstall.php                 # Data cleanup (multisite aware)
   blocks/subpage/               # Subpage block: block.json, index.js, index.asset.php, editor.css
   classes/
@@ -52,7 +52,7 @@ post-chapters/
     pchap-options.php             # Option definitions, validation, getters
     pchap-update.php              # Upgrades, subpage index rebuild, WP-Cron
     pchap-blocks.php              # Block registration, JS translations
-    pchap-cli.php                 # wp multipage rebuild|status
+    pchap-cli.php                 # wp post-chapters rebuild|status
     pchap-functions.php           # Version getters, text domain
     admin/                      # Settings screens, TinyMCE plugin
   css/, admin/css/              # Frontend and admin styles (LTR / RTL, minified)
@@ -104,7 +104,7 @@ npx wp-env run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/p
 ```
 
 - The configuration is strict: PHP notices, warnings and deprecations, risky tests and unexpected output fail the run
-- Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `Multipage` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
+- Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `PChap` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
 - Content cases shared by several tests live in `PChap_Test_Corpus` (`tests/includes/class-pchap-test-corpus.php`); add a case there when you fix a parsing bug
 - Splitting changes must keep every page balanced (tags and block delimiters) and must not leave empty elements: see `tests/test-split-html.php` and `tests/test-request-invariant.php`
 - CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx wp-env start`
@@ -137,7 +137,7 @@ To refresh the files after changing strings, from the plugin root:
 ```bash
 # 1. Template (reads PHP, JavaScript and block.json)
 wp i18n make-pot . languages/post-chapters.pot --domain=post-chapters \
-  --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name=Multipage \
+  --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name="Post Chapters" \
   --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}'
 
 # 2. Merge the new strings into every catalog, drop obsolete entries
@@ -169,7 +169,7 @@ bin/build-zip.sh
 
 The archive `build/post-chapters.zip` holds one top-level `post-chapters/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `PCHAP_VERSION` in `post-chapters.php` and `version` in `blocks/subpage/block.json`, and the database version in `PChap::setup_globals()` when an upgrade routine is added.
 
-The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with the older WordPress.org listing of the same slug (owned by its original author). Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
+The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with a WordPress.org plugin of the same slug. Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
 
 ## Submitting a Pull Request
 
