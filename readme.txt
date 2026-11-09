@@ -82,7 +82,7 @@ Yes, with any public post type that supports the editor: chapters work as they d
 
 = Is it fast? =
 
-On a post without chapters, the plugin only looks for a chapter marker. A split post is parsed once and the result is kept in the object cache (tested with Redis), and the stylesheet is only loaded on split posts.
+With WordPress 6.8 or later, the next chapter is prefetched when a visitor hovers a navigation or table of contents link, so turning the page is almost instant (not for logged in users, as for all speculative loading in WordPress). The stylesheet is printed inline, one request less. On a post without chapters, the plugin only looks for a chapter marker. A split post is parsed once and the result is kept in the object cache (tested with Redis), and the stylesheet is only loaded on split posts.
 
 = What happens with a chapter number that does not exist? =
 

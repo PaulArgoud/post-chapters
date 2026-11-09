@@ -92,7 +92,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 
 		// Remove the request hooks (title, content, styles, SEO...) of the previous request,
 		// registered by the instance and by its components.
-		$owners = array( $mpp, $mpp->seo, $mpp->comments );
+		$owners = array( $mpp, $mpp->seo, $mpp->comments, $mpp->speculation );
 		foreach ( array( 'yoast', 'rank_math', 'seopress', 'aioseo', 'seo_framework' ) as $key ) {
 			$owners[] = $mpp->seo->get_integration( $key );
 		}

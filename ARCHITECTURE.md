@@ -29,6 +29,7 @@ post-chapters/
 │   │                                #   TinyMCE / Quicktags / Classic block integration, admin CSS
 │   ├── class-pchap-seo.php            # PChap_SEO (pchap()->seo): document title, rel prev/next, SEO plugins
 │   ├── class-pchap-comments.php       # PChap_Comments (pchap()->comments): comments on all / first / last chapter
+│   ├── class-pchap-speculation.php    # PChap_Speculation (pchap()->speculation): the chapter links are prefetched (WP 6.8+)
 │   └── class-pchap-shortcodes.php     # PChap_Shortcodes: [nextpage] shortcode handler
 │
 ├── inc/
@@ -164,7 +165,8 @@ pchap_post()
 ├── pre_render_block / render_block_core/post-content → track the core/post-content block
 ├── wp_enqueue_scripts → enqueue_styles()
 ├── comments->register_hooks() → comments_template, pre_render_block (when the chapter shows no comments)
-└── seo->register_hooks() → document_title_parts, wp_head (rel links), Yoast SEO / Rank Math / SEOPress (only when active)
+├── seo->register_hooks() → document_title_parts, wp_head (rel links), the SEO plugin integrations (only when active)
+└── speculation->register_hooks() → wp_load_speculation_rules (WordPress 6.8+)
 ```
 
 ### 4. Rendering: `the_content`
@@ -358,6 +360,9 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 | `pchap_the_content` | `$output, $page_title, $toc, $content` | `class-pchap.php` | Title + TOC + content (the navigation is appended afterwards) |
 | `pchap_page_title_template` | `$template` | `class-pchap.php` | Subpage title template, `%s` = title HTML (default `<h2>%s</h2>`) |
 | `pchap_untitled_subpage_title` | `$title, $number, $page` | `class-pchap.php` | Fallback title of an untitled subpage (default "Chapter N") |
+| `pchap_speculation_rule` | `$rule` | `class-pchap-speculation.php` | Speculation rule of the chapter links (`source`, `where`, `eagerness`, default `moderate`: on hover); return an empty value for no rule |
+| `pchap_speculation_mode` | `$mode` | `class-pchap-speculation.php` | `prefetch` (default) or `prerender` |
+| `pchap_seo_integrations` | `$integrations` | `class-pchap-seo.php` | SEO plugin integrations (objects extending `PChap_SEO_Integration`) |
 | `pchap_comment_block_names` | `$block_names` | `class-pchap.php` | Blocks hidden on subpages without comments (`core/comments`, `core/post-comments`, `core/post-comments-form`, `core/comments-title`, `core/comments-pagination`, `core/comment-template`, `core/comments-query-loop`) |
 | `pchap_subpage_title_allowed_html` | `$allowed` | `pchap-template.php` | Inline tags allowed in subpage titles (`wp_kses()` format) |
 | `pchap_link_pages_args` | `$params` | `pchap-template.php` | Navigation arguments |

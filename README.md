@@ -21,7 +21,7 @@ Post Chapters is the continuation of **Multipage** (`sgr-nextpage-titles`), orig
 - **Comments** on all chapters, the first one or the last one, in classic and block themes
 - **SEO-friendly**: chapter titles in `<title>`, `rel=prev` / `rel=next` links, integrations with Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework (chapter title in every title, canonical and Open Graph URL of each chapter, indexable chapters)
 - **Block and classic themes**: the table of contents and the navigation are added once, only to the post being viewed (never to excerpts, related posts or Query Loop blocks)
-- **Fast**: on posts without chapters the plugin only looks for a chapter marker, and it parses split posts once, keeping the result in the object cache (tested with Redis)
+- **Fast**: the next chapter is prefetched when the reader hovers a navigation or table of contents link (WordPress 6.8+, visitors who are not logged in), the stylesheet is printed inline, and on posts without chapters the plugin only looks for a chapter marker, and it parses split posts once, keeping the result in the object cache (tested with Redis)
 - **Custom CSS**: override the plugin styles from your theme
 - **RTL support** (frontend and admin)
 - **Internationalized**: French, German, Italian and Spanish included
@@ -134,6 +134,8 @@ The plugin checks the child theme first, then the parent theme, then falls back 
 | `pchap_untitled_subpage_title` | Fallback title of untitled chapters (default: "Chapter N") |
 | `pchap_subpage_title_allowed_html` | Inline HTML allowed in chapter titles |
 | `pchap_comment_block_names` | Comment blocks hidden on chapters without comments (block themes) |
+| `pchap_speculation_rule` / `pchap_speculation_mode` | The rule that prefetches the chapter links on hover (WordPress 6.8+): change it, switch to `prerender`, or return an empty value to turn it off |
+| `pchap_seo_integrations` | Add an SEO plugin integration |
 | `pchap_get_admin_tabs` | Add or remove admin settings tabs |
 
 Every hook was called `mpp_*` in Multipage; the old names still work but are deprecated. See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete hooks reference.

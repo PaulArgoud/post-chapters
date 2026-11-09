@@ -67,6 +67,14 @@ class PChap {
 	 */
 	public $comments = null;
 
+	/**
+	 * Speculative loading component: the next chapter is prefetched.
+	 *
+	 * @since 2.1.0
+	 * @var PChap_Speculation|null
+	 */
+	public $speculation = null;
+
 	/** Paths *****************************************************************/
 
 	/**
@@ -339,6 +347,7 @@ class PChap {
 		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-framework.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-seo.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-comments.php';
+		require_once $this->plugin_dir . 'classes/class-pchap-speculation.php';
 
 		require_once $this->plugin_dir . 'inc/pchap-admin.php';
 		require_once $this->plugin_dir . 'inc/pchap-functions.php';
@@ -350,8 +359,9 @@ class PChap {
 		require_once $this->plugin_dir . 'inc/pchap-blocks.php';
 		require_once $this->plugin_dir . 'inc/pchap-cli.php';
 
-		$this->seo      = new PChap_SEO( $this );
-		$this->comments = new PChap_Comments( $this );
+		$this->seo         = new PChap_SEO( $this );
+		$this->comments    = new PChap_Comments( $this );
+		$this->speculation = new PChap_Speculation( $this );
 	}
 
 	/**
@@ -694,6 +704,9 @@ class PChap {
 
 		// Document title, rel prev/next links and SEO plugins.
 		$this->seo->register_hooks();
+
+		// The links of the chapters are prefetched before the click (WordPress 6.8+).
+		$this->speculation->register_hooks();
 	}
 
 	/**
