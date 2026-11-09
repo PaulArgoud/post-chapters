@@ -25,7 +25,7 @@
 #
 # Refresh workflow (after changing strings), from the plugin root:
 #   wp i18n make-pot . languages/post-chapters.pot --domain=post-chapters \
-#     --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name=Post Chapters \
+#     --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name="Post Chapters" \
 #     --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}'
 #   for po in languages/*.po; do
 #     msgmerge --quiet --no-wrap --backup=off --update "$po" languages/post-chapters.pot
@@ -98,7 +98,7 @@ echo "== Extracting strings from the code (wp i18n make-pot)"
 MAKE_POT_LOG="$("${WP[@]}" i18n make-pot . "${CODE_POT}" \
 	--domain="${DOMAIN}" \
 	--exclude="${EXCLUDE}" \
-	--package-name=Post Chapters \
+	--package-name="Post Chapters" \
 	--headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}' \
 	"${WP_EXTRA[@]+"${WP_EXTRA[@]}"}" 2>&1)" || {
 	echo "${MAKE_POT_LOG}" >&2

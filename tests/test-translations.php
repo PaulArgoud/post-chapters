@@ -92,7 +92,7 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 
 		$this->assert_registry_resolves_pack();
 		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
-		$this->assertSame( 'Navigation des sous-pages', __( 'Subpage navigation', 'post-chapters' ) );
+		$this->assertSame( 'Navigation des chapitres', __( 'Chapter navigation', 'post-chapters' ) );
 	}
 
 	/**

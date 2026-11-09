@@ -3,7 +3,7 @@
 	"description": "Post Chapters: split WordPress posts into multiple subpages, each with its own title and an automatic table of contents.",
 	"type": "wordpress-plugin",
 	"license": "GPL-3.0-or-later",
-	"homepage": "https://wordpress.org/plugins/post-chapters/",
+	"homepage": "https://github.com/PaulArgoud/post-chapters",
 	"authors": [
 		{
 			"name": "Paul ARGOUD",

@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the Multipage package (GPL v3).
 msgid ""
 msgstr ""
-"Project-Id-Version: Multipage 1.7.0\n"
-"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/sgr-nextpage-titles/issues\n"
-"POT-Creation-Date: 2026-11-07T21:52:12+00:00\n"
+"Project-Id-Version: Post Chapters 2.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/post-chapters/issues\n"
+"POT-Creation-Date: 2026-11-09T15:11:50+00:00\n"
 "PO-Revision-Date: 2026-11-07 20:54+0000\n"
 "Last-Translator: Multipage contributors\n"
 "Language-Team: Spanish (Spain)\n"
@@ -15,137 +15,137 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: GNU gettext msgmerge + reviewed translations\n"
-"X-Domain: sgr-nextpage-titles\n"
+"X-Domain: post-chapters\n"
 
 #. Plugin Name of the plugin
-#: sgr-nextpage-titles.php classes/class-mpp-admin.php:159
-msgid "Multipage"
-msgstr "Multipage"
+#: post-chapters.php classes/class-pchap-admin.php:159
+msgid "Post Chapters"
+msgstr "Post Chapters"
 
 #. Plugin URI of the plugin
-#: sgr-nextpage-titles.php
-msgid "https://wordpress.org/plugins/sgr-nextpage-titles/"
-msgstr "https://es.wordpress.org/plugins/sgr-nextpage-titles/"
+#: post-chapters.php
+msgid "https://github.com/PaulArgoud/post-chapters"
+msgstr "https://github.com/PaulArgoud/post-chapters"
 
 #. Description of the plugin
-#: sgr-nextpage-titles.php
-msgid "Split your WordPress posts into multiple subpages, each with its own title and an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation."
-msgstr "Divide tus entradas de WordPress en varias subpáginas, cada una con su propio título y una tabla de contenidos automática. Compatible con los bloques de Gutenberg, los shortcodes del editor clásico, un marcado optimizado para SEO y una navegación personalizable."
+#: post-chapters.php
+msgid "Split your long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation."
+msgstr "Divide tus entradas largas de WordPress en capítulos, cada uno en su propia página y con su propio título, y añade una tabla de contenidos automática. Compatible con los bloques de Gutenberg, los shortcodes del editor clásico, un marcado optimizado para SEO y una navegación personalizable."
 
 #. Author of the plugin
-#: sgr-nextpage-titles.php
-msgid "Paul ARGOUD, based on an original idea by SGr33n (aka Sergio De Falco, Envire Web Solutions)."
-msgstr "Paul ARGOUD, basado en una idea original de SGr33n (alias Sergio De Falco, Envire Web Solutions)."
+#: post-chapters.php
+msgid "Paul ARGOUD, based on Multipage by SGr33n (aka Sergio De Falco, Envire Web Solutions)."
+msgstr "Paul ARGOUD, basado en Multipage de SGr33n (alias Sergio De Falco, Envire Web Solutions)."
 
 #. Author URI of the plugin
-#: sgr-nextpage-titles.php
+#: post-chapters.php
 msgid "https://paul.argoud.net"
 msgstr "https://paul.argoud.net"
 
-#: class-mpp.php:513 classes/class-mpp-admin.php:231
+#: class-pchap.php:535 classes/class-pchap-admin.php:231
 msgid "Intro"
 msgstr "Introducción"
 
-#. translators: %d: subpage number.
-#: class-mpp.php:521
+#. translators: %d: chapter number.
+#: class-pchap.php:543
 #, php-format
-msgid "Page %d"
-msgstr "Página %d"
+msgid "Chapter %d"
+msgstr "Capítulo %d"
 
-#. translators: %: subpage number (literal percent sign, replaced by the number).
-#: class-mpp.php:1354
-msgid "Page %"
-msgstr "Página %"
+#. translators: %: chapter number (literal percent sign, replaced by the number).
+#: class-pchap.php:1376
+msgid "Chapter %"
+msgstr "Capítulo %"
 
-#: class-mpp.php:1371
-msgid "Subpage navigation"
-msgstr "Navegación de subpáginas"
+#: class-pchap.php:1393
+msgid "Chapter navigation"
+msgstr "Navegación de capítulos"
 
-#: class-mpp.php:1405 classes/class-mpp-admin.php:246
+#: class-pchap.php:1427 classes/class-pchap-admin.php:246
 msgid "Table of contents"
 msgstr "Tabla de contenidos"
 
-#: classes/class-mpp-admin.php:158
-msgid "Multipage Options"
-msgstr "Opciones de Multipage"
+#: classes/class-pchap-admin.php:158
+msgid "Post Chapters Options"
+msgstr "Opciones de Post Chapters"
 
-#: classes/class-mpp-admin.php:167 classes/class-mpp-admin.php:168
-msgid "Multipage Advanced Settings"
-msgstr "Ajustes avanzados de Multipage"
+#: classes/class-pchap-admin.php:167 classes/class-pchap-admin.php:168
+msgid "Post Chapters Advanced Settings"
+msgstr "Ajustes avanzados de Post Chapters"
 
-#: classes/class-mpp-admin.php:228
+#: classes/class-pchap-admin.php:228
 msgid "Main Settings"
 msgstr "Ajustes principales"
 
-#: classes/class-mpp-admin.php:234 inc/admin/admin-settings.php:149
+#: classes/class-pchap-admin.php:234 inc/admin/admin-settings.php:149
 msgid "Display comments on"
 msgstr "Mostrar los comentarios en"
 
-#: classes/class-mpp-admin.php:237
+#: classes/class-pchap-admin.php:237
 msgid "Pagination"
 msgstr "Paginación"
 
-#: classes/class-mpp-admin.php:240
+#: classes/class-pchap-admin.php:240
 msgid "Navigation type"
 msgstr "Tipo de navegación"
 
-#: classes/class-mpp-admin.php:243
+#: classes/class-pchap-admin.php:243
 msgid "Disable the standard pagination"
 msgstr "Desactivar la paginación estándar"
 
-#: classes/class-mpp-admin.php:249
+#: classes/class-pchap-admin.php:249
 msgid "Only on the first page"
 msgstr "Solo en la primera página"
 
-#: classes/class-mpp-admin.php:252
+#: classes/class-pchap-admin.php:252
 msgid "Position"
 msgstr "Posición"
 
-#: classes/class-mpp-admin.php:255 inc/admin/admin-settings.php:218
+#: classes/class-pchap-admin.php:255 inc/admin/admin-settings.php:218
 msgid "Row labels"
 msgstr "Etiquetas de las filas"
 
-#: classes/class-mpp-admin.php:258
+#: classes/class-pchap-admin.php:258
 msgid "Hide header"
 msgstr "Ocultar la cabecera"
 
-#: classes/class-mpp-admin.php:261
+#: classes/class-pchap-admin.php:261
 msgid "Comments link"
 msgstr "Enlace a los comentarios"
 
-#: classes/class-mpp-admin.php:269
+#: classes/class-pchap-admin.php:269
 msgid "Rewrite Title Priority"
 msgstr "Prioridad de reescritura del título"
 
-#: classes/class-mpp-admin.php:272
+#: classes/class-pchap-admin.php:272
 msgid "Rewrite Content Priority"
 msgstr "Prioridad de reescritura del contenido"
 
-#: classes/class-mpp-admin.php:275 inc/admin/admin-advanced-settings.php:87
+#: classes/class-pchap-admin.php:275 inc/admin/admin-advanced-settings.php:87
 msgid "Disable TinyMCE Buttons"
 msgstr "Desactivar los botones de TinyMCE"
 
-#: classes/class-mpp-admin.php:320
+#: classes/class-pchap-admin.php:320
 msgid "Settings"
 msgstr "Ajustes"
 
-#: classes/class-mpp-admin.php:357
-msgid "subpage"
-msgstr "subpágina"
+#: classes/class-pchap-admin.php:357
+msgid "chapter"
+msgstr "capítulo"
 
-#: classes/class-mpp-admin.php:358 classes/class-mpp-admin.php:537
+#: classes/class-pchap-admin.php:358 classes/class-pchap-admin.php:537
 #: inc/admin/tinymce/languages.php:34
-msgid "Start a new Subpage"
-msgstr "Empezar una nueva subpágina"
+msgid "Start a new chapter"
+msgstr "Empezar un nuevo capítulo"
 
-#: classes/class-mpp-admin.php:359 classes/class-mpp-admin.php:538
+#: classes/class-pchap-admin.php:359 classes/class-pchap-admin.php:538
 #: inc/admin/tinymce/languages.php:35
-msgid "Enter the subpage title"
-msgstr "Introduce el título de la subpágina"
+msgid "Enter the chapter title"
+msgstr "Introduce el título del capítulo"
 
 #: inc/admin/admin-advanced-settings.php:36
-msgid "Some plugins need this higher in order to correctly show the subpage title instead of \"Page # of #\". If the title works good please leave this to normal."
-msgstr "Algunos plugins necesitan un valor más alto para mostrar correctamente el título de la subpágina en lugar de «Página # de #». Si el título se muestra correctamente, deja este valor en «Normal»."
+msgid "Some plugins need this higher in order to correctly show the chapter title instead of \"Page # of #\". If the title works good please leave this to normal."
+msgstr "Algunos plugins necesitan un valor más alto para mostrar correctamente el título del capítulo en lugar de «Página # de #». Si el título se muestra correctamente, deja este valor en «Normal»."
 
 #. translators: %1$s: URL of the_content filter documentation.
 #: inc/admin/admin-advanced-settings.php:55
@@ -154,8 +154,8 @@ msgid "This value affects the position where the table of contents is displayed,
 msgstr "Este valor determina la posición en la que se muestra la tabla de contenidos respecto a otros plugins que usan el filtro <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code>, por ejemplo, encima o debajo de los botones para compartir en redes sociales o de las entradas relacionadas. Si la posición de la tabla de contenidos es correcta, deja este valor en «Normal»."
 
 #: inc/admin/admin-advanced-settings.php:88
-msgid "Disable the TinyMCE Subpage button in the classic editor. Leave unchecked unless you experience editor conflicts."
-msgstr "Desactiva el botón Subpágina de TinyMCE en el editor clásico. Déjalo sin marcar salvo que tengas conflictos con el editor."
+msgid "Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts."
+msgstr "Desactiva el botón Capítulo de TinyMCE en el editor clásico. Déjalo sin marcar salvo que tengas conflictos con el editor."
 
 #. translators: %s: date and time of the last rebuild.
 #: inc/admin/admin-advanced-settings.php:123
@@ -168,16 +168,16 @@ msgid "Last rebuilt: unknown date."
 msgstr "Última reconstrucción: fecha desconocida."
 
 #: inc/admin/admin-advanced-settings.php:129
-msgid "The subpage index has never been rebuilt on this site."
-msgstr "El índice de subpáginas nunca se ha reconstruido en este sitio."
+msgid "The chapter index has never been rebuilt on this site."
+msgstr "El índice de capítulos nunca se ha reconstruido en este sitio."
 
 #: inc/admin/admin-advanced-settings.php:132
-msgid "Subpage index"
-msgstr "Índice de subpáginas"
+msgid "Chapter index"
+msgstr "Índice de capítulos"
 
 #: inc/admin/admin-advanced-settings.php:134
-msgid "Multipage stores the list of subpages of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
-msgstr "Multipage guarda la lista de subpáginas de cada entrada cuando se guarda la entrada. Reconstruye este índice después de una actualización o de una importación, o si la tabla de contenidos de una entrada parece desactualizada. Las entradas se procesan por lotes; en sitios grandes, las entradas restantes se procesan en segundo plano."
+msgid "Post Chapters stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
+msgstr "Post Chapters guarda la lista de capítulos de cada entrada cuando se guarda la entrada. Reconstruye este índice después de una actualización o de una importación, o si la tabla de contenidos de una entrada parece desactualizada. Las entradas se procesan por lotes; en sitios grandes, las entradas restantes se procesan en segundo plano."
 
 #. translators: %s: number of posts already checked.
 #: inc/admin/admin-advanced-settings.php:144
@@ -188,8 +188,8 @@ msgstr[0] "Hay una reconstrucción en curso en segundo plano: %s entrada comprob
 msgstr[1] "Hay una reconstrucción en curso en segundo plano: %s entradas comprobadas hasta ahora."
 
 #: inc/admin/admin-advanced-settings.php:160
-msgid "Rebuild subpage index"
-msgstr "Reconstruir el índice de subpáginas"
+msgid "Rebuild chapter index"
+msgstr "Reconstruir el índice de capítulos"
 
 #: inc/admin/admin-advanced-settings.php:176
 msgid "Sorry, you are not allowed to manage options for this site."
@@ -203,7 +203,7 @@ msgid_plural "%s posts checked"
 msgstr[0] "%s entrada comprobada"
 msgstr[1] "%s entradas comprobadas"
 
-#. translators: %s: number of posts whose subpage index was updated.
+#. translators: %s: number of posts whose chapter index was updated.
 #: inc/admin/admin-advanced-settings.php:261
 #, php-format
 msgid "%s post updated"
@@ -211,7 +211,7 @@ msgid_plural "%s posts updated"
 msgstr[0] "%s entrada actualizada"
 msgstr[1] "%s entradas actualizadas"
 
-#. translators: %s: number of stale subpage indexes removed.
+#. translators: %s: number of stale chapter indexes removed.
 #: inc/admin/admin-advanced-settings.php:266
 #, php-format
 msgid "%s stale entry removed"
@@ -222,26 +222,26 @@ msgstr[1] "%s registros obsoletos eliminados"
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
 #: inc/admin/admin-advanced-settings.php:277
 #, php-format
-msgid "Subpage index rebuilt: %1$s, %2$s, %3$s."
-msgstr "Índice de subpáginas reconstruido: %1$s, %2$s, %3$s."
+msgid "Chapter index rebuilt: %1$s, %2$s, %3$s."
+msgstr "Índice de capítulos reconstruido: %1$s, %2$s, %3$s."
 
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
 #: inc/admin/admin-advanced-settings.php:286
 #, php-format
-msgid "Subpage index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background."
-msgstr "Reconstrucción del índice de subpáginas iniciada: hasta ahora, %1$s, %2$s, %3$s. Las entradas restantes se procesan en segundo plano."
+msgid "Chapter index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background."
+msgstr "Reconstrucción del índice de capítulos iniciada: hasta ahora, %1$s, %2$s, %3$s. Las entradas restantes se procesan en segundo plano."
 
 #: inc/admin/admin-advanced-settings.php:293
-msgid "A subpage index rebuild is already running. Please try again in a few minutes."
-msgstr "Ya hay una reconstrucción del índice de subpáginas en curso. Inténtalo de nuevo dentro de unos minutos."
+msgid "A chapter index rebuild is already running. Please try again in a few minutes."
+msgstr "Ya hay una reconstrucción del índice de capítulos en curso. Inténtalo de nuevo dentro de unos minutos."
 
 #: inc/admin/admin-advanced-settings.php:333 inc/admin/admin-settings.php:269
-msgid "Multipage Settings"
-msgstr "Ajustes de Multipage"
+msgid "Post Chapters Settings"
+msgstr "Ajustes de Post Chapters"
 
 #: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-settings.php:272
-msgid "Multipage settings sections"
-msgstr "Secciones de los ajustes de Multipage"
+msgid "Post Chapters settings sections"
+msgstr "Secciones de los ajustes de Post Chapters"
 
 #: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-functions.php:126
 msgid "Advanced"
@@ -278,8 +278,8 @@ msgid "Disable the WordPress standard pagination"
 msgstr "Desactivar la paginación estándar de WordPress"
 
 #: inc/admin/admin-settings.php:177
-msgid "WordPress, by default, displays a pagination with only numbers on standard multipage posts. Please uncheck this if you still want the standard pagination to display on multipage posts."
-msgstr "De forma predeterminada, WordPress muestra en las entradas de varias páginas una paginación compuesta solo por números. Desmarca esta opción si aun así quieres que se muestre la paginación estándar en las entradas de varias páginas."
+msgid "By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed."
+msgstr "De forma predeterminada, WordPress muestra en las entradas divididas en páginas una paginación compuesta solo por números. Desmarca esta opción si aun así quieres que se muestre esta paginación estándar."
 
 #: inc/admin/admin-settings.php:191
 msgid "Display the table of contents only on the first page of the post"
@@ -297,129 +297,146 @@ msgstr "Añadir un enlace a los comentarios dentro de la tabla de contenidos"
 msgid "If comments are enabled, this will display, inside the table of contents, a link for the comments list."
 msgstr "Si los comentarios están activados, se mostrará un enlace a la lista de comentarios dentro de la tabla de contenidos."
 
-#: inc/mpp-options.php:170
+#: inc/pchap-options.php:170
 msgid "Highest"
 msgstr "Muy alta"
 
-#: inc/mpp-options.php:171
+#: inc/pchap-options.php:171
 msgid "High"
 msgstr "Alta"
 
-#: inc/mpp-options.php:172
+#: inc/pchap-options.php:172
 msgid "Normal"
 msgstr "Normal"
 
-#: inc/mpp-options.php:173
+#: inc/pchap-options.php:173
 msgid "Low"
 msgstr "Baja"
 
-#: inc/mpp-options.php:174
+#: inc/pchap-options.php:174
 msgid "Lowest"
 msgstr "Muy baja"
 
-#: inc/mpp-options.php:179
+#: inc/pchap-options.php:179
 msgid "All pages — Display comments on all post pages"
 msgstr "Todas las páginas — Mostrar los comentarios en todas las páginas de la entrada"
 
-#: inc/mpp-options.php:180
+#: inc/pchap-options.php:180
 msgid "First page — Display comments only on the first page"
 msgstr "Primera página — Mostrar los comentarios solo en la primera página"
 
-#: inc/mpp-options.php:181
+#: inc/pchap-options.php:181
 msgid "Last page — Display comments only on the last page"
 msgstr "Última página — Mostrar los comentarios solo en la última página"
 
-#: inc/mpp-options.php:184
+#: inc/pchap-options.php:184
 msgid "Continue or back to intro"
 msgstr "Continuar o volver a la introducción"
 
-#: inc/mpp-options.php:185
+#: inc/pchap-options.php:185
 msgid "Next and previous"
 msgstr "Siguiente y anterior"
 
-#: inc/mpp-options.php:186
+#: inc/pchap-options.php:186
 msgid "Hidden"
 msgstr "Oculta"
 
-#: inc/mpp-options.php:189
+#: inc/pchap-options.php:189
 msgid "above the post content, align left"
 msgstr "encima del contenido de la entrada, alineada a la izquierda"
 
-#: inc/mpp-options.php:190
+#: inc/pchap-options.php:190
 msgid "above the post content, align right"
 msgstr "encima del contenido de la entrada, alineada a la derecha"
 
-#: inc/mpp-options.php:191
+#: inc/pchap-options.php:191
 msgid "above the post content"
 msgstr "encima del contenido de la entrada"
 
-#: inc/mpp-options.php:192
+#: inc/pchap-options.php:192
 msgid "below the post content"
 msgstr "debajo del contenido de la entrada"
 
-#: inc/mpp-options.php:193
+#: inc/pchap-options.php:193
 msgid "hidden"
 msgstr "oculta"
 
-#: inc/mpp-options.php:196
-msgid "number — Display numbers before the subpage title"
-msgstr "número — Mostrar el número antes del título de la subpágina"
+#: inc/pchap-options.php:196
+msgid "number — Display numbers before the chapter title"
+msgstr "número — Mostrar el número antes del título del capítulo"
 
-#: inc/mpp-options.php:197
-msgid "page # — Display \"Page #\" before the subpage title"
-msgstr "página # — Mostrar «Página #» antes del título de la subpágina"
+#: inc/pchap-options.php:197
+msgid "chapter # — Display \"Chapter #\" before the chapter title"
+msgstr "capítulo # — Mostrar «Capítulo #» antes del título del capítulo"
 
-#: inc/mpp-options.php:198
-msgid "hidden — Hide subpage labels, display only the title"
-msgstr "oculto — Ocultar las etiquetas de las subpáginas y mostrar solo el título"
+#: inc/pchap-options.php:198
+msgid "hidden — Hide the labels, display only the chapter title"
+msgstr "oculto — Ocultar las etiquetas y mostrar solo el título del capítulo"
 
 #. translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type").
-#: inc/mpp-options.php:380
+#: inc/pchap-options.php:380
 #, php-format
 msgid "An invalid value was submitted for the %s setting. The previous value was kept."
 msgstr "Se ha enviado un valor no válido para el ajuste %s. Se ha mantenido el valor anterior."
 
-#: inc/mpp-template.php:215
+#: inc/pchap-template.php:215
 msgid "Next page"
 msgstr "Página siguiente"
 
-#: inc/mpp-template.php:216
+#: inc/pchap-template.php:216
 msgid "Previous page"
 msgstr "Página anterior"
 
-#. translators: %s: link to the next subpage.
-#: inc/mpp-template.php:244
+#. translators: %s: link to the next chapter.
+#: inc/pchap-template.php:244
 #, php-format
 msgid "Continue: %s"
 msgstr "Continuar: %s"
 
-#. translators: %s: link to the first subpage.
-#: inc/mpp-template.php:248
+#. translators: %s: link to the first chapter.
+#: inc/pchap-template.php:248
 #, php-format
 msgid "Back to: %s"
 msgstr "Volver a: %s"
 
-#: inc/mpp-template.php:397
+#: inc/pchap-template.php:397
 msgid "Comments"
 msgstr "Comentarios"
 
-#: inc/mpp-template.php:419
+#: inc/pchap-template.php:419
 msgid "Contents"
 msgstr "Contenidos"
 
+#: post-chapters.php:72
+msgid "Post Chapters is not running yet."
+msgstr "Post Chapters todavía no está funcionando."
+
+#: post-chapters.php:73
+msgid "Deactivate Multipage: Post Chapters replaces it and takes over its settings and content."
+msgstr "Desactiva Multipage: Post Chapters lo sustituye y recupera sus ajustes y contenidos."
+
+#: post-chapters.php:74
+msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Post Chapters uses."
+msgstr "Para eliminar Multipage después, borra su carpeta del servidor en lugar de hacerlo desde la pantalla Plugins: al borrarse desde la pantalla Plugins, Multipage 1.5.15 y posteriores eliminan los ajustes y el índice de capítulos que usa Post Chapters."
+
 #: blocks/subpage/index.js:119
-msgid "Write subpage title…"
-msgstr "Escribe el título de la subpágina…"
+msgid "Write chapter title…"
+msgstr "Escribe el título del capítulo…"
 
 #: blocks/subpage/block.json
 msgctxt "block title"
-msgid "Subpage"
-msgstr "Subpágina"
+msgid "Chapter"
+msgstr "Capítulo"
 
 #: blocks/subpage/block.json
 msgctxt "block description"
-msgid "Add a subpage break to split your post into multiple pages."
-msgstr "Añade un salto de subpágina para dividir tu entrada en varias páginas."
+msgid "Start a new chapter: split your post into pages, each with its own title."
+msgstr "Empieza un nuevo capítulo: divide tu entrada en páginas, cada una con su propio título."
+
+#: blocks/subpage/block.json
+msgctxt "block keyword"
+msgid "chapter"
+msgstr "capítulo"
 
 #: blocks/subpage/block.json
 msgctxt "block keyword"
