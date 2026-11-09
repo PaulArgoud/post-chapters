@@ -75,11 +75,15 @@ Yes: Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework. On ch
 
 = Which plugins is it tested with? =
 
-On WordPress 7.1.4 with Twenty Twenty-Five, in November 2026: Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0 and Redis Object Cache 3.0.0 (with Redis 7). With each SEO plugin, a chapter has its own title, canonical URL and Open Graph URL, one pair of `rel=prev` / `rel=next` links, and is not set to `noindex` as a "paginated page". The WordPress core sitemap works as before. Custom post types, flat or hierarchical, work like posts. Page builders and e-commerce templates that render the post content themselves are not tested. If a plugin misbehaves with a chapter, please open an issue on [GitHub](https://github.com/PaulArgoud/post-chapters/issues).
+On WordPress 7.1.4 with Twenty Twenty-Five, in November 2026: Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0 and Redis Object Cache 3.0.0 (with Redis 7). With each SEO plugin, a chapter has its own title, canonical URL and Open Graph URL, one pair of `rel=prev` / `rel=next` links, and is not set to `noindex` as a "paginated page". The WordPress core sitemap works as before. Custom post types, flat or hierarchical, work like posts. Elementor 4.4.0 works with its Canvas and Full Width templates for posts written in the block or classic editor; posts built with the Elementor editor are not split (see the next question). Divi, Beaver Builder, Bricks, Elementor Pro theme templates and e-commerce templates that render the post content themselves are not tested. If a plugin misbehaves with a chapter, please open an issue on [GitHub](https://github.com/PaulArgoud/post-chapters/issues).
 
 = Does it work with custom post types? =
 
 Yes, with any public post type that supports the editor: chapters work as they do for posts, with the URL base of the post type. The Chapter block needs the block editor (`show_in_rest`); in the classic editor, use the **Chapter** button or the shortcode.
+
+= Does it work with page builders? =
+
+A page builder such as Elementor replaces the content of the posts it builds with its own layout, on every page, so the chapters of such a post would all show the whole post. Post Chapters therefore leaves posts built with Elementor, Divi, Beaver Builder or Bricks alone: write the chapters in the block editor or the classic editor. Only Elementor is tested; the others are recognized by their post meta. A post written in the block or classic editor and displayed with a builder template (for example Elementor's Canvas) is split as usual.
 
 = Is it fast? =
 

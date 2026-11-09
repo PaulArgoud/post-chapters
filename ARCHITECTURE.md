@@ -132,6 +132,7 @@ The live post content is the single source of truth: every request parses it wit
 
 - Bails out for admin, non-singular, 404, feed, embed, trackback and robots requests
 - Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `post-chapters`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
+- Steps aside (returns false) for a post that a page builder renders (`PChap::is_builder_post()`: post meta of Elementor, Divi, Beaver Builder and Bricks; filter `pchap_is_builder_post`): the builder replaces the content by its layout on every page, so the chapters would show the whole post. Checked only after the parse found a chapter marker, so posts without chapters cost nothing more
 - Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$pchap_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$pchap_index`, `$pchap_pagename`, `$page_title`
 - Returns whether the post is a multipage post; the requested subpage may still be out of range
 
@@ -360,6 +361,7 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 | `pchap_the_content` | `$output, $page_title, $toc, $content` | `class-pchap.php` | Title + TOC + content (the navigation is appended afterwards) |
 | `pchap_page_title_template` | `$template` | `class-pchap.php` | Subpage title template, `%s` = title HTML (default `<h2>%s</h2>`) |
 | `pchap_untitled_subpage_title` | `$title, $number, $page` | `class-pchap.php` | Fallback title of an untitled subpage (default "Chapter N") |
+| `pchap_is_builder_post` | `$is_builder, $post_id` | `class-pchap.php` | Whether a page builder renders the content of the post, which the plugin then does not split (Elementor, Divi, Beaver Builder, Bricks by their post meta); return false to split it anyway |
 | `pchap_speculation_rule` | `$rule` | `class-pchap-speculation.php` | Speculation rule of the chapter links (`source`, `where`, `eagerness`, default `moderate`: on hover); return an empty value for no rule |
 | `pchap_speculation_mode` | `$mode` | `class-pchap-speculation.php` | `prefetch` (default) or `prerender` |
 | `pchap_seo_integrations` | `$integrations` | `class-pchap-seo.php` | SEO plugin integrations (objects extending `PChap_SEO_Integration`) |

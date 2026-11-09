@@ -446,6 +446,11 @@ class PChap {
 			return false;
 		}
 
+		// A page builder renders the whole post by itself and ignores the pages: the plugin steps aside.
+		if ( self::is_builder_post( $post->ID ) ) {
+			return false;
+		}
+
 		$this->is_multipage  = true;
 		$this->post_id       = (int) $post->ID;
 		$this->pages         = $parsed['pages'];
@@ -502,6 +507,42 @@ class PChap {
 		wp_cache_set( $key, $parsed, 'post-chapters', DAY_IN_SECONDS );
 
 		return $parsed;
+	}
+
+	/**
+	 * Whether a page builder renders the content of a post.
+	 *
+	 * Elementor, Divi, Beaver Builder and Bricks replace the content of a post, on the front end, by
+	 * the output of their own layout. That output holds every chapter: shown on each chapter page, it
+	 * would make the pages copies of each other. Chapters need the content of the post itself (the block
+	 * editor, the classic editor), so the plugin does not split these posts.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	public static function is_builder_post( $post_id ) {
+		$post_id = (int) $post_id;
+
+		// Post meta of each builder (Elementor is tested; the others are recognized by their well-known meta).
+		$beaver     = (string) get_post_meta( $post_id, '_fl_builder_enabled', true );
+		$is_builder = 'builder' === get_post_meta( $post_id, '_elementor_edit_mode', true )
+			|| 'on' === get_post_meta( $post_id, '_et_pb_use_builder', true )
+			|| ( '' !== $beaver && '0' !== $beaver )
+			|| 'bricks' === get_post_meta( $post_id, '_bricks_editor_mode', true );
+
+		/**
+		 * Filters whether a page builder renders the content of a post, which the plugin then does not split.
+		 *
+		 * Return false to split such a post anyway, true to leave another builder's posts alone.
+		 *
+		 * @since 2.1.0
+		 *
+		 * @param bool $is_builder Whether the post is rendered by Elementor, Divi, Beaver Builder or Bricks.
+		 * @param int  $post_id    Post ID.
+		 */
+		return (bool) pchap_apply_filters( 'pchap_is_builder_post', $is_builder, $post_id );
 	}
 
 	/**

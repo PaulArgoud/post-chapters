@@ -88,7 +88,8 @@ class Test_PChap_Styles extends PChap_UnitTestCase {
 		$this->assertFalse( $style->src, 'The stylesheet has no file to request.' );
 
 		$output = get_echo( array( wp_styles(), 'do_items' ), array( 'post-chapters' ) );
-		$this->assertStringContainsString( '<style id="post-chapters-inline-css"', $output );
+		// WordPress 6.3 prints single quotes, later versions double quotes.
+		$this->assertMatchesRegularExpression( '/<style id=["\']post-chapters-inline-css["\']/', $output );
 		$this->assertStringContainsString( '.mpp-toc-container', $output );
 	}
 
