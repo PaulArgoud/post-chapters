@@ -198,14 +198,27 @@ render_content($content)
 
 ### SEO integrations
 
+`PChap_SEO` (`pchap()->seo`, `classes/class-pchap-seo.php`) does what is common to all SEO plugins, and one `PChap_SEO_Integration` object per plugin (`classes/seo/`, `pchap()->seo->get_integration( 'yoast' )`) registers its hooks only when the plugin is active. The `pchap_seo_integrations` filter adds integrations.
+
+Common to every SEO plugin:
+
+- `document_title_parts`: the "Page N" part of the core document title becomes the chapter title (pages 2+)
+- `pre_get_document_title` (added on `template_redirect`, last, because The SEO Framework removes every filter of that hook on `template_redirect` 20): `ensure_chapter_title()` puts the chapter title after the post title, with the separator of the plugin, when the plugin's title has none (it removes the "Page N" part). Rank Math and SEOPress have no page variable in their default title template, so without it every chapter would share the same `<title>`
+- `wp_head`: `<link rel="prev">` and `<link rel="next">`; the plugins that print their own are told not to
+
+What each integration changes, checked on the real plugins by `bin/check-seo.sh`:
+
 | Plugin | Hooks | Effect |
 |--------|-------|--------|
-| WordPress core | `document_title_parts` | The "Page N" part of the document title becomes the subpage title (pages 2+) |
-| Yoast SEO | `wpseo_replacements`, `wpseo_adjacent_rel_url`, `wpseo_canonical` | `%%page%%` = separator + subpage title; no Yoast rel prev/next; canonical of subpages 2+ is the subpage URL (a canonical set by the user is kept) |
-| Rank Math | `rank_math/replacements`, `rank_math/frontend/disable_adjacent_rel_links` | `%page%` = separator + subpage title; no Rank Math rel prev/next |
-| SEOPress | `seopress_context_paged`, `seopress_get_tag_page_value` | `%%page%%` filled on subpages (legacy variables and Tags engine) |
+| Yoast SEO | `wpseo_replacements`, `wpseo_adjacent_rel_url`, `wpseo_canonical`, `wpseo_opengraph_url`, `wpseo_schema_webpage` | `%%page%%` = separator + chapter title; no Yoast rel prev/next; canonical, `og:url` and schema WebPage `url` of chapters 2+ are the chapter URL (a canonical set by the user is kept; the schema `@id`s are kept) |
+| Rank Math | `rank_math/replacements`, `rank_math/frontend/disable_adjacent_rel_links`, `rank_math/opengraph/{facebook,twitter}/*_title` | `%page%` = separator + chapter title; no Rank Math rel prev/next; the chapter title in the Open Graph and Twitter titles |
+| SEOPress | `seopress_context_paged`, `seopress_get_tag_page_value`, `seopress_titles_title`, `seopress_social_og_title`, `seopress_social_twitter_card_title`, `seopress_titles_canonical` | `%%page%%` filled on chapters (legacy variables and Tags engine); the chapter title goes after `%%post_title%%` in the title templates (SEOPress filters the template, before its variables); the canonical tag (SEOPress filters the whole tag) is the chapter URL |
+| All in One SEO | `aioseo_title`, `aioseo_description`, `aioseo_robots_meta`, `aioseo_prev_link`, `aioseo_next_link`, `aioseo_schema_output` | The chapter title replaces the "Page N" suffix of the paged format, descriptions lose it; chapters get the robots of the post instead of AIOSEO's default "noindex paginated pages" (the settings of the post, its post type or the global ones are read like `Meta\Robots` does, and left alone when unreadable); no AIOSEO rel prev/next; schema WebPage `url` is the chapter URL |
+| The SEO Framework | `the_seo_framework_meta_render_data` | No rel prev/next of its own; the chapter title in the Open Graph and Twitter titles (its `<title>` is handled by the common filter) |
 
 SEO plugins receive the plain-text title from `pchap_get_subpage_title_text()`.
+
+The WordPress core sitemap (`wp-sitemap.xml`) lists the URL of each post, never the chapters, like the SEO plugin sitemaps and like posts split with core page breaks. Chapters are reached through the table of contents and the rel links.
 
 ## Content Parsing
 

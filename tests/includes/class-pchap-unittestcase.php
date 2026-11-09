@@ -92,7 +92,11 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 
 		// Remove the request hooks (title, content, styles, SEO...) of the previous request,
 		// registered by the instance and by its components.
-		$owners    = array_filter( array( $mpp, $mpp->seo, $mpp->comments ) );
+		$owners = array( $mpp, $mpp->seo, $mpp->comments );
+		foreach ( array( 'yoast', 'rank_math', 'seopress', 'aioseo', 'seo_framework' ) as $key ) {
+			$owners[] = $mpp->seo->get_integration( $key );
+		}
+		$owners    = array_filter( $owners );
 		$to_remove = array();
 		foreach ( (array) $wp_filter as $hook_name => $hook ) {
 			if ( ! $hook instanceof WP_Hook ) {

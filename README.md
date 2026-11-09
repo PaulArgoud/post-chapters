@@ -19,7 +19,7 @@ Post Chapters is the continuation of **Multipage** (`sgr-nextpage-titles`), orig
 - **Table of contents** with configurable position, labels, header visibility and an optional comments link
 - **Navigation**: "Continue / Back to" or "Previous / Next" links between chapters
 - **Comments** on all chapters, the first one or the last one, in classic and block themes
-- **SEO-friendly**: chapter titles in `<title>`, `rel=prev` / `rel=next` links, integrations with Yoast SEO (title variable, canonical URL of each chapter), Rank Math and SEOPress (title variable)
+- **SEO-friendly**: chapter titles in `<title>`, `rel=prev` / `rel=next` links, integrations with Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework (chapter title in every title, canonical and Open Graph URL of each chapter, indexable chapters)
 - **Block and classic themes**: the table of contents and the navigation are added once, only to the post being viewed (never to excerpts, related posts or Query Loop blocks)
 - **Custom CSS**: override the plugin styles from your theme
 - **RTL support** (frontend and admin)
@@ -158,7 +158,7 @@ bin/build-zip.sh          # Release archive: build/post-chapters.zip (--wporg: W
 
 ## History
 
-Post Chapters started as **Multipage** (`sgr-nextpage-titles`), created by Sergio De Falco (SGr33n). The [original code up to version 1.3.1](https://github.com/wp-plugins/sgr-nextpage-titles) and the releases up to [1.5.12 on WordPress.org](https://wordpress.org/plugins/sgr-nextpage-titles/) (2021) are his work. Paul Argoud then took over development on GitHub (1.5.13 to 1.7.1), bringing the plugin up to modern WordPress and PHP standards, and renamed it Post Chapters in 2.0.0. The WordPress.org listing of Multipage remains in the hands of its original author.
+Post Chapters started as **Multipage** (`sgr-nextpage-titles`), created by Sergio De Falco (SGr33n). The [original code up to version 1.3.1](https://github.com/wp-plugins/sgr-nextpage-titles) and the releases up to [1.5.12 on WordPress.org](https://wordpress.org/plugins/sgr-nextpage-titles/) (2021) are his work. [Paul Argoud](https://paul.argoud.net/) then took over development on GitHub (1.5.13 to 1.7.1), bringing the plugin up to modern WordPress and PHP standards, and renamed it Post Chapters in 2.0.0. The WordPress.org listing of Multipage remains in the hands of its original author.
 
 ## Changelog
 
@@ -166,4 +166,4 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
 
 ## License
 
-This plugin is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html). It is based on Multipage, © Sergio De Falco, also released under the GPL v3.
+This plugin is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).

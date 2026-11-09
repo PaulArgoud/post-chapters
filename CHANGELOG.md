@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **All in One SEO** and **The SEO Framework** integrations, next to Yoast SEO, Rank Math and SEOPress (`classes/seo/`, one `PChap_SEO_Integration` per plugin, registered only when the plugin is active; the `pchap_seo_integrations` filter adds more)
+- `bin/check-seo.sh`: checks the chapters against the five SEO plugins, installed from wordpress.org on the wp-env site (title, canonical, Open Graph, robots, rel links)
+- Tests for custom post types (flat, hierarchical, plain permalinks), and a CI job that runs the suite with a Redis object cache
+
 ### Fixed
+
+- **SEO plugins, found by testing the real plugins** (Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0):
+  - All in One SEO set every chapter after the first to `noindex, nofollow` (its default "noindex paginated pages"). Chapters now get the robots of the post
+  - SEOPress gave every chapter the post URL as canonical, which tells search engines each chapter duplicates the first page. The canonical is now the chapter URL
+  - Yoast SEO kept the post URL in `og:url` and in the schema WebPage `url` of every chapter; both are now the chapter URL
+  - Rank Math and SEOPress, whose default title templates have no page variable, gave every chapter the same `<title>` and the same social titles; All in One SEO and The SEO Framework ended the title with "Page N". The chapter title now appears in the `<title>` and the Open Graph and Twitter titles of any SEO plugin
+  - All in One SEO and The SEO Framework printed their own rel prev/next next to ours
 
 - The admin stylesheet loads again: 2.0.0 enqueued `admin/css/multipage-admin[.min].css`, a file renamed to `post-chapters-admin[.min].css`, so every admin page requested a missing file (404) and the settings screens lost their styles. The style handle is now `post-chapters-admin`
 

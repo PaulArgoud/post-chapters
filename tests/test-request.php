@@ -256,7 +256,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 				'%%page%%' => 'Page 1 of 3',
 				'%%sep%%'  => '-',
 			),
-			$mpp->seo->filter_wpseo_replacements(
+			$mpp->seo->get_integration( 'yoast' )->filter_replacements(
 				array(
 					'%%page%%' => 'Page 1 of 3',
 					'%%sep%%'  => '-',
@@ -268,7 +268,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 		$post = get_post( $post_id );
 
-		$yoast = $mpp->seo->filter_wpseo_replacements(
+		$yoast = $mpp->seo->get_integration( 'yoast' )->filter_replacements(
 			array(
 				'%%page%%' => '- Page 2 of 3',
 				'%%sep%%'  => '-',
@@ -279,9 +279,9 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 
 		// Another post's replacements are left alone.
 		$other = self::factory()->post->create_and_get();
-		$this->assertSame( array( '%%page%%' => 'x' ), $mpp->seo->filter_wpseo_replacements( array( '%%page%%' => 'x' ), $other ) );
+		$this->assertSame( array( '%%page%%' => 'x' ), $mpp->seo->get_integration( 'yoast' )->filter_replacements( array( '%%page%%' => 'x' ), $other ) );
 
-		$rank_math = $mpp->seo->filter_rank_math_replacements(
+		$rank_math = $mpp->seo->get_integration( 'rank_math' )->filter_replacements(
 			array(
 				'%page%' => 'Page 2 of 3',
 				'%sep%'  => '|',
@@ -290,12 +290,12 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		);
 		$this->assertSame( '| Deux', $rank_math['%page%'] );
 
-		$this->assertSame( ' - Deux', $mpp->seo->filter_seopress_context_paged( '' ) );
-		$this->assertSame( 'Deux', $mpp->seo->filter_seopress_tag_page_value( '' ) );
-		$this->assertSame( 'Page 2 of 3', $mpp->seo->filter_seopress_tag_page_value( 'Page 2 of 3' ) );
+		$this->assertSame( ' - Deux', $mpp->seo->get_integration( 'seopress' )->filter_context_paged( '' ) );
+		$this->assertSame( 'Deux', $mpp->seo->get_integration( 'seopress' )->filter_tag_page_value( '' ) );
+		$this->assertSame( 'Page 2 of 3', $mpp->seo->get_integration( 'seopress' )->filter_tag_page_value( 'Page 2 of 3' ) );
 
-		$this->assertSame( '', $mpp->seo->filter_seo_adjacent_rel_url( 'http://example.org/x' ) );
-		$this->assertTrue( $mpp->seo->filter_disable_seo_adjacent_rel_links( false ) );
+		$this->assertSame( '', $mpp->seo->get_integration( 'yoast' )->filter_adjacent_rel_url( 'http://example.org/x' ) );
+		$this->assertTrue( $mpp->seo->get_integration( 'rank_math' )->filter_disable_adjacent_rel_links( false ) );
 	}
 
 	/**
@@ -309,25 +309,25 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$permalink = get_permalink( $post_id );
 
 		$this->go_to_subpage( $post_id, 1 );
-		$this->assertSame( $permalink, $mpp->seo->filter_wpseo_canonical( $permalink ), 'First page unchanged.' );
+		$this->assertSame( $permalink, $mpp->seo->get_integration( 'yoast' )->filter_canonical( $permalink ), 'First page unchanged.' );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$this->assertSame( 2, $mpp->get_current_page() );
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( $permalink ) );
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( untrailingslashit( $permalink ) ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->get_integration( 'yoast' )->filter_canonical( $permalink ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->get_integration( 'yoast' )->filter_canonical( untrailingslashit( $permalink ) ) );
 
 		// A canonical set by the user, or pointing elsewhere, is kept.
 		$custom = home_url( '/elsewhere/' );
-		$this->assertSame( $custom, $mpp->seo->filter_wpseo_canonical( $custom ) );
+		$this->assertSame( $custom, $mpp->seo->get_integration( 'yoast' )->filter_canonical( $custom ) );
 
 		$presentation        = new stdClass();
 		$presentation->model = (object) array( 'canonical' => $permalink );
-		$this->assertSame( $permalink, $mpp->seo->filter_wpseo_canonical( $permalink, $presentation ) );
+		$this->assertSame( $permalink, $mpp->seo->get_integration( 'yoast' )->filter_canonical( $permalink, $presentation ) );
 
 		$presentation->model->canonical = null;
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( $permalink, $presentation ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->get_integration( 'yoast' )->filter_canonical( $permalink, $presentation ) );
 
-		$this->assertSame( '', $mpp->seo->filter_wpseo_canonical( '' ), 'An empty canonical (noindex) stays empty.' );
+		$this->assertSame( '', $mpp->seo->get_integration( 'yoast' )->filter_canonical( '' ), 'An empty canonical (noindex) stays empty.' );
 	}
 
 	/**
@@ -338,13 +338,13 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 
 		if ( ! defined( 'WPSEO_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'wpseo_replacements', array( pchap()->seo, 'filter_wpseo_replacements' ) ) );
+			$this->assertFalse( has_filter( 'wpseo_replacements', array( pchap()->seo->get_integration( 'yoast' ), 'filter_replacements' ) ) );
 		}
 		if ( ! defined( 'RANK_MATH_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'rank_math/replacements', array( pchap()->seo, 'filter_rank_math_replacements' ) ) );
+			$this->assertFalse( has_filter( 'rank_math/replacements', array( pchap()->seo->get_integration( 'rank_math' ), 'filter_replacements' ) ) );
 		}
 		if ( ! defined( 'SEOPRESS_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'seopress_context_paged', array( pchap()->seo, 'filter_seopress_context_paged' ) ) );
+			$this->assertFalse( has_filter( 'seopress_context_paged', array( pchap()->seo->get_integration( 'seopress' ), 'filter_context_paged' ) ) );
 		}
 	}
 }

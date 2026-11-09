@@ -331,6 +331,12 @@ class PChap {
 
 		require_once $this->plugin_dir . 'classes/class-pchap-admin.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-shortcodes.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-integration.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-yoast.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-rank-math.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-seopress.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-aioseo.php';
+		require_once $this->plugin_dir . 'classes/seo/class-pchap-seo-framework.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-seo.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-comments.php';
 
@@ -853,108 +859,108 @@ class PChap {
 	 * Yoast SEO: %%page%% replacement.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_wpseo_replacements().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'yoast' )->filter_replacements().
 	 *
 	 * @param array $replacements Replacement values keyed by %%var%%.
 	 * @param mixed $args         The object the replacements are computed for.
 	 * @return array
 	 */
 	public function filter_wpseo_replacements( $replacements, $args = null ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_wpseo_replacements()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'yoast' )->filter_replacements()" );
 
-		return $this->seo->filter_wpseo_replacements( $replacements, $args );
+		return $this->seo->get_integration( 'yoast' )->filter_replacements( $replacements, $args );
 	}
 
 	/**
 	 * Rank Math: %page% replacement.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_rank_math_replacements().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'rank_math' )->filter_replacements().
 	 *
 	 * @param array $replacements Replacement values keyed by %var%.
 	 * @param mixed $args         The object the replacements are computed for.
 	 * @return array
 	 */
 	public function filter_rank_math_replacements( $replacements, $args = null ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_rank_math_replacements()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'rank_math' )->filter_replacements()" );
 
-		return $this->seo->filter_rank_math_replacements( $replacements, $args );
+		return $this->seo->get_integration( 'rank_math' )->filter_replacements( $replacements, $args );
 	}
 
 	/**
 	 * SEOPress (legacy dynamic variables): %%page%% on singular subpages.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_seopress_context_paged().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'seopress' )->filter_context_paged().
 	 *
 	 * @param string $value " {sep} Page X of Y" or empty.
 	 * @return string
 	 */
 	public function filter_seopress_context_paged( $value ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seopress_context_paged()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'seopress' )->filter_context_paged()" );
 
-		return $this->seo->filter_seopress_context_paged( $value );
+		return $this->seo->get_integration( 'seopress' )->filter_context_paged( $value );
 	}
 
 	/**
 	 * SEOPress (Tags engine): %%page%% on singular subpages.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_seopress_tag_page_value().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'seopress' )->filter_tag_page_value().
 	 *
 	 * @param string $value "Page X of Y" or empty.
 	 * @return string
 	 */
 	public function filter_seopress_tag_page_value( $value ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seopress_tag_page_value()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'seopress' )->filter_tag_page_value()" );
 
-		return $this->seo->filter_seopress_tag_page_value( $value );
+		return $this->seo->get_integration( 'seopress' )->filter_tag_page_value( $value );
 	}
 
 	/**
 	 * Yoast SEO: drop its rel prev/next on the multipage post.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_seo_adjacent_rel_url().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'yoast' )->filter_adjacent_rel_url().
 	 *
 	 * @param string $url The adjacent URL.
 	 * @return string
 	 */
 	public function filter_seo_adjacent_rel_url( $url ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seo_adjacent_rel_url()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'yoast' )->filter_adjacent_rel_url()" );
 
-		return $this->seo->filter_seo_adjacent_rel_url( $url );
+		return $this->seo->get_integration( 'yoast' )->filter_adjacent_rel_url( $url );
 	}
 
 	/**
 	 * Yoast SEO: canonical URL of subpages >= 2.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_wpseo_canonical().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'yoast' )->filter_canonical().
 	 *
 	 * @param string $canonical    The canonical URL.
 	 * @param mixed  $presentation Optional. The Yoast indexable presentation.
 	 * @return string
 	 */
 	public function filter_wpseo_canonical( $canonical, $presentation = null ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_wpseo_canonical()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'yoast' )->filter_canonical()" );
 
-		return $this->seo->filter_wpseo_canonical( $canonical, $presentation );
+		return $this->seo->get_integration( 'yoast' )->filter_canonical( $canonical, $presentation );
 	}
 
 	/**
 	 * Rank Math: disable its rel prev/next on the multipage post.
 	 *
 	 * @since 1.7.0
-	 * @deprecated 2.1.0 Use pchap()->seo->filter_disable_seo_adjacent_rel_links().
+	 * @deprecated 2.1.0 Use pchap()->seo->get_integration( 'rank_math' )->filter_disable_adjacent_rel_links().
 	 *
 	 * @param bool $disable Whether to disable the links.
 	 * @return bool
 	 */
 	public function filter_disable_seo_adjacent_rel_links( $disable ) {
-		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_disable_seo_adjacent_rel_links()' );
+		_deprecated_function( __METHOD__, '2.1.0', "pchap()->seo->get_integration( 'rank_math' )->filter_disable_adjacent_rel_links()" );
 
-		return $this->seo->filter_disable_seo_adjacent_rel_links( $disable );
+		return $this->seo->get_integration( 'rank_math' )->filter_disable_adjacent_rel_links( $disable );
 	}
 
 	/**

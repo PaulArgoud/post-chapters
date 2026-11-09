@@ -22,7 +22,7 @@ Post Chapters splits a long post into chapters. Each chapter is a page of its ow
 * **Table of contents** with a configurable position (top left, top right, top, bottom or hidden), row labels, header and an optional link to the comments.
 * **Navigation** between chapters: "Continue / Back to" or "Previous / Next" links.
 * **Comments** on all chapters, on the first one only or on the last one only, in classic and block themes.
-* **SEO-friendly**: the chapter title appears in the browser title, `rel=prev` / `rel=next` links are added, and Yoast SEO, Rank Math and SEOPress show the chapter title instead of "Page X of Y".
+* **SEO-friendly**: the chapter title appears in the browser title, `rel=prev` / `rel=next` links are added, and Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework show the chapter title, canonical URL and robots of each chapter instead of "Page X of Y".
 * **Block and classic themes**: the table of contents and the navigation are added once, only to the post being read, never to excerpts, related posts or Query Loop blocks.
 * **Your own styles**: the plugin loads a minimal stylesheet that your theme can replace.
 * **RTL support** and translations in French, German, Italian and Spanish.
@@ -40,7 +40,7 @@ The content before the first chapter becomes the intro page. A chapter without a
 
 = Credits =
 
-Post Chapters is the continuation of Multipage, created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Paul Argoud maintained it from 1.5.13 and renamed it Post Chapters in 2.0.0. Development happens on [GitHub](https://github.com/PaulArgoud/post-chapters).
+Post Chapters is the continuation of Multipage, created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Paul Argoud ([paul.argoud.net](https://paul.argoud.net/)) maintained it from 1.5.13 and renamed it Post Chapters in 2.0.0. Development happens on [GitHub](https://github.com/PaulArgoud/post-chapters).
 
 == Installation ==
 
@@ -69,7 +69,7 @@ Yes. The elements open around the shortcode are closed at the end of the chapter
 
 = Does it work with SEO plugins? =
 
-Yes. With Yoast SEO, Rank Math or SEOPress, the "page" variable of your title templates shows the chapter title on chapters 2 and up. With Yoast SEO, each chapter also declares its own canonical URL.
+Yes: Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework. On chapters 2 and up, the title carries the chapter title (even when your title template has no page variable), the canonical URL and the Open Graph URL are the chapter's, and a chapter is not set to noindex as a "paginated page" (All in One SEO does that by default). The plugin also works with the WordPress core sitemap, which lists the post URLs.
 
 = What happens with a chapter number that does not exist? =
 

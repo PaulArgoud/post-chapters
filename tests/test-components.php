@@ -67,17 +67,31 @@ class Test_PChap_Components extends PChap_UnitTestCase {
 					),
 				),
 			),
-			'filter_wpseo_replacements'             => array( 'filter_wpseo_replacements', 'seo', 'filter_wpseo_replacements', array( array( '%%page%%' => 'x' ) ) ),
-			'filter_rank_math_replacements'         => array( 'filter_rank_math_replacements', 'seo', 'filter_rank_math_replacements', array( array( '%page%' => 'x' ) ) ),
-			'filter_seopress_context_paged'         => array( 'filter_seopress_context_paged', 'seo', 'filter_seopress_context_paged', array( '' ) ),
-			'filter_seopress_tag_page_value'        => array( 'filter_seopress_tag_page_value', 'seo', 'filter_seopress_tag_page_value', array( '' ) ),
-			'filter_seo_adjacent_rel_url'           => array( 'filter_seo_adjacent_rel_url', 'seo', 'filter_seo_adjacent_rel_url', array( 'http://example.org/x' ) ),
-			'filter_wpseo_canonical'                => array( 'filter_wpseo_canonical', 'seo', 'filter_wpseo_canonical', array( 'http://example.org/x' ) ),
-			'filter_disable_seo_adjacent_rel_links' => array( 'filter_disable_seo_adjacent_rel_links', 'seo', 'filter_disable_seo_adjacent_rel_links', array( false ) ),
+			'filter_wpseo_replacements'             => array( 'filter_wpseo_replacements', 'seo:yoast', 'filter_replacements', array( array( '%%page%%' => 'x' ) ) ),
+			'filter_rank_math_replacements'         => array( 'filter_rank_math_replacements', 'seo:rank_math', 'filter_replacements', array( array( '%page%' => 'x' ) ) ),
+			'filter_seopress_context_paged'         => array( 'filter_seopress_context_paged', 'seo:seopress', 'filter_context_paged', array( '' ) ),
+			'filter_seopress_tag_page_value'        => array( 'filter_seopress_tag_page_value', 'seo:seopress', 'filter_tag_page_value', array( '' ) ),
+			'filter_seo_adjacent_rel_url'           => array( 'filter_seo_adjacent_rel_url', 'seo:yoast', 'filter_adjacent_rel_url', array( 'http://example.org/x' ) ),
+			'filter_wpseo_canonical'                => array( 'filter_wpseo_canonical', 'seo:yoast', 'filter_canonical', array( 'http://example.org/x' ) ),
+			'filter_disable_seo_adjacent_rel_links' => array( 'filter_disable_seo_adjacent_rel_links', 'seo:rank_math', 'filter_disable_adjacent_rel_links', array( false ) ),
 			'comments_allowed_on_current_page'      => array( 'comments_allowed_on_current_page', 'comments', 'allowed_on_current_page', array() ),
 			'hide_comments'                         => array( 'hide_comments', 'comments', 'filter_comments_template', array() ),
 			'filter_comment_blocks'                 => array( 'filter_comment_blocks', 'comments', 'filter_comment_blocks', array( null, $parsed_block ) ),
 		);
+	}
+
+	/**
+	 * The object of a component: a PChap property, or 'seo:key' for an SEO integration.
+	 *
+	 * @param string $component Component.
+	 * @return object
+	 */
+	private function resolve_component( $component ) {
+		if ( 0 === strpos( $component, 'seo:' ) ) {
+			return pchap()->seo->get_integration( substr( $component, 4 ) );
+		}
+
+		return pchap()->$component;
 	}
 
 	/**
@@ -100,7 +114,7 @@ class Test_PChap_Components extends PChap_UnitTestCase {
 		$pchap = pchap();
 
 		ob_start();
-		$expected        = call_user_func_array( array( $pchap->$component, $target ), $args );
+		$expected        = call_user_func_array( array( $this->resolve_component( $component ), $target ), $args );
 		$expected_output = ob_get_clean();
 
 		ob_start();

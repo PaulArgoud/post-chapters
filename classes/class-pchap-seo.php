@@ -11,11 +11,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Titles and links of the subpages for browsers, search engines and SEO plugins
- * (Yoast SEO, Rank Math, SEOPress).
+ * What browsers, search engines and SEO plugins see of a chapter.
  *
  * Reads the request state of the PChap instance; its hooks are registered by
  * PChap::pchap_post() on valid multipage views only. Available as pchap()->seo.
+ *
+ * - Core: the "Page N" part of the document title becomes the chapter title, and
+ *   the rel prev/next links are printed.
+ * - Any SEO plugin: the final document title always carries the chapter title
+ *   (ensure_chapter_title()), whatever the title template of the plugin is.
+ * - Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework: one
+ *   PChap_SEO_Integration object each, registered only when the plugin is active.
  *
  * @since 2.1.0
  */
@@ -29,6 +35,13 @@ class PChap_SEO {
 	private $pchap;
 
 	/**
+	 * The SEO plugin integrations, by key (yoast, rank_math, seopress, aioseo, seo_framework).
+	 *
+	 * @var PChap_SEO_Integration[]
+	 */
+	private $integrations = array();
+
+	/**
 	 * Constructor.
 	 *
 	 * @since 2.1.0
@@ -36,7 +49,26 @@ class PChap_SEO {
 	 * @param PChap $pchap The main plugin instance.
 	 */
 	public function __construct( PChap $pchap ) {
-		$this->pchap = $pchap;
+		$this->pchap        = $pchap;
+		$this->integrations = array(
+			'yoast'         => new PChap_SEO_Yoast( $pchap, $this ),
+			'rank_math'     => new PChap_SEO_Rank_Math( $pchap, $this ),
+			'seopress'      => new PChap_SEO_SEOPress( $pchap, $this ),
+			'aioseo'        => new PChap_SEO_AIOSEO( $pchap, $this ),
+			'seo_framework' => new PChap_SEO_Framework( $pchap, $this ),
+		);
+	}
+
+	/**
+	 * The integration of an SEO plugin.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $key yoast, rank_math, seopress, aioseo or seo_framework.
+	 * @return PChap_SEO_Integration|null
+	 */
+	public function get_integration( $key ) {
+		return isset( $this->integrations[ $key ] ) ? $this->integrations[ $key ] : null;
 	}
 
 	/**
@@ -50,26 +82,49 @@ class PChap_SEO {
 			add_filter( 'document_title_parts', array( $this, 'filter_document_title_parts' ), pchap_get_rewrite_title_priority(), 1 );
 		}
 
+		// Last word on the title of any SEO plugin. Added once the plugins are done with it:
+		// The SEO Framework removes every pre_get_document_title filter on template_redirect (20).
+		add_action( 'template_redirect', array( $this, 'add_title_filter' ), PHP_INT_MAX );
+
 		add_action( 'wp_head', array( $this, 'print_rel_links' ) );
 
-		// Yoast SEO: %%page%% replacement variable and its own rel prev/next.
-		if ( defined( 'WPSEO_VERSION' ) ) {
-			add_filter( 'wpseo_replacements', array( $this, 'filter_wpseo_replacements' ), 10, 2 );
-			add_filter( 'wpseo_adjacent_rel_url', array( $this, 'filter_seo_adjacent_rel_url' ), 10, 1 );
-			add_filter( 'wpseo_canonical', array( $this, 'filter_wpseo_canonical' ), 10, 2 );
-		}
+		/**
+		 * Filters the SEO plugin integrations of a multipage view.
+		 *
+		 * An integration only registers its hooks when its plugin is active. Add an
+		 * object extending PChap_SEO_Integration to support another SEO plugin.
+		 *
+		 * @since 2.1.0
+		 *
+		 * @param PChap_SEO_Integration[] $integrations Integrations by key.
+		 */
+		$integrations = (array) pchap_apply_filters( 'pchap_seo_integrations', $this->integrations );
 
-		// Rank Math: %page% replacement variable and its own rel prev/next.
-		if ( defined( 'RANK_MATH_VERSION' ) ) {
-			add_filter( 'rank_math/replacements', array( $this, 'filter_rank_math_replacements' ), 10, 2 );
-			add_filter( 'rank_math/frontend/disable_adjacent_rel_links', array( $this, 'filter_disable_seo_adjacent_rel_links' ) );
+		foreach ( $integrations as $integration ) {
+			if ( $integration instanceof PChap_SEO_Integration && $integration->is_active() ) {
+				$integration->register_hooks();
+			}
 		}
+	}
 
-		// SEOPress: %%page%% (legacy variables and Tags engine).
-		if ( defined( 'SEOPRESS_VERSION' ) ) {
-			add_filter( 'seopress_context_paged', array( $this, 'filter_seopress_context_paged' ) );
-			add_filter( 'seopress_get_tag_page_value', array( $this, 'filter_seopress_tag_page_value' ), 10, 1 );
-		}
+	/**
+	 * Hook the last word on the document title.
+	 *
+	 * @since 2.1.0
+	 */
+	public function add_title_filter() {
+		add_filter( 'pre_get_document_title', array( $this, 'filter_pre_document_title' ), PHP_INT_MAX, 1 );
+	}
+
+	/**
+	 * Whether the current request is a chapter after the first one, rendered by the plugin.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @return bool
+	 */
+	public function is_subpage_view() {
+		return $this->pchap->is_multipage_view() && $this->pchap->get_current_page() >= 2;
 	}
 
 	/**
@@ -119,6 +174,23 @@ class PChap_SEO {
 	}
 
 	/**
+	 * Make sure the title an SEO plugin gives to WordPress carries the chapter title.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $title The title ('' when no plugin sets one).
+	 * @return string
+	 */
+	public function filter_pre_document_title( $title ) {
+		if ( ! is_string( $title ) || '' === $title || ! $this->is_subpage_view() ) {
+			return $title;
+		}
+
+		// The title is printed as is: it holds HTML.
+		return $this->ensure_chapter_title( $title, true );
+	}
+
+	/**
 	 * Plain-text title of the current subpage, on subpages >= 2 of the multipage post.
 	 *
 	 * @since 1.7.0 As the private PChap::get_seo_subpage_title().
@@ -128,7 +200,7 @@ class PChap_SEO {
 	 * @return string Empty string when nothing should be replaced.
 	 */
 	public function get_subpage_title( $context = null ) {
-		if ( ! $this->pchap->is_multipage_view() || $this->pchap->get_current_page() < 2 ) {
+		if ( ! $this->is_subpage_view() ) {
 			return '';
 		}
 
@@ -147,177 +219,164 @@ class PChap_SEO {
 	}
 
 	/**
-	 * Yoast SEO: replace %%page%% ("{sep} Page X of Y") with "{sep} {subpage title}".
+	 * URL of the current chapter, when a URL given by an SEO plugin is the one of the post.
 	 *
-	 * @since 1.7.0
+	 * SEO plugins give every chapter the permalink of the post. Any other URL (a
+	 * canonical set by the user, another post) is kept.
 	 *
-	 * @param array $replacements Replacement values keyed by %%var%%.
-	 * @param mixed $args         The object the replacements are computed for.
-	 * @return array
+	 * @since 2.1.0
+	 *
+	 * @param string $url A URL built by an SEO plugin.
+	 * @return string The URL of the chapter, or $url.
 	 */
-	public function filter_wpseo_replacements( $replacements, $args = null ) {
-		if ( ! is_array( $replacements ) || ! isset( $replacements['%%page%%'] ) ) {
-			return $replacements;
-		}
-
-		$text = $this->get_subpage_title( $args );
-		if ( '' === $text ) {
-			return $replacements;
-		}
-
-		$sep = '';
-		if ( isset( $replacements['%%sep%%'] ) && is_string( $replacements['%%sep%%'] ) ) {
-			$sep = $replacements['%%sep%%'];
-		} elseif ( function_exists( 'YoastSEO' ) ) {
-			$yoast = YoastSEO();
-			if ( isset( $yoast->helpers->options ) && method_exists( $yoast->helpers->options, 'get_title_separator' ) ) {
-				$sep = (string) $yoast->helpers->options->get_title_separator();
-			}
-		}
-
-		$replacements['%%page%%'] = ( '' !== $sep ? $sep . ' ' : '' ) . $text;
-
-		return $replacements;
-	}
-
-	/**
-	 * Rank Math: replace %page% ("{sep} Page X of Y") with "{sep} {subpage title}".
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param array $replacements Replacement values keyed by %var%.
-	 * @param mixed $args         The object the replacements are computed for.
-	 * @return array
-	 */
-	public function filter_rank_math_replacements( $replacements, $args = null ) {
-		if ( ! is_array( $replacements ) || ! array_key_exists( '%page%', $replacements ) ) {
-			return $replacements;
-		}
-
-		$text = $this->get_subpage_title( $args );
-		if ( '' === $text ) {
-			return $replacements;
-		}
-
-		$sep = '';
-		if ( isset( $replacements['%sep%'] ) && is_string( $replacements['%sep%'] ) ) {
-			$sep = $replacements['%sep%'];
-		} elseif ( class_exists( '\RankMath\Helper' ) && is_callable( array( '\RankMath\Helper', 'get_settings' ) ) ) {
-			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.NamingConventions.ValidHookName.UseUnderscores -- Rank Math's own hook, applied like Rank Math does.
-			$sep = (string) apply_filters( 'rank_math/settings/title_separator', \RankMath\Helper::get_settings( 'titles.title_separator' ) );
-			$sep = htmlentities( $sep, ENT_COMPAT, 'UTF-8', false );
-		}
-
-		$replacements['%page%'] = ( '' !== $sep ? $sep . ' ' : '' ) . $text;
-
-		return $replacements;
-	}
-
-	/**
-	 * SEOPress (legacy dynamic variables): %%page%% on singular subpages.
-	 *
-	 * SEOPress only fills %%page%% for paginated archives, so it is empty on subpages.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $value " {sep} Page X of Y" or empty.
-	 * @return string
-	 */
-	public function filter_seopress_context_paged( $value ) {
-		if ( (int) get_query_var( 'paged' ) > 1 ) {
-			return $value;
-		}
-
-		$text = $this->get_subpage_title();
-		if ( '' === $text ) {
-			return $value;
-		}
-
-		$sep = '-';
-		if ( function_exists( 'seopress_get_service' ) ) {
-			$option = seopress_get_service( 'TitleOption' );
-			if ( is_object( $option ) && method_exists( $option, 'getSeparator' ) && $option->getSeparator() ) {
-				$sep = htmlspecialchars( (string) $option->getSeparator(), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
-			}
-		}
-
-		return ' ' . $sep . ' ' . esc_attr( $text );
-	}
-
-	/**
-	 * SEOPress (Tags engine): %%page%% on singular subpages.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $value "Page X of Y" or empty.
-	 * @return string
-	 */
-	public function filter_seopress_tag_page_value( $value ) {
-		if ( is_string( $value ) && '' !== $value ) {
-			return $value;
-		}
-
-		$text = $this->get_subpage_title();
-
-		return '' !== $text ? esc_attr( $text ) : $value;
-	}
-
-	/**
-	 * Yoast SEO: drop its rel prev/next on the multipage post (print_rel_links() prints them).
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $url The adjacent URL.
-	 * @return string
-	 */
-	public function filter_seo_adjacent_rel_url( $url ) {
-		return $this->pchap->is_multipage_view() ? '' : $url;
-	}
-
-	/**
-	 * Yoast SEO: canonical URL of subpages >= 2.
-	 *
-	 * Yoast only paginates the canonical of posts whose saved content holds core
-	 * `<!--nextpage-->` markers, so every subpage of a block or shortcode post would
-	 * declare the first page as its canonical (and be dropped from search results).
-	 * The default canonical (the post permalink) becomes the subpage URL, like core
-	 * rel_canonical() does; a canonical set by the user in Yoast is kept.
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string $canonical    The canonical URL.
-	 * @param mixed  $presentation Optional. The Yoast indexable presentation.
-	 * @return string
-	 */
-	public function filter_wpseo_canonical( $canonical, $presentation = null ) {
-		if ( ! is_string( $canonical ) || '' === $canonical || ! $this->pchap->is_multipage_view() || $this->pchap->get_current_page() < 2 || ! is_singular() ) {
-			return $canonical;
-		}
-
-		// A canonical set by the user for this post.
-		if ( is_object( $presentation ) && isset( $presentation->model ) && is_object( $presentation->model ) && ! empty( $presentation->model->canonical ) ) {
-			return $canonical;
+	public function maybe_chapter_url( $url ) {
+		if ( ! is_string( $url ) || '' === $url || ! $this->is_subpage_view() || ! is_singular() ) {
+			return $url;
 		}
 
 		$permalink = get_permalink( $this->pchap->post_id );
-		if ( ! $permalink || untrailingslashit( $canonical ) !== untrailingslashit( $permalink ) ) {
-			return $canonical;
+		if ( ! $permalink || untrailingslashit( $url ) !== untrailingslashit( $permalink ) ) {
+			return $url;
 		}
 
-		$url = pchap_link_page_url( $this->pchap->get_current_page(), '', $this->pchap->post_id );
+		$chapter_url = pchap_link_page_url( $this->pchap->get_current_page(), '', $this->pchap->post_id );
 
-		return '' !== $url ? $url : $canonical;
+		return '' !== $chapter_url ? $chapter_url : $url;
 	}
 
 	/**
-	 * Rank Math: disable its rel prev/next on the multipage post (print_rel_links() prints them).
+	 * Add the chapter title to the title of a chapter built by an SEO plugin.
 	 *
-	 * @since 1.7.0
+	 * Without it, every chapter of a post would share the same title as soon as the title
+	 * template of the plugin has no "page" variable (the default of Rank Math and
+	 * SEOPress), or would end with "Page N" (All in One SEO, The SEO Framework). The chapter
+	 * title goes after the title of the post, with the separator of the plugin; a "Page N"
+	 * part is removed. A title that already has the chapter title is left as it is.
 	 *
-	 * @param bool $disable Whether to disable the links.
-	 * @return bool
+	 * @since 2.1.0
+	 *
+	 * @param string $title   Title.
+	 * @param bool   $html    Whether $title is HTML (printed as is) rather than plain text.
+	 * @param mixed  $context Optional. Post object/array the title is built for.
+	 * @return string
 	 */
-	public function filter_disable_seo_adjacent_rel_links( $disable ) {
-		return $this->pchap->is_multipage_view() ? true : $disable;
+	public function ensure_chapter_title( $title, $html = false, $context = null ) {
+		$chapter = $this->get_subpage_title( $context );
+
+		if ( ! is_string( $title ) || '' === $title || '' === $chapter ) {
+			return $title;
+		}
+
+		if ( false !== strpos( $this->to_plain_text( $title ), $chapter ) ) {
+			return $title;
+		}
+
+		$addition = $html ? esc_html( $chapter ) : $chapter;
+		$post     = get_post( $this->pchap->post_id );
+		$found    = $post instanceof WP_Post ? $this->find_post_title( $title, $post->post_title ) : null;
+
+		if ( null !== $found ) {
+			$before = substr( $title, 0, $found[0] + $found[1] );
+			$after  = (string) substr( $title, $found[0] + $found[1] );
+		} else {
+			$before = $title;
+			$after  = '';
+		}
+
+		$sep = $this->detect_separator( $after, $html );
+
+		return $this->strip_page_number( $before . ' ' . $sep . ' ' . $addition . $after );
+	}
+
+	/**
+	 * Remove the "Page N" part (and the separator before it) of a title or description.
+	 *
+	 * @since 2.1.0
+	 *
+	 * @param string $text Text.
+	 * @return string
+	 */
+	public function strip_page_number( $text ) {
+		if ( ! is_string( $text ) || '' === $text ) {
+			return $text;
+		}
+
+		$number = $this->pchap->get_current_page();
+		$tokens = array(
+			/* translators: %s: page number. */
+			sprintf( __( 'Page %s', 'default' ), $number ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- The string of WordPress core, as the SEO plugins print it.
+			sprintf( 'Page %s', $number ),
+		);
+
+		foreach ( array_unique( $tokens ) as $token ) {
+			$pattern = '/(?:[\s\x{00A0}]|&nbsp;)*(?:[-\x{2013}\x{2014}|\x{00B7}\x{2022}\x{00BB}:]|&#8211;|&#8212;|&ndash;|&mdash;)?(?:[\s\x{00A0}]|&nbsp;)*' . preg_quote( $token, '/' ) . '(?!\w)/u';
+			$result  = preg_replace( $pattern, '', $text, 1 );
+
+			if ( is_string( $result ) && $result !== $text ) {
+				return $result;
+			}
+		}
+
+		return $text;
+	}
+
+	/**
+	 * Text of a title, without tags and entities.
+	 *
+	 * @param string $text Title.
+	 * @return string
+	 */
+	private function to_plain_text( $text ) {
+		$text = html_entity_decode( wp_strip_all_tags( $text ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+		return str_replace( "\xc2\xa0", ' ', $text );
+	}
+
+	/**
+	 * Position of the title of the post in a title.
+	 *
+	 * @param string $haystack   Title built by an SEO plugin.
+	 * @param string $post_title Title of the post.
+	 * @return int[]|null Array( byte offset, byte length ), or null.
+	 */
+	private function find_post_title( $haystack, $post_title ) {
+		$needles = array(
+			$post_title,
+			esc_html( $post_title ),
+			wptexturize( $post_title ),
+			esc_html( wptexturize( $post_title ) ),
+			wp_specialchars_decode( $post_title ),
+		);
+
+		foreach ( array_unique( $needles ) as $needle ) {
+			if ( '' === $needle ) {
+				continue;
+			}
+
+			$position = strpos( $haystack, $needle );
+			if ( false !== $position ) {
+				return array( $position, strlen( $needle ) );
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * The separator that follows the title of the post, or the one of the document title.
+	 *
+	 * @param string $after Text after the title of the post.
+	 * @param bool   $html  Whether the text is HTML.
+	 * @return string
+	 */
+	private function detect_separator( $after, $html ) {
+		if ( preg_match( '/^[\s\x{00A0}]*(&#?\w+;|[^\w\s\x{00A0}]{1,3})[\s\x{00A0}]/u', $after, $match ) ) {
+			return $match[1];
+		}
+
+		/** This filter is documented in wp-includes/general-template.php */
+		$sep = (string) apply_filters( 'document_title_separator', '-' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core hook.
+
+		return $html ? esc_html( $sep ) : $sep;
 	}
 }

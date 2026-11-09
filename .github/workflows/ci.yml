@@ -159,6 +159,56 @@ jobs:
         if: ${{ always() }}
         run: npx -y @wordpress/env@12 stop || true
 
+  # PHPUnit again with a persistent object cache, as many sites run: the Redis Object
+  # Cache drop-in on a Redis container joined to the wp-env network.
+  phpunit-redis:
+    name: PHPUnit (Redis object cache)
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Start Redis
+        run: docker run -d --name pchap-redis redis:7-alpine
+
+      - name: Configure wp-env for Redis
+        run: |
+          cat > .wp-env.override.json <<'JSON'
+          { "config": { "WP_REDIS_HOST": "redis", "WP_REDIS_PORT": 6379, "WP_REDIS_PREFIX": "pchap", "WP_CACHE_KEY_SALT": "pchap-ci:" } }
+          JSON
+
+      - name: Start wp-env
+        run: npx -y @wordpress/env@12 start
+
+      - name: Install the Redis object cache drop-in
+        run: |
+          NETWORK="$(docker network ls --format '{{.Name}}' | grep '^wp-env-.*_default$' | head -n 1)"
+          docker network connect --alias redis "${NETWORK}" pchap-redis
+          npx -y @wordpress/env@12 run cli bash -c "wp plugin install redis-cache && cp wp-content/plugins/redis-cache/includes/object-cache.php wp-content/object-cache.php"
+          npx -y @wordpress/env@12 run cli wp eval 'global $wp_object_cache; var_dump( $wp_object_cache->redis_status() );' | tee /dev/stderr | grep -q 'bool(true)'
+
+      - name: Run PHPUnit
+        run: npx -y @wordpress/env@12 run cli --env-cwd="wp-content/plugins/$(basename "$GITHUB_WORKSPACE")" vendor/bin/phpunit
+
+      - name: Stop wp-env
+        if: ${{ always() }}
+        run: npx -y @wordpress/env@12 stop || true
+
   # Distributable zip, honoring .distignore.
   build:
     name: Build zip

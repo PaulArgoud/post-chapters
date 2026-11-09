@@ -73,6 +73,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 | `composer test:wp-env` | PHPUnit suite inside the running wp-env `cli` container (reinstalls its database) |
 | `composer test` | PHPUnit with the local PHP, when the WordPress test library is available (`WP_TESTS_DIR`) |
 | `bin/check-i18n.sh` | Translation files in sync with the code (see [Translations](#translations)) |
+| `bin/check-seo.sh` | Checks the chapters against Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework on the running wp-env site (installs them from wordpress.org; run it before a release, they change their output) |
 | `bin/build-zip.sh` | Release archive `build/post-chapters.zip` (`--wporg`: `build/post-chapters-wporg.zip`, without `Update URI`) |
 
 ### Coding standards
@@ -107,6 +108,7 @@ npx @wordpress/env@12 run cli --env-cwd=wp-content/plugins/post-chapters vendor/
 - Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `PChap` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
 - Content cases shared by several tests live in `PChap_Test_Corpus` (`tests/includes/class-pchap-test-corpus.php`); add a case there when you fix a parsing bug
 - Splitting changes must keep every page balanced (tags and block delimiters) and must not leave empty elements: see `tests/test-split-html.php` and `tests/test-request-invariant.php`
+- Many sites run a persistent object cache. CI runs the suite once more with Redis (Redis Object Cache drop-in): to do the same locally, start a Redis container on the wp-env network (`docker network ls` shows `wp-env-post-chapters-…_default`; `docker run -d --name pchap-redis --network <network> --network-alias redis redis:7-alpine`), put `{ "config": { "WP_REDIS_HOST": "redis" } }` in `.wp-env.override.json`, run `npx @wordpress/env@12 start --update`, then in the `cli` container `wp plugin install redis-cache` and copy `wp-content/plugins/redis-cache/includes/object-cache.php` to `wp-content/object-cache.php`
 - CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx @wordpress/env@12 start`
 
 Also check your change by hand in the browser: the block editor, the classic editor (Classic Editor plugin), a block theme (Twenty Twenty-Five) and a classic theme (Twenty Twenty-One).
