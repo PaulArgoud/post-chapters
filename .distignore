@@ -12,8 +12,6 @@
 /.gitignore
 /.wp-env.json
 /.wp-env.override.json
-/.wp-env.test.json
-/.wp-env.test.override.json
 /.env
 /.env.*
 /*.code-workspace

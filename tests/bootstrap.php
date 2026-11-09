@@ -32,7 +32,7 @@ if ( ! $pchap_tests_dir ) {
 $pchap_tests_dir = rtrim( $pchap_tests_dir, '/\\' );
 
 if ( ! file_exists( $pchap_tests_dir . '/includes/functions.php' ) ) {
-	fwrite( STDERR, "Could not find the WordPress test library in {$pchap_tests_dir}. Set the WP_TESTS_DIR environment variable or run the tests inside the cli container of the wp-env test environment (.wp-env.test.json)." . PHP_EOL ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI output, before WordPress is loaded.
+	fwrite( STDERR, "Could not find the WordPress test library in {$pchap_tests_dir}. Set the WP_TESTS_DIR environment variable or run the tests inside the wp-env cli container." . PHP_EOL ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite, WordPress.Security.EscapeOutput.OutputNotEscaped -- CLI output, before WordPress is loaded.
 	exit( 1 );
 }
 

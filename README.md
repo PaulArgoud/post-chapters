@@ -148,9 +148,8 @@ The plugin itself needs no build step. The development tools are installed with 
 composer install          # PHPCS, WPCS, PHPCompatibilityWP, PHPUnit (dev only)
 composer lint             # php -l on every PHP file
 composer phpcs            # WordPress Coding Standards (composer phpcbf to fix)
-npx @wordpress/env@12 start                               # WordPress 7.1.4 / PHP 8.4 at http://localhost:8888
-npx @wordpress/env@12 start --config=.wp-env.test.json    # Test environment at http://localhost:8889
-composer test:wp-env      # PHPUnit suite inside the test environment
+npx @wordpress/env@12 start   # WordPress 7.1.4 / PHP 8.4 at http://localhost:8888
+composer test:wp-env          # PHPUnit suite inside wp-env (reinstalls its database)
 bin/check-i18n.sh         # Translation files in sync with the code (WP-CLI + gettext)
 bin/build-zip.sh          # Release archive: build/post-chapters.zip
 ```

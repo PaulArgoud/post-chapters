@@ -83,8 +83,7 @@ post-chapters/
 ├── composer.json / composer.lock    # Dev-only tools: PHPCS + WPCS, PHPCompatibilityWP, PHPUnit
 ├── phpcs.xml.dist                   # Coding standards ruleset
 ├── phpunit.xml.dist                 # PHPUnit configuration (strict: notices/deprecations fail)
-├── .wp-env.json                     # wp-env development site: WordPress 7.1.4, PHP 8.4, WP_DEBUG / SCRIPT_DEBUG
-├── .wp-env.test.json                # wp-env test environment (--config): port 8889, PHPUnit runs in its cli container
+├── .wp-env.json                     # wp-env (single environment, tests run in its cli container): WordPress 7.1.4, PHP 8.4
 └── .distignore / .gitattributes     # Files kept out of the release zip / git archive
 ```
 

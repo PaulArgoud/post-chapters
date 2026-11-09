@@ -121,7 +121,7 @@ jobs:
           - wp: '7.1.4'
             php: '8.4'
     env:
-      # Override "core" and "phpVersion" of .wp-env.test.json.
+      # Override "core" and "phpVersion" of .wp-env.json.
       WP_ENV_CORE: https://downloads.wordpress.org/release/wordpress-${{ matrix.wp }}.zip
       WP_ENV_PHP_VERSION: ${{ matrix.php }}
     steps:
@@ -145,19 +145,19 @@ jobs:
         uses: ramsey/composer-install@v3
 
       - name: Start wp-env
-        run: npx -y @wordpress/env@12 start --config=.wp-env.test.json
+        run: npx -y @wordpress/env@12 start
 
       - name: Show versions
         run: |
-          npx -y @wordpress/env@12 run cli --config=.wp-env.test.json php -v
-          npx -y @wordpress/env@12 run cli --config=.wp-env.test.json wp core version
+          npx -y @wordpress/env@12 run cli php -v
+          npx -y @wordpress/env@12 run cli wp core version
 
       - name: Run PHPUnit
-        run: npx -y @wordpress/env@12 run cli --config=.wp-env.test.json --env-cwd="wp-content/plugins/$(basename "$GITHUB_WORKSPACE")" vendor/bin/phpunit
+        run: npx -y @wordpress/env@12 run cli --env-cwd="wp-content/plugins/$(basename "$GITHUB_WORKSPACE")" vendor/bin/phpunit
 
       - name: Stop wp-env
         if: ${{ always() }}
-        run: npx -y @wordpress/env@12 stop --config=.wp-env.test.json || true
+        run: npx -y @wordpress/env@12 stop || true
 
   # Distributable zip, honoring .distignore.
   build:

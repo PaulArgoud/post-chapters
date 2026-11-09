@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Development
 
-- The PHPUnit suite runs in a separate wp-env environment, `.wp-env.test.json` (port 8889, `WP_DEBUG` and `SCRIPT_DEBUG` off), started with `--config=.wp-env.test.json`; `.wp-env.json` now only describes the development site (`"testsEnvironment": false`). `composer test:wp-env` and CI run PHPUnit in the `cli` container of that environment. The deprecated built-in tests environment (`tests-cli`, `testsPort`) is no longer used
+- wp-env runs a single environment (`.wp-env.json`, `"testsEnvironment": false`, `WP_DEBUG` and `SCRIPT_DEBUG` off): `composer test:wp-env` and CI run PHPUnit in its `cli` container instead of the deprecated `tests-cli` container, and the development site at http://localhost:8888 is the same environment (the test run reinstalls its database)
 - The documentation uses `npx @wordpress/env@12` instead of `npx wp-env` (the npm package `wp-env` is unrelated)
 
 ## [2.0.0] - 2026-11-09

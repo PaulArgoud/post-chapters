@@ -5,7 +5,7 @@
 	"testsEnvironment": false,
 	"plugins": [ "." ],
 	"config": {
-		"WP_DEBUG": true,
-		"SCRIPT_DEBUG": true
+		"WP_DEBUG": false,
+		"SCRIPT_DEBUG": false
 	}
 }
