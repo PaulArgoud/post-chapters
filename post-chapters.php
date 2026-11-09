@@ -46,7 +46,9 @@ function pchap_is_multipage_active() {
 	}
 
 	foreach ( $active as $plugin ) {
-		if ( is_string( $plugin ) && 'sgr-nextpage-titles.php' === basename( $plugin ) ) {
+		// Like wp_get_active_and_valid_plugins(), ignore an entry whose file is gone
+		// (e.g. a Multipage folder deleted over FTP while still active).
+		if ( is_string( $plugin ) && 'sgr-nextpage-titles.php' === basename( $plugin ) && file_exists( WP_PLUGIN_DIR . '/' . $plugin ) ) {
 			return true;
 		}
 	}

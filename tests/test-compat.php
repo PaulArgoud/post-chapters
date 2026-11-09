@@ -15,11 +15,36 @@
 class Test_PChap_Compat extends PChap_UnitTestCase {
 
 	/**
-	 * Restore the active plugins after each test.
+	 * Folders of the fake Multipage installs created by the tests.
+	 *
+	 * @var string[]
+	 */
+	private $fake_folders = array();
+
+	/**
+	 * Restore the active plugins and remove the fake Multipage installs after each test.
 	 */
 	public function tear_down() {
 		delete_option( 'active_plugins' );
+		foreach ( $this->fake_folders as $folder ) {
+			wp_delete_file( WP_PLUGIN_DIR . '/' . $folder . '/sgr-nextpage-titles.php' );
+			rmdir( WP_PLUGIN_DIR . '/' . $folder ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir -- Test fixture cleanup.
+		}
 		parent::tear_down();
+	}
+
+	/**
+	 * Create a fake Multipage main file in a plugin folder.
+	 *
+	 * @param string $folder Plugin folder name.
+	 * @return string The plugin basename (folder/sgr-nextpage-titles.php).
+	 */
+	private function fake_multipage( $folder ) {
+		wp_mkdir_p( WP_PLUGIN_DIR . '/' . $folder );
+		file_put_contents( WP_PLUGIN_DIR . '/' . $folder . '/sgr-nextpage-titles.php', "<?php\n" ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents -- Test fixture.
+		$this->fake_folders[] = $folder;
+
+		return $folder . '/sgr-nextpage-titles.php';
 	}
 
 	/**
@@ -142,10 +167,21 @@ class Test_PChap_Compat extends PChap_UnitTestCase {
 	 * The guard detects Multipage, whatever the name of its folder.
 	 */
 	public function test_guard_detects_multipage() {
-		foreach ( array( 'sgr-nextpage-titles/sgr-nextpage-titles.php', 'sgr-nextpage-titles-main/sgr-nextpage-titles.php' ) as $basename ) {
+		foreach ( array( 'pchap-test-multipage', 'pchap-test-multipage-main' ) as $folder ) {
+			$basename = $this->fake_multipage( $folder );
 			update_option( 'active_plugins', array( 'post-chapters/post-chapters.php', $basename ) );
 			$this->assertTrue( pchap_is_multipage_active(), $basename );
 		}
+	}
+
+	/**
+	 * An active entry whose Multipage file was deleted (folder removed over FTP
+	 * while active) does not keep Post Chapters idle.
+	 */
+	public function test_guard_ignores_deleted_multipage() {
+		update_option( 'active_plugins', array( 'post-chapters/post-chapters.php', 'pchap-test-deleted/sgr-nextpage-titles.php' ) );
+
+		$this->assertFalse( pchap_is_multipage_active() );
 	}
 
 	/**

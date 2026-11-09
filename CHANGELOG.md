@@ -41,9 +41,9 @@ Multipage becomes **Post Chapters**, a plugin of its own: new name, slug `post-c
 
 ### Added
 
-- Coexistence guard: `pchap_is_multipage_active()` detects an active Multipage (any folder holding `sgr-nextpage-titles.php`, or the `Multipage` class); Post Chapters then loads nothing but an admin notice telling how to switch safely
+- Coexistence guard: `pchap_is_multipage_active()` detects an active Multipage (an existing `sgr-nextpage-titles.php` in any active plugin folder, or the `Multipage` class); Post Chapters then loads nothing but an admin notice telling how to switch safely
 - 2.0 upgrade routine `pchap_update_to_2_0()` (database version 2000)
-- Tests for the deprecated hooks, the guard and the 1.7 to 2.0 update (400 tests)
+- Tests for the deprecated hooks, the guard and the 1.7 to 2.0 update (401 tests)
 
 ## [1.7.1] - 2026-11-08
 
