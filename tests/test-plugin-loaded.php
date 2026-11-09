@@ -33,7 +33,7 @@ class PChap_Test_Plugin_Loaded extends WP_UnitTestCase {
 	 */
 	public function test_version() {
 		$this->assertTrue( defined( 'PCHAP_VERSION' ), 'PCHAP_VERSION is not defined.' );
-		$this->assertSame( '2.0.0', PCHAP_VERSION );
+		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+$/', PCHAP_VERSION );
 		$this->assertSame( PCHAP_VERSION, pchap()->version );
 	}
 

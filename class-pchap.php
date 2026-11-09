@@ -1410,6 +1410,7 @@ class PChap {
 		$file     = 'css/post-chapters' . $rtl . $suffix . '.css';
 		$location = '';
 		$handle   = '';
+		$path     = '';
 
 		$themes = array(
 			array( get_stylesheet_directory(), get_stylesheet_directory_uri(), get_stylesheet() ),
@@ -1422,6 +1423,7 @@ class PChap {
 					$file     = $candidate;
 					$location = trailingslashit( $theme[1] );
 					$handle   = $theme[2] . '-post-chapters';
+					$path     = trailingslashit( $theme[0] ) . $candidate;
 					break 2;
 				}
 			}
@@ -1436,10 +1438,16 @@ class PChap {
 			if ( ! file_exists( PCHAP_PLUGIN_DIR . $file ) ) {
 				$file = 'css/post-chapters' . $suffix . '.css';
 			}
+
+			$path = PCHAP_PLUGIN_DIR . $file;
 		}
 
 		// Enqueue the Post Chapters styling.
 		wp_enqueue_style( $handle, $location . $file, array(), $this->version, 'screen' );
+
+		// Small stylesheet: with its path, WordPress prints it inline (no extra request),
+		// within the limit of the styles_inline_size_limit filter.
+		wp_style_add_data( $handle, 'path', $path );
 	}
 
 	/**

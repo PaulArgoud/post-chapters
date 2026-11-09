@@ -12,9 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **All in One SEO** and **The SEO Framework** integrations, next to Yoast SEO, Rank Math and SEOPress (`classes/seo/`, one `PChap_SEO_Integration` per plugin, registered only when the plugin is active; the `pchap_seo_integrations` filter adds more)
 - `bin/check-seo.sh`: checks the chapters against the five SEO plugins, installed from wordpress.org on the wp-env site (title, canonical, Open Graph, robots, rel links)
 - Tests for custom post types (flat, hierarchical, plain permalinks), and a CI job that runs the suite with a Redis object cache
+- Tests that catch the mistakes of a release: the version of the plugin header, `PCHAP_VERSION`, `block.json`, `index.asset.php`, `readme.txt`, the README badge and the changelogs must agree; every stylesheet and script the plugin loads must exist (LTR, RTL, minified or not); the block metadata copied in `blocks/subpage/index.js` must match `block.json`. `tests/test-plugin-loaded.php` no longer holds the version, so a release has one place less to change
 
 ### Fixed
 
+- **Uninstall** (deleting the plugin from the Plugins screen) left traces. With a persistent object cache (Redis, Memcached), the `_mpp_data` index stayed readable from the cache of each post, and the parsed chapters stayed cached; both are now cleared. The events of the background rebuild are removed whatever their arguments. `uninstall.php` now uses `delete_post_meta_by_key()`, `wp_unschedule_hook()` and `wp_cache_flush_group()`. A test lets the plugin live (activation, settings, posts, a rebuild, its lock), uninstalls it, and checks that no table holds anything of it
 - **SEO plugins, found by testing the real plugins** (Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0):
   - All in One SEO set every chapter after the first to `noindex, nofollow` (its default "noindex paginated pages"). Chapters now get the robots of the post
   - SEOPress gave every chapter the post URL as canonical, which tells search engines each chapter duplicates the first page. The canonical is now the chapter URL
@@ -26,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The stylesheet of the chapters (about 1 KB minified) is printed inline by WordPress instead of being requested as a file: one request less on each chapter. A stylesheet of the theme (`css/post-chapters.css`) gets the same treatment, within the limit of the core `styles_inline_size_limit` filter
 - Code structure: `PChap` no longer holds the SEO and comments code. It moves to two components created with the instance, `pchap()->seo` (`PChap_SEO`: document title, rel prev/next links, Yoast SEO / Rank Math / SEOPress) and `pchap()->comments` (`PChap_Comments`). The former `PChap` methods (e.g. `pchap_rel_links()`, `filter_wpseo_replacements()`, `hide_comments()`) still work, as deprecated methods that delegate
 - The settings screens are built from one description per option, `pchap_get_settings_sections()` and `pchap_get_settings_fields()`, rendered by `pchap_admin_render_option_field()`. The twelve `pchap_admin_*_callback_*()` field callbacks are deprecated wrappers. The HTML of the screens is unchanged
 
