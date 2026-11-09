@@ -1,0 +1,7 @@
+/*
+Plugin Name: Post Chapters
+Plugin URI: https://github.com/PaulArgoud/post-chapters
+Author: Sergio De Falco, Paul ARGOUD
+License: GPL v3
+*/
+i.mce-i-subpage:before{content:"\f133"}i.mce-i-subpage{font:400 20px/1 dashicons;margin-right:-2px;padding:0 0 0 2px;vertical-align:top}.clear{clear:both}.settings_page_post-chapters-advanced label a,.settings_page_post-chapters label a{text-decoration:none;color:#444}.settings_page_post-chapters-advanced .mpp-rebuild-form{margin:1em 0 2em}.settings_page_post-chapters-advanced .mpp-rebuild-pending{font-style:italic}

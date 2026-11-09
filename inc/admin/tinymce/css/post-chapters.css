@@ -1,0 +1,21 @@
+/*
+Plugin Name: Post Chapters Plugin
+Plugin URI: https://github.com/PaulArgoud/post-chapters
+Author: Sergio De Falco
+Author URI: https://www.envire.it
+License: GPL v3
+*/
+
+.mce-content-body img[data-wp-more="subpage"] {
+	background: url("../images/subpage.png") repeat-y scroll center center transparent;
+}
+
+@media print,
+	(-webkit-min-device-pixel-ratio: 1.25),
+	(min-resolution: 120dpi) {
+
+	.mce-content-body img[data-wp-more="subpage"] {
+		background-image: url("../images/subpage-2x.png");
+		background-size: 1900px 20px;
+	}
+}

@@ -1,12 +1,12 @@
 /**
- * Multipage TinyMCE plugin.
+ * Post Chapters TinyMCE plugin.
  *
  * Adds the "Subpage" toolbar button and shows [nextpage title="..."]
  * shortcodes as placeholders in the Visual editor (and in the Classic block).
  *
  * Minified copy: plugin.min.js (regenerate with `npx -y terser`).
  *
- * @package Multipage
+ * @package Post Chapters
  * @since   1.3
  */
 ( function( tinymce ) {
@@ -17,7 +17,7 @@
 	 *
 	 * The title is stored as HTML (like the block editor does), so & < > are
 	 * encoded; " [ ] are encoded too, otherwise they would end the attribute
-	 * or the shortcode (shortcode_parse_atts(), MPP_PATTERN).
+	 * or the shortcode (shortcode_parse_atts(), PCHAP_PATTERN).
 	 *
 	 * @param {string} text Plain text.
 	 * @return {string} Encoded attribute value.
@@ -230,21 +230,21 @@
 	 *
 	 * @param {Object} editor TinyMCE editor instance.
 	 */
-	function multipagePlugin( editor ) {
+	function postChaptersPlugin( editor ) {
 		var __ = editor.editorManager.i18n.translate;
 
 		// Register buttons.
 		editor.addButton( 'subpage', {
-			tooltip: __( 'Start a new Subpage' ),
+			tooltip: __( 'Start a new chapter' ),
 			onclick: function() {
-				editor.execCommand( 'MPP_Subpage' );
+				editor.execCommand( 'PCHAP_Subpage' );
 			}
 		} );
 
 		// Register commands.
-		editor.addCommand( 'MPP_Subpage', function() {
+		editor.addCommand( 'PCHAP_Subpage', function() {
 			editor.windowManager.open( {
-				title: __( 'Enter the subpage title' ),
+				title: __( 'Enter the chapter title' ),
 				body: [ {
 					type: 'textbox',
 					name: 'title',
@@ -280,7 +280,7 @@
 	}
 
 	// Pure helpers, exposed for tests (no global is added).
-	multipagePlugin.utils = {
+	postChaptersPlugin.utils = {
 		escapeShortcodeAttribute: escapeShortcodeAttribute,
 		buildShortcode: buildShortcode,
 		escapeHtmlAttribute: escapeHtmlAttribute,
@@ -302,5 +302,5 @@
 		tinymce.ui.FloatPanel.zIndex = 100100;
 	}
 
-	tinymce.PluginManager.add( 'multipage', multipagePlugin );
+	tinymce.PluginManager.add( 'postchapters', postChaptersPlugin );
 }( window.tinymce ) );

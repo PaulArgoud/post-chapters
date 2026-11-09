@@ -2,20 +2,20 @@
 /**
  * Smoke tests: the plugin boots inside WordPress.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
 /**
  * Plugin bootstrap smoke tests.
  */
-class MPP_Test_Plugin_Loaded extends WP_UnitTestCase {
+class PChap_Test_Plugin_Loaded extends WP_UnitTestCase {
 
 	/**
 	 * Remove the forced locale and the loaded translations after each test.
 	 */
 	public function tear_down() {
 		remove_filter( 'determine_locale', array( $this, 'force_fr_fr_locale' ) );
-		unload_textdomain( 'sgr-nextpage-titles', true );
+		unload_textdomain( 'post-chapters', true );
 		parent::tear_down();
 	}
 
@@ -23,18 +23,18 @@ class MPP_Test_Plugin_Loaded extends WP_UnitTestCase {
 	 * The main plugin file was loaded and the singleton is available.
 	 */
 	public function test_plugin_is_loaded() {
-		$this->assertTrue( function_exists( 'multipage' ), 'multipage() is not defined.' );
-		$this->assertInstanceOf( 'Multipage', multipage() );
-		$this->assertTrue( class_exists( 'Multipage_Parser' ), 'Multipage_Parser is not loaded.' );
+		$this->assertTrue( function_exists( 'pchap' ), 'pchap() is not defined.' );
+		$this->assertInstanceOf( 'PChap', pchap() );
+		$this->assertTrue( class_exists( 'PChap_Parser' ), 'PChap_Parser is not loaded.' );
 	}
 
 	/**
 	 * The version constant and the instance version match the release.
 	 */
 	public function test_version() {
-		$this->assertTrue( defined( 'MPP_VERSION' ), 'MPP_VERSION is not defined.' );
-		$this->assertSame( '1.7.1', MPP_VERSION );
-		$this->assertSame( MPP_VERSION, multipage()->version );
+		$this->assertTrue( defined( 'PCHAP_VERSION' ), 'PCHAP_VERSION is not defined.' );
+		$this->assertSame( '2.0.0', PCHAP_VERSION );
+		$this->assertSame( PCHAP_VERSION, pchap()->version );
 	}
 
 	/**
@@ -48,12 +48,12 @@ class MPP_Test_Plugin_Loaded extends WP_UnitTestCase {
 	 * The text domain is registered on init with the bundled /languages fallback path.
 	 */
 	public function test_bundled_translations_are_loaded() {
-		$this->assertSame( 10, has_action( 'init', 'mpp_load_multipage_textdomain' ) );
+		$this->assertSame( 10, has_action( 'init', 'pchap_load_textdomain' ) );
 
 		add_filter( 'determine_locale', array( $this, 'force_fr_fr_locale' ) );
-		unload_textdomain( 'sgr-nextpage-titles', true );
+		unload_textdomain( 'post-chapters', true );
 
-		$this->assertSame( 'Commentaires', __( 'Comments', 'sgr-nextpage-titles' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
 	}
 
 	/**

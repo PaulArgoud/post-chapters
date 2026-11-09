@@ -1,8 +1,8 @@
 <?php
 /**
- * Multipage Admin Functions.
+ * Post Chapters Admin Functions.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.4
  */
 
@@ -10,21 +10,21 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Highlight the Settings > Multipage menu item, regardless of which actual
- * Multipage admin screen we are on.
+ * Highlight the Settings > Post Chapters menu item, regardless of which actual
+ * Post Chapters admin screen we are on.
  *
  * @since 1.4
  *
  * @global string $plugin_page  The current plugin page.
  * @global string $submenu_file The submenu item to highlight.
  */
-function mpp_modify_admin_menu_highlight() {
+function pchap_modify_admin_menu_highlight() {
 	global $plugin_page, $submenu_file;
 
-	// This tweaks the Settings subnav menu to show only one Multipage menu item.
-	if ( in_array( $plugin_page, array( 'mpp-advanced-settings' ), true ) ) {
+	// This tweaks the Settings subnav menu to show only one Post Chapters menu item.
+	if ( in_array( $plugin_page, array( 'post-chapters-advanced' ), true ) ) {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intended.
-		$submenu_file = 'mpp-settings';
+		$submenu_file = 'post-chapters';
 	}
 }
 
@@ -33,11 +33,11 @@ function mpp_modify_admin_menu_highlight() {
  *
  * @since 1.4
  *
- * @param string $path   See {@link mpp_get_admin_url()}.
- * @param string $scheme See {@link mpp_get_admin_url()}.
+ * @param string $path   See {@link pchap_get_admin_url()}.
+ * @param string $scheme See {@link pchap_get_admin_url()}.
  */
-function mpp_admin_url( $path = '', $scheme = 'admin' ) {
-	echo esc_url( mpp_get_admin_url( $path, $scheme ) );
+function pchap_admin_url( $path = '', $scheme = 'admin' ) {
+	echo esc_url( pchap_get_admin_url( $path, $scheme ) );
 }
 
 /**
@@ -52,7 +52,7 @@ function mpp_admin_url( $path = '', $scheme = 'admin' ) {
  *                       or 'https' can be passed to force those schemes.
  * @return string Admin url link with optional path appended.
  */
-function mpp_get_admin_url( $path = '', $scheme = 'admin' ) {
+function pchap_get_admin_url( $path = '', $scheme = 'admin' ) {
 	return admin_url( $path, $scheme );
 }
 
@@ -63,7 +63,7 @@ function mpp_get_admin_url( $path = '', $scheme = 'admin' ) {
  *
  * @param string $active_tab Name of the tab that is active. Optional.
  */
-function mpp_admin_tabs( $active_tab = '' ) {
+function pchap_admin_tabs( $active_tab = '' ) {
 	$tabs_html    = '';
 	$idle_class   = 'nav-tab';
 	$active_class = 'nav-tab nav-tab-active';
@@ -75,7 +75,7 @@ function mpp_admin_tabs( $active_tab = '' ) {
 	 *
 	 * @param array $value Array of tabs to output to the admin area.
 	 */
-	$tabs = apply_filters( 'mpp_admin_tabs', mpp_get_admin_tabs( $active_tab ) );
+	$tabs = pchap_apply_filters( 'pchap_admin_tabs', pchap_get_admin_tabs( $active_tab ) );
 
 	// Loop through tabs and build navigation.
 	foreach ( array_values( (array) $tabs ) as $tab_data ) {
@@ -104,7 +104,7 @@ function mpp_admin_tabs( $active_tab = '' ) {
 	 *
 	 * @since 1.4
 	 */
-	do_action( 'mpp_admin_tabs' );
+	pchap_do_action( 'pchap_admin_tabs' );
 }
 
 /**
@@ -115,15 +115,15 @@ function mpp_admin_tabs( $active_tab = '' ) {
  * @param string $active_tab Name of the tab that is active. Optional.
  * @return array
  */
-function mpp_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public 1.4+ signature kept for backward compatibility.
+function pchap_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public 1.4+ signature kept for backward compatibility.
 	$tabs = array(
 		'0' => array(
-			'href' => mpp_get_admin_url( add_query_arg( array( 'page' => 'mpp-settings' ), 'options-general.php' ) ),
-			'name' => __( 'Options', 'sgr-nextpage-titles' ),
+			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'post-chapters' ), 'options-general.php' ) ),
+			'name' => __( 'Options', 'post-chapters' ),
 		),
 		'1' => array(
-			'href' => mpp_get_admin_url( add_query_arg( array( 'page' => 'mpp-advanced-settings' ), 'options-general.php' ) ),
-			'name' => __( 'Advanced', 'sgr-nextpage-titles' ),
+			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'post-chapters-advanced' ), 'options-general.php' ) ),
+			'name' => __( 'Advanced', 'post-chapters' ),
 		),
 	);
 
@@ -134,7 +134,7 @@ function mpp_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAn
 	 *
 	 * @param array $tabs Tab data.
 	 */
-	return apply_filters( 'mpp_get_admin_tabs', $tabs );
+	return pchap_apply_filters( 'pchap_get_admin_tabs', $tabs );
 }
 
 /**
@@ -155,8 +155,8 @@ function mpp_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAn
  *
  * @return bool
  */
-function mpp_is_block_editor_active() {
-	if ( ! mpp_is_classic_editor_plugin_active() ) {
+function pchap_is_block_editor_active() {
+	if ( ! pchap_is_classic_editor_plugin_active() ) {
 		return true;
 	}
 
@@ -209,7 +209,7 @@ function mpp_is_block_editor_active() {
  *
  * @return bool
  */
-function mpp_is_classic_editor_plugin_active() {
+function pchap_is_classic_editor_plugin_active() {
 	if ( ! function_exists( 'is_plugin_active' ) ) {
 		include_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}

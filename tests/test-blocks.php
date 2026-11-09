@@ -2,10 +2,10 @@
 /**
  * Block registration tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * The multipage/subpage block, registered from blocks/subpage/block.json.
@@ -13,7 +13,7 @@
  * @group multipage
  * @group blocks
  */
-class Test_Mpp_Blocks extends Mpp_UnitTestCase {
+class Test_PChap_Blocks extends PChap_UnitTestCase {
 
 	/**
 	 * The registered block type.
@@ -30,7 +30,7 @@ class Test_Mpp_Blocks extends Mpp_UnitTestCase {
 	 * The block is registered on init, with API version 3.
 	 */
 	public function test_block_is_registered() {
-		$this->assertSame( 10, has_action( 'init', 'mpp_register_blocks' ) );
+		$this->assertSame( 10, has_action( 'init', 'pchap_register_blocks' ) );
 
 		$block_type = $this->block_type();
 
@@ -76,14 +76,14 @@ class Test_Mpp_Blocks extends Mpp_UnitTestCase {
 			$this->assertArrayHasKey( $handle, $scripts->registered, "Script {$handle} is not registered." );
 
 			$script = $scripts->registered[ $handle ];
-			$this->assertSame( 'sgr-nextpage-titles', $script->textdomain );
+			$this->assertSame( 'post-chapters', $script->textdomain );
 			$this->assertTrue(
-				untrailingslashit( MPP_PLUGIN_DIR . 'languages' ) === untrailingslashit( (string) $script->translations_path )
-					|| false !== has_filter( 'load_script_translation_file', 'mpp_load_bundled_script_translation_file' ),
+				untrailingslashit( PCHAP_PLUGIN_DIR . 'languages' ) === untrailingslashit( (string) $script->translations_path )
+					|| false !== has_filter( 'load_script_translation_file', 'pchap_load_bundled_script_translation_file' ),
 				'Neither a translations path nor the bundled translations fallback is set.'
 			);
 			$this->assertStringEndsWith( 'blocks/subpage/index.js', strtok( $script->src, '?' ) );
-			$this->assertSame( MPP_VERSION, $script->ver );
+			$this->assertSame( PCHAP_VERSION, $script->ver );
 
 			foreach ( array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n' ) as $dependency ) {
 				$this->assertContains( $dependency, $script->deps );
@@ -101,10 +101,10 @@ class Test_Mpp_Blocks extends Mpp_UnitTestCase {
 	 */
 	public function test_block_files() {
 		foreach ( array( 'block.json', 'index.js', 'index.asset.php', 'editor.css' ) as $file ) {
-			$this->assertFileExists( MPP_PLUGIN_DIR . 'blocks/subpage/' . $file );
+			$this->assertFileExists( PCHAP_PLUGIN_DIR . 'blocks/subpage/' . $file );
 		}
 
-		$metadata = wp_json_file_decode( MPP_PLUGIN_DIR . 'blocks/subpage/block.json', array( 'associative' => true ) );
+		$metadata = wp_json_file_decode( PCHAP_PLUGIN_DIR . 'blocks/subpage/block.json', array( 'associative' => true ) );
 		$this->assertSame( 'multipage/subpage', $metadata['name'] );
 		$this->assertSame( 3, $metadata['apiVersion'] );
 	}
@@ -113,7 +113,7 @@ class Test_Mpp_Blocks extends Mpp_UnitTestCase {
 	 * Rendering the block on its own (outside a multipage view) outputs no shortcode text.
 	 */
 	public function test_block_render_outside_multipage_view() {
-		$html = do_shortcode( do_blocks( Mpp_Test_Corpus::block( 'Deux' ) ) );
+		$html = do_shortcode( do_blocks( PChap_Test_Corpus::block( 'Deux' ) ) );
 
 		$this->assertStringNotContainsString( '[nextpage', $html );
 		$this->assertStringNotContainsString( 'Deux', $html );

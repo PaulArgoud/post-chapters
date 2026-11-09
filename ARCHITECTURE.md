@@ -1,15 +1,15 @@
 # Architecture
 
-This document describes the internal structure and data flow of the Multipage plugin (version 1.7.1).
+This document describes the internal structure and data flow of the Post Chapters plugin (version 2.0.0), named Multipage (`sgr-nextpage-titles`) up to 1.7.1.
 
 ## File Tree
 
 ```
-sgr-nextpage-titles/
+post-chapters/
 │
-├── sgr-nextpage-titles.php          # Plugin entry point: header (incl. Update URI), MPP_VERSION / MPP__PLUGIN_FILE,
-│                                    #   loads class-mpp.php
-├── class-mpp.php                    # Main Multipage class (singleton): bootstrap, request setup,
+├── post-chapters.php          # Plugin entry point: header (incl. Update URI), PCHAP_VERSION / PCHAP__PLUGIN_FILE,
+│                                    #   loads class-pchap.php
+├── class-pchap.php                    # Main PChap class (singleton): bootstrap, request setup,
 │                                    #   frontend rendering, SEO integrations, 404/redirect handling
 ├── uninstall.php                    # Cleanup on deletion (every site of a multisite network)
 ├── index.php                        # "Silence is golden" (one in every shipped folder)
@@ -21,61 +21,61 @@ sgr-nextpage-titles/
 │   └── subpage/                     # "Subpage" block (multipage/subpage), no build step
 │       ├── block.json               # Block metadata (apiVersion 3, "title" attribute)
 │       ├── index.js                 # Editor script: plain ES5 using the wp.* globals
-│       ├── index.asset.php          # Script dependencies and version (MPP_VERSION)
+│       ├── index.asset.php          # Script dependencies and version (PCHAP_VERSION)
 │       └── editor.css               # Editor style (loaded inside the iframed editor)
 │
 ├── classes/
-│   ├── class-mpp-admin.php          # MPP_Admin: admin menus, Settings API registration,
+│   ├── class-pchap-admin.php          # PChap_Admin: admin menus, Settings API registration,
 │   │                                #   TinyMCE / Quicktags / Classic block integration, admin CSS
-│   └── class-mpp-shortcodes.php     # Multipage_Plugin_Shortcodes: [nextpage] shortcode handler
+│   └── class-pchap-shortcodes.php     # PChap_Shortcodes: [nextpage] shortcode handler
 │
 ├── inc/
-│   ├── mpp-admin.php                # mpp_admin(): creates the MPP_Admin instance (admin only)
-│   ├── mpp-blocks.php               # mpp_register_blocks() on init, bundled JS translations fallback
-│   ├── mpp-cli.php                  # MPP_CLI_Command: "wp multipage rebuild|status" (WP-CLI only)
-│   ├── mpp-functions.php            # Version getters, text domain loading
-│   ├── mpp-options.php              # Option definitions, validation, sanitization, cached getters
-│   ├── mpp-parser.php               # Multipage_Parser: splits the content into subpages
-│   ├── mpp-shortcodes.php           # Initializes Multipage_Plugin_Shortcodes
-│   ├── mpp-template.php             # Title helpers, navigation (mpp_link_pages), TOC (mpp_toc), page URLs
-│   ├── mpp-update.php               # Install/upgrade routines, subpage index rebuild (batches,
+│   ├── pchap-admin.php                # pchap_admin(): creates the PChap_Admin instance (admin only)
+│   ├── pchap-blocks.php               # pchap_register_blocks() on init, bundled JS translations fallback
+│   ├── pchap-cli.php                  # PChap_CLI_Command: "wp post-chapters rebuild|status" (WP-CLI only)
+│   ├── pchap-functions.php            # Version getters, text domain loading
+│   ├── pchap-options.php              # Option definitions, validation, sanitization, cached getters
+│   ├── pchap-parser.php               # PChap_Parser: splits the content into subpages
+│   ├── pchap-shortcodes.php           # Initializes PChap_Shortcodes
+│   ├── pchap-template.php             # Title helpers, navigation (pchap_link_pages), TOC (pchap_toc), page URLs
+│   ├── pchap-update.php               # Install/upgrade routines, subpage index rebuild (batches,
 │   │                                #   lock, WP-Cron), activation/deactivation hooks
 │   └── admin/
-│       ├── admin-actions.php        # admin_init → mpp_admin_init → updater, settings, rebuild action
+│       ├── admin-actions.php        # admin_init → pchap_admin_init → updater, settings, rebuild action
 │       ├── admin-functions.php      # Admin URL helpers, tabs, Classic Editor detection
 │       ├── admin-settings.php       # Main settings screen (field callbacks and render helpers)
-│       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild subpage index" action
+│       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild chapter index" action
 │       └── tinymce/
-│           ├── languages.php        # Deprecated, never loaded (see MPP_Admin::mpp_wp_mce_translation())
+│           ├── languages.php        # Deprecated, never loaded (see PChap_Admin::pchap_wp_mce_translation())
 │           ├── js/plugin[.min].js   # TinyMCE "Subpage" button and placeholders
-│           ├── css/multipage[.min].css  # TinyMCE content styles (placeholder image)
+│           ├── css/post-chapters[.min].css  # TinyMCE content styles (placeholder image)
 │           └── images/              # Placeholder images (1x and 2x)
 │
 ├── admin/
-│   └── css/multipage-admin[-rtl][.min].css  # Admin styles (LTR / RTL)
+│   └── css/post-chapters-admin[-rtl][.min].css  # Admin styles (LTR / RTL)
 │
 ├── css/
-│   └── multipage[-rtl][.min].css    # Frontend styles (LTR / RTL)
+│   └── post-chapters[-rtl][.min].css    # Frontend styles (LTR / RTL)
 │
 ├── languages/
-│   ├── sgr-nextpage-titles.pot                       # Translation template (wp i18n make-pot)
-│   ├── sgr-nextpage-titles-{locale}.po               # Translation sources (not shipped)
-│   ├── sgr-nextpage-titles-{locale}.mo               # Compiled translations
-│   ├── sgr-nextpage-titles-{locale}.l10n.php         # PHP translations (WordPress 6.5+, wp i18n make-php)
-│   └── sgr-nextpage-titles-{locale}-{md5}.json       # JS translations of blocks/subpage/index.js
+│   ├── post-chapters.pot                       # Translation template (wp i18n make-pot)
+│   ├── post-chapters-{locale}.po               # Translation sources (not shipped)
+│   ├── post-chapters-{locale}.mo               # Compiled translations
+│   ├── post-chapters-{locale}.l10n.php         # PHP translations (WordPress 6.5+, wp i18n make-php)
+│   └── post-chapters-{locale}-{md5}.json       # JS translations of blocks/subpage/index.js
 │                                                     #   (md5 of "blocks/subpage/index.js", wp i18n make-json)
 │
 ├── tests/                           # PHPUnit integration suite (WordPress test library, wp-env)
 │   ├── bootstrap.php                # Locates the WP test library, loads the plugin on muplugins_loaded
 │   ├── includes/
-│   │   ├── class-mpp-unittestcase.php   # Mpp_UnitTestCase: resets the singleton, request helpers
-│   │   └── class-mpp-test-corpus.php    # Mpp_Test_Corpus: real-world contents with expected pages
+│   │   ├── class-pchap-unittestcase.php   # PChap_UnitTestCase: resets the singleton, request helpers
+│   │   └── class-pchap-test-corpus.php    # PChap_Test_Corpus: real-world contents with expected pages
 │   └── test-*.php                   # Parser, split HTML, request invariant, rendering, titles,
 │                                    #   request/SEO, comments, options, admin notices, save_post,
 │                                    #   rebuild, upgrade, blocks, shortcode, uninstall
 │
 ├── bin/
-│   ├── build-zip.sh                 # Builds build/sgr-nextpage-titles.zip (git-known files minus .distignore)
+│   ├── build-zip.sh                 # Builds build/post-chapters.zip (git-known files minus .distignore)
 │   ├── check-i18n.sh                # Fails when the translation files are out of sync with the code
 │   └── php-lint.php                 # php -l on every PHP file (composer lint)
 │
@@ -90,58 +90,63 @@ sgr-nextpage-titles/
 ## Boot Sequence
 
 ```
-1. WordPress loads sgr-nextpage-titles.php
+1. WordPress loads post-chapters.php
    │
-   ├── Defines MPP_VERSION ('1.7.1') and MPP__PLUGIN_FILE
-   ├── require class-mpp.php
-   └── multipage() → Multipage::instance()
+   ├── Defines PCHAP_VERSION ('2.0.0') and PCHAP__PLUGIN_FILE
+   ├── pchap_is_multipage_active()? → only an admin notice, nothing else is loaded
+   ├── require class-pchap.php
+   └── pchap() → PChap::instance()
        │
-       ├── constants()       → MPP_PLUGIN_DIR, MPP_PLUGIN_URL, MPP_PATTERN, MPP_GUTENBERG_PATTERN
+       ├── constants()       → PCHAP_PLUGIN_DIR, PCHAP_PLUGIN_URL, PCHAP_PATTERN, PCHAP_GUTENBERG_PATTERN
        │                       (the two patterns are kept for backward compatibility only)
-       ├── setup_globals()   → $version, $db_version (1700), paths
+       ├── setup_globals()   → $version, $db_version (2000), paths
        ├── includes()        → versions() (detects a legacy 1.3 install), then:
-       │   ├── if is_admin(): add_action( 'init', 'mpp_admin' ) → new MPP_Admin
-       │   ├── classes/class-mpp-admin.php, classes/class-mpp-shortcodes.php
-       │   └── inc/mpp-{admin,functions,options,parser,shortcodes,template,update,blocks,cli}.php
-       │       (mpp-cli.php returns immediately unless WP_CLI is running)
+       │   ├── if is_admin(): add_action( 'init', 'pchap_admin' ) → new PChap_Admin
+       │   ├── classes/class-pchap-admin.php, classes/class-pchap-shortcodes.php
+       │   └── inc/pchap-{admin,functions,options,parser,shortcodes,template,update,blocks,cli}.php
+       │       (pchap-cli.php returns immediately unless WP_CLI is running)
        ├── setup_actions()   → activation/deactivation hooks; unless the plugin is being
        │                       deactivated: save_post, pre_handle_404 (100), redirect_canonical (10)
-       └── frontend_init()   → add_action( 'wp', mpp_post )
+       └── frontend_init()   → add_action( 'wp', pchap_post )
 ```
 
-Hooks registered at file load: `init` → `mpp_load_multipage_textdomain()` and `mpp_register_blocks()`; `load_script_translation_file` → `mpp_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `mpp_maybe_clear_options_cache()`; `mpp_rebuild_postmeta_batch` (WP-Cron) → `mpp_cron_rebuild_postmeta()`. No string is translated before `init`.
+Hooks registered at file load: `init` → `pchap_load_textdomain()` and `pchap_register_blocks()`; `load_script_translation_file` → `pchap_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `pchap_maybe_clear_options_cache()`; `pchap_rebuild_postmeta_batch` (WP-Cron) → `pchap_cron_rebuild_postmeta()`. No string is translated before `init`.
 
-The header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so the older WordPress.org listing of the same slug (owned by the original author) can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
+**Coexistence with Multipage.** Multipage handles the same shortcode, block and options. `pchap_is_multipage_active()` reads the active plugins (site and network) for an existing file named `sgr-nextpage-titles.php` (an entry whose file was deleted is ignored, as WordPress does), and checks the `Multipage` class: the class alone is not enough, because `post-chapters/` loads before `sgr-nextpage-titles/`. When Multipage is active, `post-chapters.php` only hooks `pchap_multipage_active_notice()` to `admin_notices` / `network_admin_notices` and returns. Since every class, function and constant was renamed in 2.0.0, both plugins can be installed (and even active) at the same time without a fatal error.
+
+**Hooks.** Every hook of the plugin is fired through `pchap_apply_filters()` / `pchap_do_action()` (`inc/pchap-functions.php`): they run the `pchap_*` hook, then, when callbacks are attached to it, the matching `mpp_*` name of Multipage through `apply_filters_deprecated()` / `do_action_deprecated()` (deprecated since 2.0.0, same arguments, after the `pchap_*` callbacks).
+
+The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
 
 ## Request Lifecycle (Frontend)
 
-The live post content is the single source of truth: every request parses it with `Multipage_Parser::parse()`. The `_mpp_data` post meta is never read by the frontend.
+The live post content is the single source of truth: every request parses it with `PChap_Parser::parse()`. The `_mpp_data` post meta is never read by the frontend.
 
-### `Multipage::setup()`
+### `PChap::setup()`
 
 `setup( $query = null )` loads the multipage data of the **main query** and is idempotent (keyed by post ID, raw page number and post object), so it can be called from several hooks and still works when another plugin short-circuits one of them.
 
 - Bails out for admin, non-singular, 404, feed, embed, trackback and robots requests
-- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `multipage`, key `parse-{MPP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/mpp-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
-- Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$mpp_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$mpp_index`, `$mpp_pagename`, `$page_title`
+- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `post-chapters`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
+- Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$pchap_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$pchap_index`, `$pchap_pagename`, `$page_title`
 - Returns whether the post is a multipage post; the requested subpage may still be out of range
 
 ### 1. `pre_handle_404` (priority 100)
 
-`Multipage::mpp_pre_handle_404()` calls `setup()`. A valid subpage returns `true`, so WordPress does not count the `<!--nextpage-->` markers of the raw content (a block or shortcode post has none). An out-of-range subpage gets `set_404()`, `status_header( 404 )` and `nocache_headers()`; core `redirect_canonical()` then redirects it to the permalink, as it does for posts split with core page breaks. When another plugin already short-circuited the filter, the data is still loaded and its value is returned unchanged.
+`PChap::pchap_pre_handle_404()` calls `setup()`. A valid subpage returns `true`, so WordPress does not count the `<!--nextpage-->` markers of the raw content (a block or shortcode post has none). An out-of-range subpage gets `set_404()`, `status_header( 404 )` and `nocache_headers()`; core `redirect_canonical()` then redirects it to the permalink, as it does for posts split with core page breaks. When another plugin already short-circuited the filter, the data is still loaded and its value is returned unchanged.
 
 ### 2. `redirect_canonical` (priority 10)
 
-`Multipage::mpp_redirect_canonical()` cancels redirects of valid subpages 2 and up, except a redirect to the canonical URL of the same subpage. The core redirect of `/post/1/` to `/post/` is kept.
+`PChap::pchap_redirect_canonical()` cancels redirects of valid subpages 2 and up, except a redirect to the canonical URL of the same subpage. The core redirect of `/post/1/` to `/post/` is kept.
 
 ### 3. `wp` action
 
-`Multipage::mpp_post()` runs once, for a valid subpage of the main query's post:
+`PChap::pchap_post()` runs once, for a valid subpage of the main query's post:
 
 ```
-mpp_post()
+pchap_post()
 ├── setup()
-├── $post->post_content = Multipage_Parser::build_paginated_content( $this->pages )
+├── $post->post_content = PChap_Parser::build_paginated_content( $this->pages )
 │     (pages joined with <!--nextpage-->, or with the core/nextpage block for block content,
 │      so that WP_Query::generate_postdata() returns exactly the parsed pages)
 ├── content_pagination           → filter_content_pagination() (same pages for any WP_Post instance)
@@ -149,19 +154,19 @@ mpp_post()
 │     wp_link_pages_args → hide_standard_pagination(), wp_link_pages → filter_wp_link_pages()
 ├── if comments are hidden on this subpage (comments_allowed_on_current_page()):
 │     comments_template → hide_comments(), pre_render_block → filter_comment_blocks()
-├── if current page > 1: document_title_parts → mpp_document_title_parts() (title priority option)
+├── if current page > 1: document_title_parts → pchap_document_title_parts() (title priority option)
 ├── the_content:
-│     open_content_run() (PHP_INT_MIN), mpp_the_content() (content priority option),
+│     open_content_run() (PHP_INT_MIN), pchap_the_content() (content priority option),
 │     close_content_run() (PHP_INT_MAX)
 ├── pre_render_block / render_block_core/post-content → track the core/post-content block
 ├── wp_enqueue_scripts → enqueue_styles()
-├── wp_head → mpp_rel_links()
+├── wp_head → pchap_rel_links()
 └── register_seo_integrations() (Yoast SEO, Rank Math, SEOPress, only when active)
 ```
 
 ### 4. Rendering: `the_content`
 
-`Multipage::mpp_the_content()` first removes the internal empty-page placeholder, then decorates the content only when `should_filter_content()` allows it:
+`PChap::pchap_the_content()` first removes the internal empty-page placeholder, then decorates the content only when `should_filter_content()` allows it:
 
 - the request is a valid multipage view, not admin, not a feed, singular;
 - not inside `get_the_excerpt`, `the_excerpt` or `wp_head`, and not a `the_content` run started by `wp_trim_excerpt()`;
@@ -175,18 +180,18 @@ A re-entrancy flag, the hashes of the produced outputs and the `open_content_run
 
 ```
 render_content($content)
-├── Title: mpp_page_title_template ('<h2>%s</h2>') + mpp_get_subpage_title_html()
+├── Title: pchap_page_title_template ('<h2>%s</h2>') + pchap_get_subpage_title_html()
 │     (skipped by "Hide intro title" when page 1 is the automatic intro)
-├── Navigation: mpp_link_pages() ("continue" or "next-previous"; none when hidden)
-├── Table of contents: mpp_toc() (hidden, or only on page 1 when configured)
+├── Navigation: pchap_link_pages() ("continue" or "next-previous"; none when hidden)
+├── Table of contents: pchap_toc() (hidden, or only on page 1 when configured)
 ├── title + TOC + content (or title + content + TOC for the "bottom" position)
-├── apply_filters( 'mpp_the_content', $output, $page_title, $toc, $content )
+├── apply_filters( 'pchap_the_content', $output, $page_title, $toc, $content )
 └── + navigation
 ```
 
 ### 5. `wp_head`
 
-`Multipage::mpp_rel_links()` prints `<link rel="prev">` and `<link rel="next">`. Yoast SEO and Rank Math are told not to print their own adjacent links.
+`PChap::pchap_rel_links()` prints `<link rel="prev">` and `<link rel="next">`. Yoast SEO and Rank Math are told not to print their own adjacent links.
 
 ### SEO integrations
 
@@ -197,11 +202,11 @@ render_content($content)
 | Rank Math | `rank_math/replacements`, `rank_math/frontend/disable_adjacent_rel_links` | `%page%` = separator + subpage title; no Rank Math rel prev/next |
 | SEOPress | `seopress_context_paged`, `seopress_get_tag_page_value` | `%%page%%` filled on subpages (legacy variables and Tags engine) |
 
-SEO plugins receive the plain-text title from `mpp_get_subpage_title_text()`.
+SEO plugins receive the plain-text title from `pchap_get_subpage_title_text()`.
 
 ## Content Parsing
 
-`Multipage_Parser::parse( $content )` (in `inc/mpp-parser.php`) returns:
+`PChap_Parser::parse( $content )` (in `inc/pchap-parser.php`) returns:
 
 ```php
 array(
@@ -219,7 +224,7 @@ array(
 ```
 
 ```
-Multipage_Parser::parse($content)
+PChap_Parser::parse($content)
 │
 ├── Bail out when the content contains neither "wp:multipage/subpage" nor "[nextpage"
 ├── tokenize_blocks()   → block delimiters (WP_Block_Parser regex), openers paired with closers
@@ -242,7 +247,7 @@ Multipage_Parser::parse($content)
 │   │   dynamic blocks); otherwise it is prepended to the first page unless disposable
 │   ├── an untitled marker followed by content that is not meaningful is merged into the
 │   │   previous page; only disposable leftovers (whitespace, comments, empty paragraphs) are dropped
-│   └── a titled page without body gets Multipage_Parser::EMPTY_PAGE_PLACEHOLDER
+│   └── a titled page without body gets PChap_Parser::EMPTY_PAGE_PLACEHOLDER
 └── Slugs: "slug" attribute, else sanitize_title( title ), else "page-N"; duplicates get -1, -2...
 ```
 
@@ -250,19 +255,19 @@ Titles come from the block JSON `title` attribute (a RichText string, HTML-encod
 
 Related methods:
 
-- `Multipage_Parser::build_paginated_content( $pages, $use_block = null )` joins the page contents with `<!--nextpage-->`, or with `Multipage_Parser::BLOCK_PAGE_BREAK` (the `core/nextpage` block) when the pages hold block markup, so that the Post Content block still appends the standard page links when they are enabled
-- `Multipage_Parser::multipage_return_array( $content )` returns `slug => title` (or `false`), derived from `parse()`: the format of the `_mpp_data` meta
-- `Multipage_Parser::is_meaningful_content( $html )`, filterable with `mpp_parser_is_meaningful_content`
+- `PChap_Parser::build_paginated_content( $pages, $use_block = null )` joins the page contents with `<!--nextpage-->`, or with `PChap_Parser::BLOCK_PAGE_BREAK` (the `core/nextpage` block) when the pages hold block markup, so that the Post Content block still appends the standard page links when they are enabled
+- `PChap_Parser::multipage_return_array( $content )` returns `slug => title` (or `false`), derived from `parse()`: the format of the `_mpp_data` meta
+- `PChap_Parser::is_meaningful_content( $html )`, filterable with `pchap_parser_is_meaningful_content`
 - `multipage_clean_content()` and `parse_nextpage_shortcode()` are kept for backward compatibility
 
 ## Subpage Titles
 
-| Format | Used for | `mpp_get_subpage_title_html()` | `mpp_get_subpage_title_text()` |
+| Format | Used for | `pchap_get_subpage_title_html()` | `pchap_get_subpage_title_text()` |
 |--------|----------|-------------------------------|-------------------------------|
-| `html` | Block titles, translated fallbacks | `wp_kses()` with the inline allowlist (`mpp_get_subpage_title_allowed_html()`: strong, b, em, i, code, mark, sub, sup, s, span), `force_balance_tags()`, no double encoding | Tags stripped, entities decoded, whitespace collapsed (not escaped) |
+| `html` | Block titles, translated fallbacks | `wp_kses()` with the inline allowlist (`pchap_get_subpage_title_allowed_html()`: strong, b, em, i, code, mark, sub, sup, s, span), `force_balance_tags()`, no double encoding | Tags stripped, entities decoded, whitespace collapsed (not escaped) |
 | `text` | Titled `[nextpage]` shortcodes | Same, after encoding every `<` that does not start an allowed tag | Same, after the same encoding |
 
-`Multipage::get_title_format( $index )` returns the format of a page. The intro is titled "Intro" and untitled pages "Page N" (`mpp_untitled_subpage_title`), both translated.
+`PChap::get_title_format( $index )` returns the format of a page. The intro is titled "Intro" and untitled pages "Chapter N" (`pchap_untitled_subpage_title`), both translated.
 
 ## Data Model
 
@@ -274,27 +279,27 @@ Related methods:
 
 ### Settings (wp_options)
 
-Defined in `mpp_get_option_definitions()` (type, default, allowed values, Settings API group) and registered with `register_setting()` by `MPP_Admin::register_admin_settings()`.
+Defined in `pchap_get_option_definitions()` (type, default, allowed values, Settings API group) and registered with `register_setting()` by `PChap_Admin::register_admin_settings()`.
 
 | Option | Type | Default | Group | Description |
 |--------|------|---------|-------|-------------|
-| `mpp-hide-intro-title` | boolean | `false` | `mpp-settings` | Hide the automatic intro title |
-| `mpp-comments-on-page` | string | `all` | `mpp-settings` | `all`, `first-page`, `last-page` |
-| `mpp-continue-or-prev-next` | string | `continue` | `mpp-settings` | `continue`, `next-previous`, `hidden` |
-| `mpp-disable-standard-pagination` | boolean | `true` | `mpp-settings` | Hide the WordPress page links |
-| `mpp-toc-only-on-the-first-page` | boolean | `false` | `mpp-settings` | Show the TOC on page 1 only |
-| `mpp-toc-position` | string | `top-right` | `mpp-settings` | `top-left`, `top-right`, `top`, `bottom`, `hidden` |
-| `mpp-toc-row-labels` | string | `number` | `mpp-settings` | `number`, `page`, `hidden` |
-| `mpp-hide-toc-header` | boolean | `false` | `mpp-settings` | Hide the "Contents" header |
-| `mpp-comments-toc-link` | boolean | `false` | `mpp-settings` | Comments link in the TOC |
-| `_mpp-rewrite-title-priority` | priority | `20` | `mpp-advanced-settings` | Priority of the document title filter (UI: 100, 50, 20, 10, 5; any integer is kept) |
-| `_mpp-rewrite-content-priority` | priority | `20` | `mpp-advanced-settings` | Priority of the `the_content` filter |
-| `mpp-disable-tinymce-buttons` | boolean | `false` | `mpp-advanced-settings` | Disable the TinyMCE Subpage button |
+| `mpp-hide-intro-title` | boolean | `false` | `post-chapters` | Hide the automatic intro title |
+| `mpp-comments-on-page` | string | `all` | `post-chapters` | `all`, `first-page`, `last-page` |
+| `mpp-continue-or-prev-next` | string | `continue` | `post-chapters` | `continue`, `next-previous`, `hidden` |
+| `mpp-disable-standard-pagination` | boolean | `true` | `post-chapters` | Hide the WordPress page links |
+| `mpp-toc-only-on-the-first-page` | boolean | `false` | `post-chapters` | Show the TOC on page 1 only |
+| `mpp-toc-position` | string | `top-right` | `post-chapters` | `top-left`, `top-right`, `top`, `bottom`, `hidden` |
+| `mpp-toc-row-labels` | string | `number` | `post-chapters` | `number`, `page`, `hidden` |
+| `mpp-hide-toc-header` | boolean | `false` | `post-chapters` | Hide the "Contents" header |
+| `mpp-comments-toc-link` | boolean | `false` | `post-chapters` | Comments link in the TOC |
+| `_mpp-rewrite-title-priority` | priority | `20` | `post-chapters-advanced` | Priority of the document title filter (UI: 100, 50, 20, 10, 5; any integer is kept) |
+| `_mpp-rewrite-content-priority` | priority | `20` | `post-chapters-advanced` | Priority of the `the_content` filter |
+| `mpp-disable-tinymce-buttons` | boolean | `false` | `post-chapters-advanced` | Disable the TinyMCE Chapter button |
 
-- Both screens post to `options.php`. `mpp_sanitize_option()` stores booleans as `1`/`0` (an unchecked checkbox is posted as `null`), and an invalid value keeps the current valid value and adds one settings error naming the field
-- Getters (`mpp_hide_intro_title()`, `mpp_get_toc_position()`...) read through `mpp_get_option()` (in-memory cache, default applied per call) and `mpp_validate_option_value()`, so they always return a valid value. Legacy stored values (`''`, `'1'`, `'on'`, `'off'`) keep their meaning
-- The cache is cleared automatically when a Multipage option is added, updated or deleted; `mpp_clear_options_cache()` is still available
-- Third-party fields added to these screens with `add_settings_field()` must also call `register_setting( 'mpp-settings', ... )` (or `'mpp-advanced-settings'`)
+- Both screens post to `options.php`. `pchap_sanitize_option()` stores booleans as `1`/`0` (an unchecked checkbox is posted as `null`), and an invalid value keeps the current valid value and adds one settings error naming the field
+- Getters (`pchap_hide_intro_title()`, `pchap_get_toc_position()`...) read through `pchap_get_option()` (in-memory cache, default applied per call) and `pchap_validate_option_value()`, so they always return a valid value. Legacy stored values (`''`, `'1'`, `'on'`, `'off'`) keep their meaning
+- The cache is cleared automatically when a Post Chapters option is added, updated or deleted; `pchap_clear_options_cache()` is still available
+- Third-party fields added to these screens with `add_settings_field()` must also call `register_setting( 'post-chapters', ... )` (or `'post-chapters-advanced'`)
 
 ### Internal options
 
@@ -305,28 +310,28 @@ Defined in `mpp_get_option_definitions()` (type, default, allowed values, Settin
 | `_mpp-rebuild-state` | Pending background rebuild: cursor (last post ID), counts, start time (not autoloaded) |
 | `_mpp-rebuild-last` | Result of the last complete rebuild: time, processed, updated, deleted (not autoloaded) |
 | `_mpp-rebuild-lock` | Rebuild lock: a timestamp and an owner token separated by a pipe (written with direct atomic queries) |
-| `multipage` | Legacy 1.3 settings, converted then deleted by `mpp_update_to_1_4()` |
+| `multipage` | Legacy 1.3 settings, converted then deleted by `pchap_update_to_1_4()` |
 
-The object cache group `multipage` holds the parse results (see `Multipage::setup()`).
+The object cache group `post-chapters` holds the parse results (see `PChap::setup()`).
 
 ## Subpage Index Rebuild
 
-`inc/mpp-update.php` rebuilds `_mpp_data` in batches of posts ordered by ID:
+`inc/pchap-update.php` rebuilds `_mpp_data` in batches of posts ordered by ID:
 
 - **Candidates**: posts containing `[nextpage` or `wp:multipage/subpage`, or already holding `_mpp_data` (stale entries are deleted); revisions and auto-drafts are skipped. Each batch is one prepared query that selects `ID` and `post_content` directly
-- **Batch**: `mpp_process_postmeta_batch( $after_id, $batch_size, $dry_run )`, 200 posts by default (`mpp_rebuild_postmeta_batch_size`). `mpp_run_postmeta_rebuild( $args )` runs batches within an optional time budget, resumes from saved totals and refreshes the lock after each batch
-- **Lock**: `mpp_rebuild_acquire_lock()` (atomic `INSERT IGNORE`; a lock not refreshed for 5 minutes is taken over with a compare-and-set `UPDATE`), `mpp_rebuild_refresh_lock()`, `mpp_rebuild_release_lock()` (owner only), `mpp_is_rebuild_locked()`
-- **Background (WP-Cron)**: `mpp_schedule_postmeta_rebuild()` saves `_mpp-rebuild-state` and schedules the single event `mpp_rebuild_postmeta_batch`. `mpp_cron_rebuild_postmeta()` takes the lock, schedules a watchdog, processes batches for 15 seconds (`mpp_rebuild_cron_time_limit`), then reschedules itself or completes (`mpp_complete_postmeta_rebuild()`). When locked, it retries a minute later
-- **Admin**: the "Rebuild subpage index" form on the Advanced screen posts to `admin-post.php?action=mpp_rebuild_postmeta` (nonce + `manage_options`). `mpp_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`mpp_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `mpp_admin_rebuild_postmeta_notice()`
-- **WP-CLI**: `wp multipage rebuild [--batch-size=<n>] [--dry-run]` and `wp multipage status [--format=table|json|yaml|csv]` (`MPP_CLI_Command`, `mpp_get_postmeta_index_stats()`)
+- **Batch**: `pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run )`, 200 posts by default (`pchap_rebuild_postmeta_batch_size`). `pchap_run_postmeta_rebuild( $args )` runs batches within an optional time budget, resumes from saved totals and refreshes the lock after each batch
+- **Lock**: `pchap_rebuild_acquire_lock()` (atomic `INSERT IGNORE`; a lock not refreshed for 5 minutes is taken over with a compare-and-set `UPDATE`), `pchap_rebuild_refresh_lock()`, `pchap_rebuild_release_lock()` (owner only), `pchap_is_rebuild_locked()`
+- **Background (WP-Cron)**: `pchap_schedule_postmeta_rebuild()` saves `_mpp-rebuild-state` and schedules the single event `pchap_rebuild_postmeta_batch`. `pchap_cron_rebuild_postmeta()` takes the lock, schedules a watchdog, processes batches for 15 seconds (`pchap_rebuild_cron_time_limit`), then reschedules itself or completes (`pchap_complete_postmeta_rebuild()`). When locked, it retries a minute later
+- **Admin**: the "Rebuild chapter index" form on the Advanced screen posts to `admin-post.php?action=pchap_rebuild_postmeta` (nonce + `manage_options`). `pchap_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`pchap_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `pchap_admin_rebuild_postmeta_notice()`
+- **WP-CLI**: `wp post-chapters rebuild [--batch-size=<n>] [--dry-run]` and `wp post-chapters status [--format=table|json|yaml|csv]` (`wp multipage` is an alias) (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
 
 ### Install, upgrade, activation
 
-- `mpp_setup_updater()` runs on `mpp_admin_init` (priority 1000). `mpp_get_installed_db_version()` combines the legacy 1.3 detection with `_mpp_db_version`
-- Fresh install: schedules a background rebuild, fires `mpp_on_install`
-- Update: `mpp_update_to_1_4()` (below 1000: converts the legacy settings, schedules a rebuild) and `mpp_update_to_1_7()` (below 1700: background rebuild), then fires `mpp_on_update`; `mpp_version_bump()` stores the new version
-- `mpp_activation()` schedules a rebuild (posts edited while the plugin was inactive) and fires `mpp_activation`; `mpp_deactivation()` clears the cron hook and fires `mpp_deactivation`
-- `uninstall.php` deletes every option above, the cron hook and all `_mpp_data` meta, on every site of a multisite network
+- `pchap_setup_updater()` runs on `pchap_admin_init` (priority 1000). `pchap_get_installed_db_version()` combines the legacy 1.3 detection with `_mpp_db_version`
+- Fresh install: schedules a background rebuild, fires `pchap_on_install`
+- Update: `pchap_update_to_1_4()` (below 1000: converts the legacy settings, schedules a rebuild), `pchap_update_to_1_7()` (below 1700: background rebuild) and `pchap_update_to_2_0()` (below 2000: clears the `mpp_rebuild_postmeta_batch` event of Multipage and schedules `pchap_rebuild_postmeta_batch` when a rebuild is pending), then fires `pchap_on_update`; `pchap_version_bump()` stores the new version
+- `pchap_activation()` schedules a rebuild (posts edited while the plugin was inactive) and fires `pchap_activation`; `pchap_deactivation()` clears the cron hook and fires `pchap_deactivation`
+- `uninstall.php` deletes every option above, the cron hook (and its Multipage name) and all `_mpp_data` meta, on every site of a multisite network. These are the names Multipage uses: deleting either plugin from the Plugins screen erases the data of both
 
 ## Hooks Reference
 
@@ -334,65 +339,65 @@ The object cache group `multipage` holds the parse results (see `Multipage::setu
 
 | Filter | Arguments | Location | Description |
 |--------|-----------|----------|-------------|
-| `mpp_the_content` | `$output, $page_title, $toc, $content` | `class-mpp.php` | Title + TOC + content (the navigation is appended afterwards) |
-| `mpp_page_title_template` | `$template` | `class-mpp.php` | Subpage title template, `%s` = title HTML (default `<h2>%s</h2>`) |
-| `mpp_untitled_subpage_title` | `$title, $number, $page` | `class-mpp.php` | Fallback title of an untitled subpage (default "Page N") |
-| `mpp_comment_block_names` | `$block_names` | `class-mpp.php` | Blocks hidden on subpages without comments (`core/comments`, `core/post-comments`, `core/post-comments-form`, `core/comments-title`, `core/comments-pagination`, `core/comment-template`, `core/comments-query-loop`) |
-| `mpp_subpage_title_allowed_html` | `$allowed` | `mpp-template.php` | Inline tags allowed in subpage titles (`wp_kses()` format) |
-| `mpp_link_pages_args` | `$params` | `mpp-template.php` | Navigation arguments |
-| `mpp_link_pages_link` | `$link, $page` / `$text, $link` | `mpp-template.php` | One navigation link ("Continue" / "Back to" passes the text and the link) |
-| `mpp_link_pages` | `$output, $args` | `mpp-template.php` | Navigation HTML |
-| `mpp_toc_args` | `$params` | `mpp-template.php` | TOC arguments |
-| `mpp_toc_pages_row` | `$row, $title, $i` | `mpp-template.php` | One TOC row |
-| `mpp_toc` | `$output, $args` | `mpp-template.php` | TOC HTML |
-| `mpp_parser_is_meaningful_content` | `$meaningful, $html` | `mpp-parser.php` | Whether a fragment counts as content (intro detection, untitled pages) |
+| `pchap_the_content` | `$output, $page_title, $toc, $content` | `class-pchap.php` | Title + TOC + content (the navigation is appended afterwards) |
+| `pchap_page_title_template` | `$template` | `class-pchap.php` | Subpage title template, `%s` = title HTML (default `<h2>%s</h2>`) |
+| `pchap_untitled_subpage_title` | `$title, $number, $page` | `class-pchap.php` | Fallback title of an untitled subpage (default "Chapter N") |
+| `pchap_comment_block_names` | `$block_names` | `class-pchap.php` | Blocks hidden on subpages without comments (`core/comments`, `core/post-comments`, `core/post-comments-form`, `core/comments-title`, `core/comments-pagination`, `core/comment-template`, `core/comments-query-loop`) |
+| `pchap_subpage_title_allowed_html` | `$allowed` | `pchap-template.php` | Inline tags allowed in subpage titles (`wp_kses()` format) |
+| `pchap_link_pages_args` | `$params` | `pchap-template.php` | Navigation arguments |
+| `pchap_link_pages_link` | `$link, $page` / `$text, $link` | `pchap-template.php` | One navigation link ("Continue" / "Back to" passes the text and the link) |
+| `pchap_link_pages` | `$output, $args` | `pchap-template.php` | Navigation HTML |
+| `pchap_toc_args` | `$params` | `pchap-template.php` | TOC arguments |
+| `pchap_toc_pages_row` | `$row, $title, $i` | `pchap-template.php` | One TOC row |
+| `pchap_toc` | `$output, $args` | `pchap-template.php` | TOC HTML |
+| `pchap_parser_is_meaningful_content` | `$meaningful, $html` | `pchap-parser.php` | Whether a fragment counts as content (intro detection, untitled pages) |
 
 ### Option filters
 
 | Filter | Location | Description |
 |--------|----------|-------------|
-| `mpp_get_option_definitions` | `mpp-options.php` | Option definitions (e.g. extra allowed values); core options cannot be removed |
-| `mpp_get_option_choice_labels` | `mpp-options.php` | Labels of the choices on the settings screens |
-| `mpp_hideintro_title` | `mpp-options.php` | Value of `mpp_hide_intro_title()` |
-| `mpp_get_comments_on_page` | `mpp-options.php` | Value of `mpp_get_comments_on_page()` |
-| `mpp_get_continue_or_prev_next` | `mpp-options.php` | Value of `mpp_get_continue_or_prev_next()` |
-| `mpp_disable_standard_pagination` | `mpp-options.php` | Value of `mpp_disable_standard_pagination()` |
-| `mpp_toc_only_on_the_first_page` | `mpp-options.php` | Value of `mpp_toc_only_on_the_first_page()` |
-| `mpp_get_toc_position` | `mpp-options.php` | Value of `mpp_get_toc_position()` |
-| `mpp_get_toc_row_labels` | `mpp-options.php` | Value of `mpp_get_toc_row_labels()` |
-| `mpp_hide_toc_header` | `mpp-options.php` | Value of `mpp_hide_toc_header()` |
-| `mpp_comments_toc_link` | `mpp-options.php` | Value of `mpp_comments_toc_link()` |
-| `mpp_get_rewrite_title_priority` | `mpp-options.php` | Value of `mpp_get_rewrite_title_priority()` |
-| `mpp_get_rewrite_content_priority` | `mpp-options.php` | Value of `mpp_get_rewrite_content_priority()` |
-| `mpp_disable_tinymce_buttons` | `mpp-options.php` | Value of `mpp_disable_tinymce_buttons()` |
+| `pchap_get_option_definitions` | `pchap-options.php` | Option definitions (e.g. extra allowed values); core options cannot be removed |
+| `pchap_get_option_choice_labels` | `pchap-options.php` | Labels of the choices on the settings screens |
+| `pchap_hideintro_title` | `pchap-options.php` | Value of `pchap_hide_intro_title()` |
+| `pchap_get_comments_on_page` | `pchap-options.php` | Value of `pchap_get_comments_on_page()` |
+| `pchap_get_continue_or_prev_next` | `pchap-options.php` | Value of `pchap_get_continue_or_prev_next()` |
+| `pchap_disable_standard_pagination` | `pchap-options.php` | Value of `pchap_disable_standard_pagination()` |
+| `pchap_toc_only_on_the_first_page` | `pchap-options.php` | Value of `pchap_toc_only_on_the_first_page()` |
+| `pchap_get_toc_position` | `pchap-options.php` | Value of `pchap_get_toc_position()` |
+| `pchap_get_toc_row_labels` | `pchap-options.php` | Value of `pchap_get_toc_row_labels()` |
+| `pchap_hide_toc_header` | `pchap-options.php` | Value of `pchap_hide_toc_header()` |
+| `pchap_comments_toc_link` | `pchap-options.php` | Value of `pchap_comments_toc_link()` |
+| `pchap_get_rewrite_title_priority` | `pchap-options.php` | Value of `pchap_get_rewrite_title_priority()` |
+| `pchap_get_rewrite_content_priority` | `pchap-options.php` | Value of `pchap_get_rewrite_content_priority()` |
+| `pchap_disable_tinymce_buttons` | `pchap-options.php` | Value of `pchap_disable_tinymce_buttons()` |
 
 ### Rebuild filters
 
 | Filter | Default | Location | Description |
 |--------|---------|----------|-------------|
-| `mpp_rebuild_postmeta_batch_size` | `200` | `mpp-update.php` | Posts per rebuild batch |
-| `mpp_rebuild_cron_time_limit` | `15` | `mpp-update.php` | Seconds per background (WP-Cron) run |
-| `mpp_rebuild_admin_time_limit` | `15` | `admin-advanced-settings.php` | Seconds spent by the "Rebuild subpage index" request before handing over to WP-Cron |
+| `pchap_rebuild_postmeta_batch_size` | `200` | `pchap-update.php` | Posts per rebuild batch |
+| `pchap_rebuild_cron_time_limit` | `15` | `pchap-update.php` | Seconds per background (WP-Cron) run |
+| `pchap_rebuild_admin_time_limit` | `15` | `admin-advanced-settings.php` | Seconds spent by the "Rebuild chapter index" request before handing over to WP-Cron |
 
 ### Admin filters
 
 | Filter | Location | Description |
 |--------|----------|-------------|
-| `mpp_get_admin_tabs` | `admin-functions.php` | Settings tabs |
-| `mpp_admin_tabs` | `admin-functions.php` | Tabs about to be displayed |
+| `pchap_get_admin_tabs` | `admin-functions.php` | Settings tabs |
+| `pchap_admin_tabs` | `admin-functions.php` | Tabs about to be displayed |
 
 ### Actions
 
 | Action | Location | Description |
 |--------|----------|-------------|
-| `mpp_admin_init` | `admin-actions.php` | Fired on `admin_init`; runs the updater (priority 1000), the settings registration and the rebuild notice |
-| `mpp_register_admin_settings` | `admin-actions.php` | Settings registration (`MPP_Admin::register_admin_settings()`) |
-| `mpp_admin_tabs` | `admin-functions.php` | After the settings tabs |
-| `mpp_on_install` | `mpp-update.php` | Fresh install |
-| `mpp_on_update` | `mpp-update.php` | Update from an older version |
-| `mpp_activation` | `mpp-update.php` | Plugin activation |
-| `mpp_deactivation` | `mpp-update.php` | Plugin deactivation |
-| `mpp_rebuild_postmeta_batch` | `mpp-update.php` | WP-Cron event of the background rebuild (`mpp_cron_rebuild_postmeta()`) |
+| `pchap_admin_init` | `admin-actions.php` | Fired on `admin_init`; runs the updater (priority 1000), the settings registration and the rebuild notice |
+| `pchap_register_admin_settings` | `admin-actions.php` | Settings registration (`PChap_Admin::register_admin_settings()`) |
+| `pchap_admin_tabs` | `admin-functions.php` | After the settings tabs |
+| `pchap_on_install` | `pchap-update.php` | Fresh install |
+| `pchap_on_update` | `pchap-update.php` | Update from an older version |
+| `pchap_activation` | `pchap-update.php` | Plugin activation |
+| `pchap_deactivation` | `pchap-update.php` | Plugin deactivation |
+| `pchap_rebuild_postmeta_batch` | `pchap-update.php` | WP-Cron event of the background rebuild (`pchap_cron_rebuild_postmeta()`) |
 
 ## Editors Integration
 
@@ -400,35 +405,37 @@ The object cache group `multipage` holds the parse results (see `Multipage::setu
 
 The "Subpage" block (`multipage/subpage`) lives in `blocks/subpage/` and needs no build step:
 
-- `mpp_register_blocks()` (`inc/mpp-blocks.php`) runs on `init` for every request and calls `register_block_type( MPP_PLUGIN_DIR . 'blocks/subpage' )`, then `wp_set_script_translations()` on the editor script (handle `multipage-subpage-editor-script`), without a path; `mpp_load_bundled_script_translation_file()` (`load_script_translation_file`) replaces a JSON file of `WP_LANG_DIR/plugins` with the bundled `languages/*.json` file of the same locale, and returns the bundled file as the last resort when core found none
+- `pchap_register_blocks()` (`inc/pchap-blocks.php`) runs on `init` for every request and calls `register_block_type( PCHAP_PLUGIN_DIR . 'blocks/subpage' )`, then `wp_set_script_translations()` on the editor script (handle `multipage-subpage-editor-script`), without a path; `pchap_load_bundled_script_translation_file()` (`load_script_translation_file`) replaces a JSON file of `WP_LANG_DIR/plugins` with the bundled `languages/*.json` file of the same locale, and returns the bundled file as the last resort when core found none
 - `block.json`: `apiVersion` 3 (iframed editor), category `design`, attribute `title` (string, default `false`), supports `html` but no custom class name. `index.js` holds a copy of the metadata so that the block also registers on screens that do not bootstrap the server definitions (keep both in sync)
 - Edit: a RichText `h2` without formatting; Enter at the end of the title inserts a paragraph after the block
 - Save: `[nextpage title="..."]` (only `"` encoded), byte-identical to every previous version, inside the block comment: `<!-- wp:multipage/subpage {"title":"..."} -->[nextpage title="..."]<!-- /wp:multipage/subpage -->`. The parser also honors an optional `slug` attribute
 
 ### Classic editor (TinyMCE and Quicktags)
 
-- Unless `mpp-disable-tinymce-buttons` is set: `mce_buttons`, `mce_external_plugins` (`inc/admin/tinymce/js/plugin[.min].js`), `mce_css`, `wp_mce_translation`, and `tiny_mce_before_init` (`MPP_Admin::mpp_classic_block_mce_css()`, which adds the placeholder styles to the Classic block of the block editor)
+- Unless `mpp-disable-tinymce-buttons` is set: `mce_buttons`, `mce_external_plugins` (`inc/admin/tinymce/js/plugin[.min].js`), `mce_css`, `wp_mce_translation`, and `tiny_mce_before_init` (`PChap_Admin::pchap_classic_block_mce_css()`, which adds the placeholder styles to the Classic block of the block editor)
 - The dialog escapes the title (`&`, `"`, `<`, `>`, `[`, `]`) and inserts nothing for an empty title. In the Visual editor, shortcodes are shown as placeholder images that store the exact shortcode value (`data-mpp-title`), so the Visual/Text round trip is lossless
-- Text editor: `MPP_Admin::editor_add_quicktags()` attaches an inline script to the core `quicktags` script (button `eg_subpage`), with the same escaping
+- Text editor: `PChap_Admin::editor_add_quicktags()` attaches an inline script to the core `quicktags` script (button `eg_subpage`), with the same escaping
 
 ### Shortcode
 
-`[nextpage title="My Title" slug="my-slug"]` is registered by `Multipage_Plugin_Shortcodes`. On multipage views the shortcodes are removed before rendering; where the content is not split (feeds, REST API, excerpts) the handler returns an empty string.
+`[nextpage title="My Title" slug="my-slug"]` is registered by `PChap_Shortcodes`. On multipage views the shortcodes are removed before rendering; where the content is not split (feeds, REST API, excerpts) the handler returns an empty string.
 
 ## CSS Loading
 
-`Multipage::enqueue_styles()` runs on multipage views only. It looks for `css/multipage[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
+`PChap::enqueue_styles()` runs on multipage views only. It looks for `css/post-chapters[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
 
-1. Child theme
-2. Parent theme
+1. Child theme: `css/post-chapters*.css`, then the Multipage name `css/multipage*.css`
+2. Parent theme: same two names
 3. Plugin default (falls back to the LTR file if the RTL one is missing)
 
-The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-post-navigation`. In the RTL file, the `top-left` / `top-right` TOC positions keep their physical side. The admin stylesheet is `admin/css/multipage-admin[-rtl][.min].css`.
+The handle is `{theme}-post-chapters` for a theme file, `post-chapters` for the plugin file.
+
+The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-post-navigation`. In the RTL file, the `top-left` / `top-right` TOC positions keep their physical side. The admin stylesheet is `admin/css/post-chapters-admin[-rtl][.min].css`.
 
 ## Translations
 
-- `mpp_load_multipage_textdomain()` (`init`) calls `load_plugin_textdomain( 'sgr-nextpage-titles', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
-- The language packs of translate.wordpress.org for this slug belong to the original plugin (old strings only). `mpp_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `mpp_prefer_bundled_translations` filter turns the replacement off
+- `pchap_load_textdomain()` (`init`) calls `load_plugin_textdomain( 'post-chapters', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
+- A language pack can lag behind the strings of a release (and, under the old `sgr-nextpage-titles` slug, the packs belonged to the original plugin). `pchap_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `pchap_prefer_bundled_translations` filter turns the replacement off
 - Block strings come from `block.json` (translated in PHP, contexts "block title", "block description", "block keyword") and from `index.js` (JSON file)
 - See [CONTRIBUTING.md](CONTRIBUTING.md#translations) for the regeneration workflow and `bin/check-i18n.sh`
 
@@ -436,18 +443,18 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 
 | Deprecated | Since | Replacement |
 |------------|-------|-------------|
-| `Multipage::multipage_return_array()` | 1.5.14 | `Multipage_Parser::multipage_return_array()` (triggers `_deprecated_function()` since 1.7.0) |
-| `Multipage::mpp_the_title()` | 1.7.0 | No longer hooked; returns the title unchanged (see the SEO integrations) |
-| `MPP_Admin::mpp_enqueue_block_editor_assets()` | 1.7.0 | `mpp_register_blocks()` |
-| `mpp_admin_settings_save()`, `mpp_admin_advanced_settings_save()` | 1.7.0 | Settings API (`options.php`); no-ops |
-| `mpp_admin_advanced_callback_build_mpp_postmeta_data()` | 1.7.0 | `mpp_admin_rebuild_postmeta_section()` |
-| `inc/admin/tinymce/languages.php` | 1.5 | `MPP_Admin::mpp_wp_mce_translation()` (the file is never loaded) |
-| `MPP_PATTERN`, `MPP_GUTENBERG_PATTERN` | 1.7.0 | `Multipage_Parser::parse()`. The constants are kept for backward compatibility (`MPP_PATTERN` is only used by the legacy `Multipage_Parser::parse_nextpage_shortcode()`) |
+| `PChap::multipage_return_array()` | 1.5.14 | `PChap_Parser::multipage_return_array()` (triggers `_deprecated_function()` since 1.7.0) |
+| `PChap::pchap_the_title()` | 1.7.0 | No longer hooked; returns the title unchanged (see the SEO integrations) |
+| `PChap_Admin::pchap_enqueue_block_editor_assets()` | 1.7.0 | `pchap_register_blocks()` |
+| `pchap_admin_settings_save()`, `pchap_admin_advanced_settings_save()` | 1.7.0 | Settings API (`options.php`); no-ops |
+| `pchap_admin_advanced_callback_build_mpp_postmeta_data()` | 1.7.0 | `pchap_admin_rebuild_postmeta_section()` |
+| `inc/admin/tinymce/languages.php` | 1.5 | `PChap_Admin::pchap_wp_mce_translation()` (the file is never loaded) |
+| `PCHAP_PATTERN`, `PCHAP_GUTENBERG_PATTERN` | 1.7.0 | `PChap_Parser::parse()`. The constants are kept for backward compatibility (`PCHAP_PATTERN` is only used by the legacy `PChap_Parser::parse_nextpage_shortcode()`) |
 
 ## Tests and Tooling
 
-- PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `Mpp_UnitTestCase` resets the `Multipage` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `Mpp_Test_Corpus` holds real-world contents with their expected pages
-- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `sgr-nextpage-titles`, prefixes `mpp_`, `_mpp_` and `multipage`
+- PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `PChap_UnitTestCase` resets the `PChap` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `PChap_Test_Corpus` holds real-world contents with their expected pages
+- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap`, `pchap_` and `_pchap_`
 - CI (`.github/workflows/ci.yml`): PHP lint 7.4–8.4, PHPCS, i18n check, PHPUnit on WordPress 6.3 / PHP 7.4, 7.1.4 / PHP 7.4 and 7.1.4 / PHP 8.4, release zip
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the commands.

@@ -1,12 +1,12 @@
 <?php
 /**
- * Multipage Admin Settings.
+ * Post Chapters Admin Settings.
  *
- * Fields of the main settings screen (Settings > Multipage). The settings are
+ * Fields of the main settings screen (Settings > Post Chapters). The settings are
  * saved by the WordPress Settings API (options.php), see
- * MPP_Admin::register_admin_settings().
+ * PChap_Admin::register_admin_settings().
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.4
  */
 
@@ -26,7 +26,7 @@ defined( 'ABSPATH' ) || exit;
  * @param string $label       The label displayed next to the checkbox.
  * @param string $description Optional. Help text displayed below the field.
  */
-function mpp_admin_render_checkbox_field( $option_name, $input_id, $checked, $label, $description = '' ) {
+function pchap_admin_render_checkbox_field( $option_name, $input_id, $checked, $label, $description = '' ) {
 	$description_id = $input_id . '-description';
 	?>
 	<input id="<?php echo esc_attr( $input_id ); ?>" name="<?php echo esc_attr( $option_name ); ?>" type="checkbox" value="1" <?php checked( (bool) $checked ); ?><?php echo '' !== $description ? ' aria-describedby="' . esc_attr( $description_id ) . '"' : ''; ?> />
@@ -47,8 +47,8 @@ function mpp_admin_render_checkbox_field( $option_name, $input_id, $checked, $la
  * @param string $current     The current value.
  * @param string $legend      The (screen reader) legend of the group.
  */
-function mpp_admin_render_radio_field( $option_name, $fieldset_id, $current, $legend ) {
-	$choices = mpp_get_option_choice_labels( $option_name );
+function pchap_admin_render_radio_field( $option_name, $fieldset_id, $current, $legend ) {
+	$choices = pchap_get_option_choice_labels( $option_name );
 	?>
 	<fieldset id="<?php echo esc_attr( $fieldset_id ); ?>">
 		<legend class="screen-reader-text"><span><?php echo esc_html( $legend ); ?></span></legend>
@@ -76,15 +76,15 @@ function mpp_admin_render_radio_field( $option_name, $fieldset_id, $current, $le
  * @param mixed  $current        The current value.
  * @param string $description_id Optional. Id of the element describing the field.
  */
-function mpp_admin_render_select_field( $option_name, $select_id, $current, $description_id = '' ) {
-	$choices = mpp_get_option_choice_labels( $option_name );
+function pchap_admin_render_select_field( $option_name, $select_id, $current, $description_id = '' ) {
+	$choices = pchap_get_option_choice_labels( $option_name );
 
 	$values = array_map( 'strval', array_keys( $choices ) );
 
 	if ( ! in_array( (string) $current, $values, true ) ) {
 		$choices[ (string) $current ] = sprintf(
 			/* translators: %s: custom value. */
-			__( 'Custom (%s)', 'sgr-nextpage-titles' ),
+			__( 'Custom (%s)', 'post-chapters' ),
 			(string) $current
 		);
 	}
@@ -104,21 +104,21 @@ function mpp_admin_render_select_field( $option_name, $select_id, $current, $des
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_main_section() { }
+function pchap_admin_settings_callback_main_section() { }
 
 /**
  * Pagination settings section description for the settings page.
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_pagination_section() { }
+function pchap_admin_settings_callback_pagination_section() { }
 
 /**
  * Table of contents settings section description for the settings page.
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_toc_section() { }
+function pchap_admin_settings_callback_toc_section() { }
 
 /** Fields ********************************************************************/
 
@@ -127,12 +127,12 @@ function mpp_admin_settings_callback_toc_section() { }
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_hide_intro_title() {
-	mpp_admin_render_checkbox_field(
+function pchap_admin_settings_callback_hide_intro_title() {
+	pchap_admin_render_checkbox_field(
 		'mpp-hide-intro-title',
 		'hide-intro-title',
-		mpp_hide_intro_title( false ),
-		__( 'Hide the default intro title', 'sgr-nextpage-titles' )
+		pchap_hide_intro_title( false ),
+		__( 'Hide the default intro title', 'post-chapters' )
 	);
 }
 
@@ -141,12 +141,12 @@ function mpp_admin_settings_callback_hide_intro_title() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_comments_on_page() {
-	mpp_admin_render_radio_field(
+function pchap_admin_settings_callback_comments_on_page() {
+	pchap_admin_render_radio_field(
 		'mpp-comments-on-page',
 		'comments-on-page',
-		mpp_get_comments_on_page(),
-		__( 'Display comments on', 'sgr-nextpage-titles' )
+		pchap_get_comments_on_page(),
+		__( 'Display comments on', 'post-chapters' )
 	);
 }
 
@@ -155,11 +155,11 @@ function mpp_admin_settings_callback_comments_on_page() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_continue_or_prev_next() {
-	mpp_admin_render_select_field(
+function pchap_admin_settings_callback_continue_or_prev_next() {
+	pchap_admin_render_select_field(
 		'mpp-continue-or-prev-next',
 		'continue-or-prev-next',
-		mpp_get_continue_or_prev_next()
+		pchap_get_continue_or_prev_next()
 	);
 }
 
@@ -168,13 +168,13 @@ function mpp_admin_settings_callback_continue_or_prev_next() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_disable_standard_pagination() {
-	mpp_admin_render_checkbox_field(
+function pchap_admin_settings_callback_disable_standard_pagination() {
+	pchap_admin_render_checkbox_field(
 		'mpp-disable-standard-pagination',
 		'disable-standard-pagination',
-		mpp_disable_standard_pagination( true ),
-		__( 'Disable the WordPress standard pagination', 'sgr-nextpage-titles' ),
-		__( 'WordPress, by default, displays a pagination with only numbers on standard multipage posts. Please uncheck this if you still want the standard pagination to display on multipage posts.', 'sgr-nextpage-titles' )
+		pchap_disable_standard_pagination( true ),
+		__( 'Disable the WordPress standard pagination', 'post-chapters' ),
+		__( 'By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed.', 'post-chapters' )
 	);
 }
 
@@ -183,12 +183,12 @@ function mpp_admin_settings_callback_disable_standard_pagination() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_toc_only_on_the_first_page() {
-	mpp_admin_render_checkbox_field(
+function pchap_admin_settings_callback_toc_only_on_the_first_page() {
+	pchap_admin_render_checkbox_field(
 		'mpp-toc-only-on-the-first-page',
 		'toc-only-on-the-first-page',
-		mpp_toc_only_on_the_first_page( false ),
-		__( 'Display the table of contents only on the first page of the post', 'sgr-nextpage-titles' )
+		pchap_toc_only_on_the_first_page( false ),
+		__( 'Display the table of contents only on the first page of the post', 'post-chapters' )
 	);
 }
 
@@ -197,11 +197,11 @@ function mpp_admin_settings_callback_toc_only_on_the_first_page() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_toc_position() {
-	mpp_admin_render_select_field(
+function pchap_admin_settings_callback_toc_position() {
+	pchap_admin_render_select_field(
 		'mpp-toc-position',
 		'toc-position',
-		mpp_get_toc_position()
+		pchap_get_toc_position()
 	);
 }
 
@@ -210,12 +210,12 @@ function mpp_admin_settings_callback_toc_position() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_toc_row_labels() {
-	mpp_admin_render_radio_field(
+function pchap_admin_settings_callback_toc_row_labels() {
+	pchap_admin_render_radio_field(
 		'mpp-toc-row-labels',
 		'row-labels',
-		mpp_get_toc_row_labels(),
-		__( 'Row labels', 'sgr-nextpage-titles' )
+		pchap_get_toc_row_labels(),
+		__( 'Row labels', 'post-chapters' )
 	);
 }
 
@@ -224,12 +224,12 @@ function mpp_admin_settings_callback_toc_row_labels() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_hide_toc_header() {
-	mpp_admin_render_checkbox_field(
+function pchap_admin_settings_callback_hide_toc_header() {
+	pchap_admin_render_checkbox_field(
 		'mpp-hide-toc-header',
 		'hide-toc-header',
-		mpp_hide_toc_header( false ),
-		__( 'Hide the table of contents header', 'sgr-nextpage-titles' )
+		pchap_hide_toc_header( false ),
+		__( 'Hide the table of contents header', 'post-chapters' )
 	);
 }
 
@@ -238,13 +238,13 @@ function mpp_admin_settings_callback_hide_toc_header() {
  *
  * @since 1.4
  */
-function mpp_admin_settings_callback_comments_toc_link() {
-	mpp_admin_render_checkbox_field(
+function pchap_admin_settings_callback_comments_toc_link() {
+	pchap_admin_render_checkbox_field(
 		'mpp-comments-toc-link',
 		'comments-toc-link',
-		mpp_comments_toc_link( false ),
-		__( 'Add a link for the comments inside the table of contents', 'sgr-nextpage-titles' ),
-		__( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'sgr-nextpage-titles' )
+		pchap_comments_toc_link( false ),
+		__( 'Add a link for the comments inside the table of contents', 'post-chapters' ),
+		__( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'post-chapters' )
 	);
 }
 
@@ -258,7 +258,7 @@ function mpp_admin_settings_callback_comments_toc_link() {
  *
  * @since 1.4
  */
-function mpp_admin_settings() {
+function pchap_admin_settings() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return;
 	}
@@ -266,18 +266,18 @@ function mpp_admin_settings() {
 
 	<div class="wrap">
 
-		<h1><?php esc_html_e( 'Multipage Settings', 'sgr-nextpage-titles' ); ?></h1>
+		<h1><?php esc_html_e( 'Post Chapters Settings', 'post-chapters' ); ?></h1>
 		<hr class="wp-header-end" />
 
-		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Multipage settings sections', 'sgr-nextpage-titles' ); ?>"><?php mpp_admin_tabs( __( 'Options', 'sgr-nextpage-titles' ) ); ?></nav>
+		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Post Chapters settings sections', 'post-chapters' ); ?>"><?php pchap_admin_tabs( __( 'Options', 'post-chapters' ) ); ?></nav>
 
 		<form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
 
-			<?php settings_fields( 'mpp-settings' ); ?>
+			<?php settings_fields( 'post-chapters' ); ?>
 
-			<?php do_settings_sections( 'multipage' ); ?>
+			<?php do_settings_sections( 'post-chapters' ); ?>
 
-			<?php submit_button( __( 'Save Settings', 'sgr-nextpage-titles' ) ); ?>
+			<?php submit_button( __( 'Save Settings', 'post-chapters' ) ); ?>
 		</form>
 
 	</div><!-- .wrap -->
@@ -293,6 +293,6 @@ function mpp_admin_settings() {
  * @since 1.4
  * @deprecated 1.7.0 No longer used, settings are saved through options.php.
  */
-function mpp_admin_settings_save() {
+function pchap_admin_settings_save() {
 	_deprecated_function( __FUNCTION__, '1.7.0' );
 }

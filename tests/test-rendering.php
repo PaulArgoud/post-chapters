@@ -2,10 +2,10 @@
 /**
  * Rendering tests: page title, table of contents, navigation and settings.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * The content of a multipage post, rendered through the_content on real requests.
@@ -13,7 +13,7 @@
  * @group multipage
  * @group rendering
  */
-class Test_Mpp_Rendering extends Mpp_UnitTestCase {
+class Test_PChap_Rendering extends PChap_UnitTestCase {
 
 	/**
 	 * Three-page classic post: Intro, Deux, Trois.
@@ -31,7 +31,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	 * @return string
 	 */
 	private function href( $post_id, $page, $fragment = '' ) {
-		return 'href="' . esc_url( _mpp_link_page_url( $page, $fragment, $post_id ) ) . '"';
+		return 'href="' . esc_url( _pchap_link_page_url( $page, $fragment, $post_id ) ) . '"';
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		$this->assertTrue( $title < $toc && $toc < $body && $body < $nav, 'Order: title, TOC, content, navigation.' );
 
 		// "Continue" navigation to the next subpage.
-		$this->assertStringContainsString( 'aria-label="Subpage navigation"', $html );
+		$this->assertStringContainsString( 'aria-label="Chapter navigation"', $html );
 		$this->assertStringContainsString( 'mpp-post-navigation continue', $html );
 		$this->assertStringContainsString( 'Continue: <a ' . $this->href( $post_id, 2 ) . ' rel="next">Deux</a>', $html );
 	}
@@ -224,15 +224,15 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 
 		$this->set_options( array( 'mpp-toc-row-labels' => 'page' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 1 ) );
-		$this->assertStringContainsString( '<li>Page 1: <span', $toc );
-		$this->assertStringContainsString( '<li>Page 3: <a', $toc );
+		$this->assertStringContainsString( '<li>Chapter 1: <span', $toc );
+		$this->assertStringContainsString( '<li>Chapter 3: <a', $toc );
 
 		$this->set_options( array( 'mpp-toc-row-labels' => 'hidden' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 1 ) );
 		$this->assertStringContainsString( '<li><span class="current"', $toc );
 		$this->assertStringContainsString( '<li><a ', $toc );
 		$this->assertStringNotContainsString( '1. ', $toc );
-		$this->assertStringNotContainsString( 'Page 1', $toc );
+		$this->assertStringNotContainsString( 'Chapter 1', $toc );
 	}
 
 	/**
@@ -305,7 +305,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	 * Block content: same rendering, nothing left of the subpage blocks.
 	 */
 	public function test_block_content_rendering() {
-		$item    = Mpp_Test_Corpus::items()['blocks 1.7'];
+		$item    = PChap_Test_Corpus::items()['blocks 1.7'];
 		$post_id = $this->create_post( $item['content'] );
 
 		$html = $this->render_subpage( $post_id, 2 );
@@ -322,7 +322,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	 * without the standard page links.
 	 */
 	public function test_post_content_block_renders_once() {
-		$item    = Mpp_Test_Corpus::items()['blocks 1.7'];
+		$item    = PChap_Test_Corpus::items()['blocks 1.7'];
 		$post_id = $this->create_post( $item['content'] );
 
 		$this->go_to_subpage( $post_id, 2 );
@@ -457,11 +457,11 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * The mpp_page_title_template and mpp_the_content filters.
+	 * The pchap_page_title_template and pchap_the_content filters.
 	 */
 	public function test_title_template_and_content_filters() {
 		add_filter(
-			'mpp_page_title_template',
+			'pchap_page_title_template',
 			static function () {
 				return '<h3 class="custom-title">%s</h3>';
 			}
@@ -469,7 +469,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 
 		$seen = array();
 		add_filter(
-			'mpp_the_content',
+			'pchap_the_content',
 			static function ( $output, $page_title, $toc, $content ) use ( &$seen ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Read by compact().
 				$seen = compact( 'page_title', 'toc', 'content' );
 				return $output . '<!-- custom -->';
@@ -490,13 +490,13 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * The 1.6 template filters still apply: mpp_toc_args, mpp_toc_pages_row, mpp_toc,
-	 * mpp_link_pages_args, mpp_link_pages_link and mpp_link_pages.
+	 * The 1.6 template filters still apply: pchap_toc_args, pchap_toc_pages_row, pchap_toc,
+	 * pchap_link_pages_args, pchap_link_pages_link and pchap_link_pages.
 	 */
 	public function test_legacy_template_filters() {
 		$rows = array();
 		add_filter(
-			'mpp_toc_pages_row',
+			'pchap_toc_pages_row',
 			static function ( $row, $title, $i ) use ( &$rows ) {
 				$rows[ $i ] = $title;
 				return str_replace( '<li>', '<li class="row-' . $i . '">', $row );
@@ -505,20 +505,20 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 			3
 		);
 		add_filter(
-			'mpp_toc_args',
+			'pchap_toc_args',
 			static function ( $args ) {
 				$args['separator'] = ' :: ';
 				return $args;
 			}
 		);
 		add_filter(
-			'mpp_toc',
+			'pchap_toc',
 			static function ( $html ) {
 				return '<div class="toc-wrap">' . $html . '</div>';
 			}
 		);
 		add_filter(
-			'mpp_link_pages_args',
+			'pchap_link_pages_args',
 			static function ( $args ) {
 				$args['link_before'] = '<span class="lb">';
 				$args['link_after']  = '</span>';
@@ -526,13 +526,13 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 			}
 		);
 		add_filter(
-			'mpp_link_pages_link',
+			'pchap_link_pages_link',
 			static function ( $text ) {
 				return '[' . $text . ']';
 			}
 		);
 		add_filter(
-			'mpp_link_pages',
+			'pchap_link_pages',
 			static function ( $html ) {
 				return '<div class="nav-wrap">' . $html . '</div>';
 			}
@@ -559,14 +559,14 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	 * Untitled pages render the translated fallback title, filterable.
 	 */
 	public function test_untitled_page_fallback_title() {
-		$post_id = $this->create_post( Mpp_Test_Corpus::items()['blocks legacy default title false']['content'] );
+		$post_id = $this->create_post( PChap_Test_Corpus::items()['blocks legacy default title false']['content'] );
 
 		$html = $this->render_subpage( $post_id, 2 );
-		$this->assertStringContainsString( '<h2>Page 2</h2>', $html );
+		$this->assertStringContainsString( '<h2>Chapter 2</h2>', $html );
 		$this->assertStringNotContainsString( 'false', wp_strip_all_tags( $html ) );
 
 		add_filter(
-			'mpp_untitled_subpage_title',
+			'pchap_untitled_subpage_title',
 			static function ( $title, $number ) {
 				return 'Part ' . $number;
 			},
@@ -616,7 +616,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	 * does not decorate it a second time.
 	 */
 	public function test_double_the_content_on_post_content_block_output() {
-		$item    = Mpp_Test_Corpus::items()['blocks 1.7'];
+		$item    = PChap_Test_Corpus::items()['blocks 1.7'];
 		$post_id = $this->create_post( $item['content'] );
 
 		$this->go_to_subpage( $post_id, 2 );
@@ -643,7 +643,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		$excerpts = array();
 
 		add_shortcode(
-			'mpp_test_related',
+			'pchap_test_related',
 			static function () use ( $other_id, &$excerpts ) {
 				$excerpt    = wp_trim_excerpt( '', get_post( $other_id ) );
 				$excerpts[] = $excerpt;
@@ -652,10 +652,10 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		);
 
 		try {
-			$post_id = $this->create_post( "Intro BODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2\n\n[mpp_test_related]\n\n[nextpage title=\"Trois\"]\n\nBODY-3" );
+			$post_id = $this->create_post( "Intro BODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2\n\n[pchap_test_related]\n\n[nextpage title=\"Trois\"]\n\nBODY-3" );
 			$html    = $this->render_subpage( $post_id, 2 );
 		} finally {
-			remove_shortcode( 'mpp_test_related' );
+			remove_shortcode( 'pchap_test_related' );
 		}
 
 		$this->assertCount( 1, $excerpts );
@@ -683,17 +683,17 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		$this->set_options( array( '_mpp-rewrite-content-priority' => $priority ) );
 
 		add_shortcode(
-			'mpp_test_box',
+			'pchap_test_box',
 			static function ( $atts, $content = '' ) {
 				return '<div class="box">' . apply_filters( 'the_content', (string) $content ) . '</div>';
 			}
 		);
 
 		try {
-			$post_id = $this->create_post( "Intro BODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2\n\n[mpp_test_box]BOX-TEXT[/mpp_test_box]\n\n[nextpage title=\"Trois\"]\n\nBODY-3" );
+			$post_id = $this->create_post( "Intro BODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2\n\n[pchap_test_box]BOX-TEXT[/pchap_test_box]\n\n[nextpage title=\"Trois\"]\n\nBODY-3" );
 			$html    = $this->render_subpage( $post_id, 2 );
 		} finally {
-			remove_shortcode( 'mpp_test_box' );
+			remove_shortcode( 'pchap_test_box' );
 		}
 
 		$this->assertStringContainsString( 'BOX-TEXT', $html );
@@ -798,17 +798,17 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * The the_content runs in progress (private Multipage::$content_runs).
+	 * The the_content runs in progress (private PChap::$content_runs).
 	 *
 	 * @return array
 	 */
 	private function content_runs() {
-		$property = new ReflectionProperty( multipage(), 'content_runs' );
+		$property = new ReflectionProperty( pchap(), 'content_runs' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$property->setAccessible( true );
 		}
 
-		return $property->getValue( multipage() );
+		return $property->getValue( pchap() );
 	}
 
 	/**
@@ -820,16 +820,16 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 
 		do_action( 'wp_enqueue_scripts' );
 
-		$this->assertTrue( wp_style_is( 'multipage', 'enqueued' ) );
-		$this->assertStringContainsString( 'css/multipage', wp_styles()->registered['multipage']->src );
+		$this->assertTrue( wp_style_is( 'post-chapters', 'enqueued' ) );
+		$this->assertStringContainsString( 'css/post-chapters', wp_styles()->registered['post-chapters']->src );
 
-		wp_dequeue_style( 'multipage' );
-		wp_deregister_style( 'multipage' );
+		wp_dequeue_style( 'post-chapters' );
+		wp_deregister_style( 'post-chapters' );
 
 		$plain_id = $this->create_post( 'Plain' );
 		$this->go_to_subpage( $plain_id, 1 );
 		do_action( 'wp_enqueue_scripts' );
-		$this->assertFalse( wp_style_is( 'multipage', 'enqueued' ) );
+		$this->assertFalse( wp_style_is( 'post-chapters', 'enqueued' ) );
 	}
 
 	/**
@@ -849,7 +849,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 
 	/**
 	 * With a persistent object cache, a parse stored by another build of the same version
-	 * (key "parse-{MPP_VERSION}-{md5}" up to 1.7.0) is never served.
+	 * (key "parse-{PCHAP_VERSION}-{md5}" up to 1.7.0) is never served.
 	 */
 	public function test_stale_parse_cache_entry_is_ignored() {
 		$post_id = $this->create_post( self::CLASSIC );
@@ -878,7 +878,7 @@ class Test_Mpp_Rendering extends Mpp_UnitTestCase {
 		add_action(
 			'parse_request',
 			static function () use ( $content, $stale ) {
-				wp_cache_set( 'parse-' . MPP_VERSION . '-' . md5( $content ), $stale, 'multipage' );
+				wp_cache_set( 'parse-' . PCHAP_VERSION . '-' . md5( $content ), $stale, 'post-chapters' );
 			}
 		);
 

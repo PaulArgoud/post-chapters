@@ -2,10 +2,10 @@
 /**
  * Subpage title escaping tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * Title helpers and the escaping of titles in the rendered output and the document title.
@@ -13,10 +13,10 @@
  * @group multipage
  * @group titles
  */
-class Test_Mpp_Titles extends Mpp_UnitTestCase {
+class Test_PChap_Titles extends PChap_UnitTestCase {
 
 	/**
-	 * Function mpp_get_subpage_title_html().
+	 * Function pchap_get_subpage_title_html().
 	 *
 	 * @dataProvider data_title_html
 	 *
@@ -25,7 +25,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * @param string $expected Expected HTML.
 	 */
 	public function test_mpp_get_subpage_title_html( $title, $format, $expected ) {
-		$this->assertSame( $expected, mpp_get_subpage_title_html( $title, $format ) );
+		$this->assertSame( $expected, pchap_get_subpage_title_html( $title, $format ) );
 	}
 
 	/**
@@ -50,7 +50,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * Function mpp_get_subpage_title_text().
+	 * Function pchap_get_subpage_title_text().
 	 *
 	 * @dataProvider data_title_text
 	 *
@@ -59,7 +59,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * @param string $expected Expected text.
 	 */
 	public function test_mpp_get_subpage_title_text( $title, $format, $expected ) {
-		$this->assertSame( $expected, mpp_get_subpage_title_text( $title, $format ) );
+		$this->assertSame( $expected, pchap_get_subpage_title_text( $title, $format ) );
 	}
 
 	/**
@@ -82,8 +82,8 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * Non-scalar titles give an empty string.
 	 */
 	public function test_non_scalar_titles() {
-		$this->assertSame( '', mpp_get_subpage_title_html( array( 'x' ) ) );
-		$this->assertSame( '', mpp_get_subpage_title_text( null ) );
+		$this->assertSame( '', pchap_get_subpage_title_html( array( 'x' ) ) );
+		$this->assertSame( '', pchap_get_subpage_title_text( null ) );
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * Gutenberg "Tom &amp; Jerry" is not double encoded (heading, TOC, navigation, document title).
 	 */
 	public function test_block_title_with_entity_is_not_double_encoded() {
-		$post_id = $this->create_post( Mpp_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . Mpp_Test_Corpus::block( 'Tom &amp; Jerry' ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'Two' ) );
+		$post_id = $this->create_post( PChap_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . PChap_Test_Corpus::block( 'Tom &amp; Jerry' ) . "\n\n" . PChap_Test_Corpus::paragraph( 'Two' ) );
 
 		$html = $this->render_subpage( $post_id, 1 );
 		$this->assertStringContainsString( '>Tom &amp; Jerry</a>', $html, 'Continue link and TOC.' );
@@ -120,7 +120,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * Legacy titles with inline HTML: the tag is rendered, and stripped from the document title.
 	 */
 	public function test_legacy_inline_html_title() {
-		$post_id = $this->create_post( Mpp_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . Mpp_Test_Corpus::block( '<strong>b</strong> title' ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'Two' ) );
+		$post_id = $this->create_post( PChap_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . PChap_Test_Corpus::block( '<strong>b</strong> title' ) . "\n\n" . PChap_Test_Corpus::paragraph( 'Two' ) );
 
 		$html = $this->render_subpage( $post_id, 2 );
 		$this->assertSame( '<strong>b</strong> title', $this->heading( $html ) );
@@ -165,7 +165,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * Quotes in titles (classic and block).
 	 */
 	public function test_titles_with_quotes() {
-		$post_id = $this->create_post( "Intro\n\n[nextpage title='He said \"yes\"']\n\nTwo\n\n" . Mpp_Test_Corpus::block( 'L\'été "chaud"' ) . "\n\nThree" );
+		$post_id = $this->create_post( "Intro\n\n[nextpage title='He said \"yes\"']\n\nTwo\n\n" . PChap_Test_Corpus::block( 'L\'été "chaud"' ) . "\n\nThree" );
 
 		$html = $this->render_subpage( $post_id, 2 );
 		$this->assertSame( 'He said "yes"', html_entity_decode( $this->heading( $html ), ENT_QUOTES, 'UTF-8' ) );
@@ -214,7 +214,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 	 * @param string $payload Title.
 	 */
 	public function test_xss_in_block_title( $payload ) {
-		$post_id = $this->create_post( Mpp_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . Mpp_Test_Corpus::block( $payload ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'Two' ) . "\n\n" . Mpp_Test_Corpus::block( 'Three' ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'Three' ) );
+		$post_id = $this->create_post( PChap_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . PChap_Test_Corpus::block( $payload ) . "\n\n" . PChap_Test_Corpus::paragraph( 'Two' ) . "\n\n" . PChap_Test_Corpus::block( 'Three' ) . "\n\n" . PChap_Test_Corpus::paragraph( 'Three' ) );
 
 		foreach ( array( 1, 2, 3 ) as $page ) {
 			$html = $this->render_subpage( $post_id, $page );
@@ -224,7 +224,7 @@ class Test_Mpp_Titles extends Mpp_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 2 );
 		$this->assert_no_active_payload( wp_get_document_title() );
-		$this->assert_no_active_payload( (string) get_echo( array( multipage(), 'mpp_rel_links' ) ) );
+		$this->assert_no_active_payload( (string) get_echo( array( pchap(), 'pchap_rel_links' ) ) );
 	}
 
 	/**

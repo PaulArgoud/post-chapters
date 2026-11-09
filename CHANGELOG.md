@@ -1,9 +1,49 @@
 # Changelog
 
-All notable changes to the Multipage plugin are documented in this file.
+All notable changes to Post Chapters (named Multipage, slug `sgr-nextpage-titles`, up to 1.7.1) are documented in this file. The entries before 2.0.0 use the names of that time (`mpp_*` functions and hooks, `Multipage` class, `wp multipage`).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.0.0] - 2026-11-09
+
+Multipage becomes **Post Chapters**, a plugin of its own: new name, slug `post-chapters`, text domain `post-chapters` and code prefix `pchap`. The WordPress.org listing of Multipage (`sgr-nextpage-titles`) stays with its original author. Content and settings need no change: everything stored in the database or in the posts keeps its name.
+
+### Migrating from Multipage
+
+1. Install and activate Post Chapters. While Multipage is active, Post Chapters stays idle and shows an admin notice
+2. Deactivate Multipage. On the next admin page load, the 2.0 upgrade routine (database version 2000) moves a pending subpage index rebuild from the `mpp_rebuild_postmeta_batch` WP-Cron event to `pchap_rebuild_postmeta_batch`
+3. Delete the `sgr-nextpage-titles` folder over FTP or SSH. **Do not use Delete on the Plugins screen**: the uninstall routine of Multipage 1.5.15 to 1.7.1 erases the options and the `_mpp_data` meta that Post Chapters reuses (the uninstall routine of Post Chapters erases them too, and now also clears the old WP-Cron event)
+
+### Kept for compatibility
+
+- The `[nextpage]` shortcode and the `multipage/subpage` block name (stored in the posts; the block `save()` output is unchanged)
+- The option names (`mpp-*`, `_mpp-*`, `_mpp_db_version`, the 1.3 `multipage` option) and the `_mpp_data` post meta
+- The HTML classes (`.mpp-toc-container`, `.mpp-toc`, `.mpp-post-navigation`...) and the `data-mpp-title` attribute of the classic editor placeholders
+- Theme stylesheets named `css/multipage[-rtl][.min].css`: still loaded, after `css/post-chapters[-rtl][.min].css` in the same theme (child theme first, then parent theme)
+- The `wp multipage` WP-CLI command, now an alias of `wp post-chapters`
+
+### Changed
+
+- Plugin name **Post Chapters**, main file `post-chapters.php`, plugin folder `post-chapters`, text domain `post-chapters`, `Update URI: https://github.com/PaulArgoud/post-chapters`
+- Interface wording: **subpage** becomes **chapter** everywhere (block title "Chapter", editor buttons, settings, admin notices, WP-CLI output). The fallback title of an untitled page is "Chapter N" (was "Page N"), and the "page #" row labels of the table of contents read "Chapter #" (the stored option value is still `page`). Translations updated in French, German, Italian and Spanish
+- Settings pages: `options-general.php?page=post-chapters` and `?page=post-chapters-advanced` (were `mpp-settings` and `mpp-advanced-settings`); the settings groups were renamed the same way
+- Object cache group `post-chapters` (was `multipage`), frontend style handle `post-chapters` / `{theme}-post-chapters`, TinyMCE plugin `postchapters`, TinyMCE command `PCHAP_Subpage`
+- Files renamed: `class-pchap.php`, `classes/class-pchap-*.php`, `inc/pchap-*.php`, `css/post-chapters*.css`, `admin/css/post-chapters-admin*.css`, `inc/admin/tinymce/css/post-chapters*.css`, `languages/post-chapters-*`. Release archive `post-chapters.zip`
+
+### Removed (breaking for custom code)
+
+- Every `mpp_*` / `_mpp_*` function, the `Multipage`, `Multipage_Parser`, `MPP_Admin`, `Multipage_Plugin_Shortcodes` and `MPP_CLI_Command` classes, the `multipage()` accessor and the `MPP_*` constants. They are renamed (`pchap_*`, `_pchap_*`, `PChap`, `PChap_Parser`, `PChap_Admin`, `PChap_Shortcodes`, `PChap_CLI_Command`, `pchap()`, `PCHAP_*`) without aliases: Multipage defines the old names, and both plugins can be installed side by side during the migration. The public `$mpp_data` property of the main instance is now `$pchap_data`; `mpp_load_multipage_textdomain()` is now `pchap_load_textdomain()`
+
+### Deprecated
+
+- The `mpp_*` hooks. Every hook is now fired as `pchap_*` (e.g. `pchap_toc`, `pchap_the_content`, `pchap_get_toc_position`, `pchap_on_update`); callbacks attached to the old `mpp_*` name still run, after the `pchap_*` ones and with the same arguments, through `apply_filters_deprecated()` / `do_action_deprecated()` (a notice is logged when `WP_DEBUG` is on). New helpers `pchap_apply_filters()` and `pchap_do_action()`
+
+### Added
+
+- Coexistence guard: `pchap_is_multipage_active()` detects an active Multipage (an existing `sgr-nextpage-titles.php` in any active plugin folder, or the `Multipage` class); Post Chapters then loads nothing but an admin notice telling how to switch safely
+- 2.0 upgrade routine `pchap_update_to_2_0()` (database version 2000)
+- Tests for the deprecated hooks, the guard and the 1.7 to 2.0 update (401 tests)
 
 ## [1.7.1] - 2026-11-08
 

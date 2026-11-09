@@ -2,10 +2,10 @@
 /**
  * Options tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * Option definitions, getters, validation, sanitization and the in-memory cache.
@@ -13,7 +13,7 @@
  * @group multipage
  * @group options
  */
-class Test_Mpp_Options extends Mpp_UnitTestCase {
+class Test_PChap_Options extends PChap_UnitTestCase {
 
 	/**
 	 * Names of the settings registered by this test.
@@ -27,7 +27,7 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 */
 	public function tear_down() {
 		foreach ( $this->registered as $option_name ) {
-			$definition = mpp_get_option_definition( $option_name );
+			$definition = pchap_get_option_definition( $option_name );
 			if ( $definition ) {
 				unregister_setting( $definition['group'], $option_name );
 			}
@@ -37,15 +37,15 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * Register the plugin settings as the admin does (MPP_Admin::register_admin_settings()).
+	 * Register the plugin settings as the admin does (PChap_Admin::register_admin_settings()).
 	 */
 	private function register_settings() {
 		require_once ABSPATH . 'wp-admin/includes/template.php';
 
-		$admin = new MPP_Admin();
+		$admin = new PChap_Admin();
 		$admin->register_admin_settings();
 
-		$this->registered = array_keys( mpp_get_option_definitions() );
+		$this->registered = array_keys( pchap_get_option_definitions() );
 	}
 
 	/**
@@ -55,18 +55,18 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 */
 	public function data_getters() {
 		return array(
-			'mpp_hide_intro_title'             => array( 'mpp_hide_intro_title', 'mpp-hide-intro-title', false, true ),
-			'mpp_get_comments_on_page'         => array( 'mpp_get_comments_on_page', 'mpp-comments-on-page', 'all', 'last-page' ),
-			'mpp_get_continue_or_prev_next'    => array( 'mpp_get_continue_or_prev_next', 'mpp-continue-or-prev-next', 'continue', 'next-previous' ),
-			'mpp_disable_standard_pagination'  => array( 'mpp_disable_standard_pagination', 'mpp-disable-standard-pagination', true, false ),
-			'mpp_toc_only_on_the_first_page'   => array( 'mpp_toc_only_on_the_first_page', 'mpp-toc-only-on-the-first-page', false, true ),
-			'mpp_get_toc_position'             => array( 'mpp_get_toc_position', 'mpp-toc-position', 'top-right', 'bottom' ),
-			'mpp_get_toc_row_labels'           => array( 'mpp_get_toc_row_labels', 'mpp-toc-row-labels', 'number', 'page' ),
-			'mpp_hide_toc_header'              => array( 'mpp_hide_toc_header', 'mpp-hide-toc-header', false, true ),
-			'mpp_comments_toc_link'            => array( 'mpp_comments_toc_link', 'mpp-comments-toc-link', false, true ),
-			'mpp_get_rewrite_title_priority'   => array( 'mpp_get_rewrite_title_priority', '_mpp-rewrite-title-priority', 20, 100 ),
-			'mpp_get_rewrite_content_priority' => array( 'mpp_get_rewrite_content_priority', '_mpp-rewrite-content-priority', 20, 5 ),
-			'mpp_disable_tinymce_buttons'      => array( 'mpp_disable_tinymce_buttons', 'mpp-disable-tinymce-buttons', false, true ),
+			'pchap_hide_intro_title'             => array( 'pchap_hide_intro_title', 'mpp-hide-intro-title', false, true ),
+			'pchap_get_comments_on_page'         => array( 'pchap_get_comments_on_page', 'mpp-comments-on-page', 'all', 'last-page' ),
+			'pchap_get_continue_or_prev_next'    => array( 'pchap_get_continue_or_prev_next', 'mpp-continue-or-prev-next', 'continue', 'next-previous' ),
+			'pchap_disable_standard_pagination'  => array( 'pchap_disable_standard_pagination', 'mpp-disable-standard-pagination', true, false ),
+			'pchap_toc_only_on_the_first_page'   => array( 'pchap_toc_only_on_the_first_page', 'mpp-toc-only-on-the-first-page', false, true ),
+			'pchap_get_toc_position'             => array( 'pchap_get_toc_position', 'mpp-toc-position', 'top-right', 'bottom' ),
+			'pchap_get_toc_row_labels'           => array( 'pchap_get_toc_row_labels', 'mpp-toc-row-labels', 'number', 'page' ),
+			'pchap_hide_toc_header'              => array( 'pchap_hide_toc_header', 'mpp-hide-toc-header', false, true ),
+			'pchap_comments_toc_link'            => array( 'pchap_comments_toc_link', 'mpp-comments-toc-link', false, true ),
+			'pchap_get_rewrite_title_priority'   => array( 'pchap_get_rewrite_title_priority', '_mpp-rewrite-title-priority', 20, 100 ),
+			'pchap_get_rewrite_content_priority' => array( 'pchap_get_rewrite_content_priority', '_mpp-rewrite-content-priority', 20, 5 ),
+			'pchap_disable_tinymce_buttons'      => array( 'pchap_disable_tinymce_buttons', 'mpp-disable-tinymce-buttons', false, true ),
 		);
 	}
 
@@ -83,7 +83,7 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 		delete_option( $option );
 
 		$this->assertSame( $default_value, call_user_func( $getter ) );
-		$this->assertSame( $default_value, mpp_get_option_definition( $option )['default'] );
+		$this->assertSame( $default_value, pchap_get_option_definition( $option )['default'] );
 	}
 
 	/**
@@ -112,7 +112,7 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 * @param mixed  $default_value Default value.
 	 */
 	public function test_getter_invalid_values_fall_back_to_default( $getter, $option, $default_value ) {
-		$definition = mpp_get_option_definition( $option );
+		$definition = pchap_get_option_definition( $option );
 
 		$invalid = array( array( 'x' ), (object) array( 'a' => 1 ) );
 		if ( 'boolean' !== $definition['type'] ) {
@@ -136,12 +136,12 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	public function test_boolean_values_of_all_versions() {
 		foreach ( array( 1, '1', true, 'on', 'yes', 'true' ) as $value ) {
 			update_option( 'mpp-hide-toc-header', $value );
-			$this->assertTrue( mpp_hide_toc_header(), wp_json_encode( $value ) );
+			$this->assertTrue( pchap_hide_toc_header(), wp_json_encode( $value ) );
 		}
 
 		foreach ( array( 0, '0', '', 'off', 'false' ) as $value ) {
 			update_option( 'mpp-hide-toc-header', $value );
-			$this->assertFalse( mpp_hide_toc_header(), wp_json_encode( $value ) );
+			$this->assertFalse( pchap_hide_toc_header(), wp_json_encode( $value ) );
 		}
 	}
 
@@ -150,13 +150,13 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 */
 	public function test_priority_strings() {
 		update_option( '_mpp-rewrite-title-priority', '50' );
-		$this->assertSame( 50, mpp_get_rewrite_title_priority() );
+		$this->assertSame( 50, pchap_get_rewrite_title_priority() );
 
 		update_option( '_mpp-rewrite-content-priority', ' 10 ' );
-		$this->assertSame( 10, mpp_get_rewrite_content_priority() );
+		$this->assertSame( 10, pchap_get_rewrite_content_priority() );
 
 		update_option( '_mpp-rewrite-content-priority', 7 );
-		$this->assertSame( 7, mpp_get_rewrite_content_priority(), 'Any integer priority is allowed.' );
+		$this->assertSame( 7, pchap_get_rewrite_content_priority(), 'Any integer priority is allowed.' );
 	}
 
 	/**
@@ -164,15 +164,15 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 */
 	public function test_getter_filters() {
 		add_filter(
-			'mpp_get_toc_position',
+			'pchap_get_toc_position',
 			static function () {
 				return 'top-left';
 			}
 		);
-		add_filter( 'mpp_hideintro_title', '__return_true' );
+		add_filter( 'pchap_hideintro_title', '__return_true' );
 
-		$this->assertSame( 'top-left', mpp_get_toc_position() );
-		$this->assertTrue( mpp_hide_intro_title() );
+		$this->assertSame( 'top-left', pchap_get_toc_position() );
+		$this->assertTrue( pchap_hide_intro_title() );
 	}
 
 	/**
@@ -180,7 +180,7 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	 */
 	public function test_definitions_filter() {
 		add_filter(
-			'mpp_get_option_definitions',
+			'pchap_get_option_definitions',
 			static function ( $definitions ) {
 				$definitions['mpp-toc-position']['choices'][] = 'sidebar';
 				unset( $definitions['mpp-hide-toc-header'] );
@@ -189,29 +189,29 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 			}
 		);
 
-		$definitions = mpp_get_option_definitions();
+		$definitions = pchap_get_option_definitions();
 		$this->assertContains( 'sidebar', $definitions['mpp-toc-position']['choices'] );
 		$this->assertArrayHasKey( 'mpp-hide-toc-header', $definitions );
 		$this->assertSame( array( 'number', 'page', 'hidden' ), $definitions['mpp-toc-row-labels']['choices'] );
 
 		update_option( 'mpp-toc-position', 'sidebar' );
-		$this->assertSame( 'sidebar', mpp_get_toc_position() );
+		$this->assertSame( 'sidebar', pchap_get_toc_position() );
 
-		$labels = mpp_get_option_choice_labels( 'mpp-toc-position' );
+		$labels = pchap_get_option_choice_labels( 'mpp-toc-position' );
 		$this->assertSame( 'sidebar', $labels['sidebar'] );
 	}
 
 	/**
-	 * Function mpp_validate_option_value().
+	 * Function pchap_validate_option_value().
 	 */
 	public function test_validate_option_value() {
-		$this->assertSame( 'bottom', mpp_validate_option_value( 'mpp-toc-position', 'bottom' ) );
-		$this->assertSame( 'top-right', mpp_validate_option_value( 'mpp-toc-position', 'nope' ) );
-		$this->assertSame( 'top', mpp_validate_option_value( 'mpp-toc-position', 'nope', 'top' ), 'Valid fallback.' );
-		$this->assertSame( 'top-right', mpp_validate_option_value( 'mpp-toc-position', 'nope', 'also-invalid' ) );
-		$this->assertSame( 'untouched', mpp_validate_option_value( 'unknown-option', 'untouched' ) );
-		$this->assertTrue( mpp_validate_option_value( 'mpp-hide-toc-header', '1' ) );
-		$this->assertSame( 100, mpp_validate_option_value( '_mpp-rewrite-title-priority', '100' ) );
+		$this->assertSame( 'bottom', pchap_validate_option_value( 'mpp-toc-position', 'bottom' ) );
+		$this->assertSame( 'top-right', pchap_validate_option_value( 'mpp-toc-position', 'nope' ) );
+		$this->assertSame( 'top', pchap_validate_option_value( 'mpp-toc-position', 'nope', 'top' ), 'Valid fallback.' );
+		$this->assertSame( 'top-right', pchap_validate_option_value( 'mpp-toc-position', 'nope', 'also-invalid' ) );
+		$this->assertSame( 'untouched', pchap_validate_option_value( 'unknown-option', 'untouched' ) );
+		$this->assertTrue( pchap_validate_option_value( 'mpp-hide-toc-header', '1' ) );
+		$this->assertSame( 100, pchap_validate_option_value( '_mpp-rewrite-title-priority', '100' ) );
 	}
 
 	/**
@@ -274,44 +274,44 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 		$this->assertSame( 1, get_option( 'mpp-disable-standard-pagination' ) );
 		$this->assertSame( 'top-right', get_option( 'mpp-toc-position' ) );
 		$this->assertSame( 20, get_option( '_mpp-rewrite-content-priority' ) );
-		$this->assertTrue( mpp_disable_standard_pagination() );
+		$this->assertTrue( pchap_disable_standard_pagination() );
 	}
 
 	/**
-	 * Function mpp_sanitize_option() for unknown options.
+	 * Function pchap_sanitize_option() for unknown options.
 	 */
 	public function test_sanitize_unknown_option() {
-		$this->assertSame( 'abc', mpp_sanitize_option( '<b>abc</b>', 'unknown' ) );
-		$this->assertSame( '', mpp_sanitize_option( array( 'x' ), 'unknown' ) );
+		$this->assertSame( 'abc', pchap_sanitize_option( '<b>abc</b>', 'unknown' ) );
+		$this->assertSame( '', pchap_sanitize_option( array( 'x' ), 'unknown' ) );
 	}
 
 	/**
-	 * The in-memory cache: cleared on add/update/delete, and by mpp_clear_options_cache().
+	 * The in-memory cache: cleared on add/update/delete, and by pchap_clear_options_cache().
 	 */
 	public function test_options_cache() {
 		global $wpdb;
 
 		update_option( 'mpp-toc-position', 'bottom' );
-		$this->assertSame( 'bottom', mpp_get_option( 'mpp-toc-position' ) );
+		$this->assertSame( 'bottom', pchap_get_option( 'mpp-toc-position' ) );
 
 		// A direct database change is not seen until the cache is cleared.
 		$wpdb->update( $wpdb->options, array( 'option_value' => 'top' ), array( 'option_name' => 'mpp-toc-position' ) );
 		wp_cache_delete( 'alloptions', 'options' );
 		wp_cache_delete( 'mpp-toc-position', 'options' );
-		$this->assertSame( 'bottom', mpp_get_option( 'mpp-toc-position' ) );
+		$this->assertSame( 'bottom', pchap_get_option( 'mpp-toc-position' ) );
 
-		mpp_clear_options_cache();
-		$this->assertSame( 'top', mpp_get_option( 'mpp-toc-position' ) );
+		pchap_clear_options_cache();
+		$this->assertSame( 'top', pchap_get_option( 'mpp-toc-position' ) );
 
 		// The option hooks clear it.
 		update_option( 'mpp-toc-position', 'hidden' );
-		$this->assertSame( 'hidden', mpp_get_option( 'mpp-toc-position' ) );
+		$this->assertSame( 'hidden', pchap_get_option( 'mpp-toc-position' ) );
 
 		delete_option( 'mpp-toc-position' );
-		$this->assertSame( 'fallback', mpp_get_option( 'mpp-toc-position', 'fallback' ) );
+		$this->assertSame( 'fallback', pchap_get_option( 'mpp-toc-position', 'fallback' ) );
 
 		add_option( 'mpp-toc-position', 'top-left' );
-		$this->assertSame( 'top-left', mpp_get_option( 'mpp-toc-position' ) );
+		$this->assertSame( 'top-left', pchap_get_option( 'mpp-toc-position' ) );
 	}
 
 	/**
@@ -320,23 +320,23 @@ class Test_Mpp_Options extends Mpp_UnitTestCase {
 	public function test_missing_option_default_per_call() {
 		delete_option( 'mpp-hide-intro-title' );
 
-		$this->assertSame( 'a', mpp_get_option( 'mpp-hide-intro-title', 'a' ) );
-		$this->assertSame( 'b', mpp_get_option( 'mpp-hide-intro-title', 'b' ) );
+		$this->assertSame( 'a', pchap_get_option( 'mpp-hide-intro-title', 'a' ) );
+		$this->assertSame( 'b', pchap_get_option( 'mpp-hide-intro-title', 'b' ) );
 	}
 
 	/**
 	 * Every choice has a translated label.
 	 */
 	public function test_choice_labels() {
-		$labels = mpp_get_option_choice_labels();
+		$labels = pchap_get_option_choice_labels();
 
-		foreach ( mpp_get_option_definitions() as $name => $definition ) {
+		foreach ( pchap_get_option_definitions() as $name => $definition ) {
 			foreach ( $definition['choices'] as $choice ) {
 				$this->assertArrayHasKey( $choice, $labels[ $name ], "{$name}: {$choice}" );
 				$this->assertNotSame( '', (string) $labels[ $name ][ $choice ] );
 			}
 		}
 
-		$this->assertSame( array(), mpp_get_option_choice_labels( 'unknown' ) );
+		$this->assertSame( array(), pchap_get_option_choice_labels( 'unknown' ) );
 	}
 }

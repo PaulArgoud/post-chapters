@@ -2,18 +2,18 @@
 /**
  * Tests of save_post: the `_mpp_data` post meta.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Multipage::save_post() keeps the 1.6-compatible `_mpp_data` meta up to date.
+ * PChap::save_post() keeps the 1.6-compatible `_mpp_data` meta up to date.
  *
  * @group multipage
  * @group meta
  */
-class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
+class Test_PChap_Save_Post extends PChap_UnitTestCase {
 
 	/**
 	 * Saving a multipage post writes `_mpp_data` (slug => title).
@@ -36,7 +36,7 @@ class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
 	 * Block posts too (saved through the REST API in the block editor).
 	 */
 	public function test_save_post_writes_meta_for_blocks() {
-		$post_id = $this->create_post( Mpp_Test_Corpus::items()['blocks legacy 1.6 exact']['content'] );
+		$post_id = $this->create_post( PChap_Test_Corpus::items()['blocks legacy 1.6 exact']['content'] );
 
 		$this->assertSame(
 			array(
@@ -52,7 +52,7 @@ class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
 	 */
 	public function test_backslashes_in_titles_are_preserved() {
 		// Shortcode attribute values go through stripcslashes() (core): a doubled backslash in the content is one backslash in the title.
-		$post_id = $this->create_post( "Intro\n\n[nextpage title=\"C:\\\\Temp\"]\n\nTwo\n\n" . Mpp_Test_Corpus::block( 'a\\b \\o/' ) . "\n\nThree" );
+		$post_id = $this->create_post( "Intro\n\n[nextpage title=\"C:\\\\Temp\"]\n\nTwo\n\n" . PChap_Test_Corpus::block( 'a\\b \\o/' ) . "\n\nThree" );
 
 		$this->assertStringContainsString( 'C:\\\\Temp', get_post( $post_id )->post_content, 'The content kept its backslashes.' );
 
@@ -118,7 +118,7 @@ class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
 			$this->assertSame( array(), get_post_meta( $revision->ID, '_mpp_data', false ), 'Revision ' . $revision->ID );
 
 			// Even when save_post is called for it explicitly.
-			multipage()->save_post( $revision->ID );
+			pchap()->save_post( $revision->ID );
 			$this->assertSame( array(), get_post_meta( $revision->ID, '_mpp_data', false ) );
 		}
 	}
@@ -143,7 +143,7 @@ class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
 		$this->assertIsInt( $autosave_id );
 		$this->assertNotFalse( wp_is_post_autosave( $autosave_id ) );
 
-		multipage()->save_post( $autosave_id );
+		pchap()->save_post( $autosave_id );
 
 		$this->assertSame( array(), get_post_meta( $autosave_id, '_mpp_data', false ) );
 		$this->assertSame(
@@ -160,7 +160,7 @@ class Test_Mpp_Save_Post extends Mpp_UnitTestCase {
 	 * Unknown post IDs do nothing.
 	 */
 	public function test_unknown_post_id() {
-		multipage()->save_post( PHP_INT_MAX );
+		pchap()->save_post( PHP_INT_MAX );
 
 		$this->assertSame( array(), get_post_meta( PHP_INT_MAX, '_mpp_data', false ) );
 	}

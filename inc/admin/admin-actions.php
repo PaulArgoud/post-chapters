@@ -1,38 +1,38 @@
 <?php
 /**
- * Multipage Admin Actions.
+ * Post Chapters Admin Actions.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.4
  */
 
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-add_action( 'admin_init', 'mpp_admin_init' );
+add_action( 'admin_init', 'pchap_admin_init' );
 
 // Hook on to admin_init.
-add_action( 'mpp_admin_init', 'mpp_setup_updater', 1000 );
-add_action( 'mpp_admin_init', 'mpp_register_admin_settings' );
-add_action( 'mpp_admin_init', 'mpp_admin_rebuild_postmeta_notice' );
+add_action( 'pchap_admin_init', 'pchap_setup_updater', 1000 );
+add_action( 'pchap_admin_init', 'pchap_register_admin_settings' );
+add_action( 'pchap_admin_init', 'pchap_admin_rebuild_postmeta_notice' );
 
 // Subpage index rebuild action (admin-post.php).
-add_action( 'admin_post_mpp_rebuild_postmeta', 'mpp_admin_rebuild_postmeta_handler' );
-add_filter( 'removable_query_args', 'mpp_admin_removable_query_args' );
+add_action( 'admin_post_mpp_rebuild_postmeta', 'pchap_admin_rebuild_postmeta_handler' );
+add_filter( 'removable_query_args', 'pchap_admin_removable_query_args' );
 
 /**
  * Piggy back admin_init action.
  *
  * @since 1.4
  */
-function mpp_admin_init() {
+function pchap_admin_init() {
 
 	/**
-	 * Fires inside the mpp_admin_init function.
+	 * Fires inside the pchap_admin_init function.
 	 *
 	 * @since 1.4
 	 */
-	do_action( 'mpp_admin_init' );
+	pchap_do_action( 'pchap_admin_init' );
 }
 
 /**
@@ -40,12 +40,12 @@ function mpp_admin_init() {
  *
  * @since 1.4
  */
-function mpp_register_admin_settings() {
+function pchap_register_admin_settings() {
 
 	/**
 	 * Fires inside the register_admin_settings function.
 	 *
 	 * @since 1.4
 	 */
-	do_action( 'mpp_register_admin_settings' );
+	pchap_do_action( 'pchap_register_admin_settings' );
 }
