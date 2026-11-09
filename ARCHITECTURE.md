@@ -10,7 +10,7 @@ post-chapters/
 ├── post-chapters.php          # Plugin entry point: header (incl. Update URI), PCHAP_VERSION / PCHAP__PLUGIN_FILE,
 │                                    #   loads class-pchap.php
 ├── class-pchap.php                    # Main PChap class (singleton): bootstrap, request setup,
-│                                    #   frontend rendering, SEO integrations, 404/redirect handling
+│                                    #   frontend rendering, 404/redirect handling
 ├── uninstall.php                    # Cleanup on deletion (every site of a multisite network)
 ├── index.php                        # "Silence is golden" (one in every shipped folder)
 ├── readme.txt                       # WordPress.org directory readme (Stable tag, FAQ, changelog)
@@ -27,6 +27,8 @@ post-chapters/
 ├── classes/
 │   ├── class-pchap-admin.php          # PChap_Admin: admin menus, Settings API registration,
 │   │                                #   TinyMCE / Quicktags / Classic block integration, admin CSS
+│   ├── class-pchap-seo.php            # PChap_SEO (pchap()->seo): document title, rel prev/next, SEO plugins
+│   ├── class-pchap-comments.php       # PChap_Comments (pchap()->comments): comments on all / first / last chapter
 │   └── class-pchap-shortcodes.php     # PChap_Shortcodes: [nextpage] shortcode handler
 │
 ├── inc/
@@ -43,7 +45,8 @@ post-chapters/
 │   └── admin/
 │       ├── admin-actions.php        # admin_init → pchap_admin_init → updater, settings, rebuild action
 │       ├── admin-functions.php      # Admin URL helpers, tabs, Classic Editor detection
-│       ├── admin-settings.php       # Main settings screen (field callbacks and render helpers)
+│       ├── admin-settings.php       # Main settings screen: pchap_get_settings_sections() / _fields() (one field per
+│       │                            #   option), generic renderer, render helpers
 │       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild chapter index" action
 │       └── tinymce/
 │           ├── languages.php        # Deprecated, never loaded (see PChap_Admin::pchap_wp_mce_translation())
@@ -102,7 +105,7 @@ post-chapters/
        ├── setup_globals()   → $version, $db_version (2000), paths
        ├── includes()        → versions() (detects a legacy 1.3 install), then:
        │   ├── if is_admin(): add_action( 'init', 'pchap_admin' ) → new PChap_Admin
-       │   ├── classes/class-pchap-admin.php, classes/class-pchap-shortcodes.php
+       │   ├── classes/class-pchap-{admin,shortcodes,seo,comments}.php (then new PChap_SEO / PChap_Comments)
        │   └── inc/pchap-{admin,functions,options,parser,shortcodes,template,update,blocks,cli}.php
        │       (pchap-cli.php returns immediately unless WP_CLI is running)
        ├── setup_actions()   → activation/deactivation hooks; unless the plugin is being
@@ -160,8 +163,8 @@ pchap_post()
 │     close_content_run() (PHP_INT_MAX)
 ├── pre_render_block / render_block_core/post-content → track the core/post-content block
 ├── wp_enqueue_scripts → enqueue_styles()
-├── wp_head → pchap_rel_links()
-└── register_seo_integrations() (Yoast SEO, Rank Math, SEOPress, only when active)
+├── comments->register_hooks() → comments_template, pre_render_block (when the chapter shows no comments)
+└── seo->register_hooks() → document_title_parts, wp_head (rel links), Yoast SEO / Rank Math / SEOPress (only when active)
 ```
 
 ### 4. Rendering: `the_content`
@@ -191,7 +194,7 @@ render_content($content)
 
 ### 5. `wp_head`
 
-`PChap::pchap_rel_links()` prints `<link rel="prev">` and `<link rel="next">`. Yoast SEO and Rank Math are told not to print their own adjacent links.
+`PChap_SEO::print_rel_links()` prints `<link rel="prev">` and `<link rel="next">`. Yoast SEO and Rank Math are told not to print their own adjacent links.
 
 ### SEO integrations
 
@@ -445,6 +448,9 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 |------------|-------|-------------|
 | `PChap::multipage_return_array()` | 1.5.14 | `PChap_Parser::multipage_return_array()` (triggers `_deprecated_function()` since 1.7.0) |
 | `PChap::pchap_the_title()` | 1.7.0 | No longer hooked; returns the title unchanged (see the SEO integrations) |
+| `PChap::pchap_rel_links()`, `pchap_document_title_parts()`, `filter_wpseo_*()`, `filter_rank_math_replacements()`, `filter_seopress_*()`, `filter_seo_adjacent_rel_url()`, `filter_disable_seo_adjacent_rel_links()` | 2.1.0 | The same methods of `pchap()->seo` (`print_rel_links()`, `filter_document_title_parts()`...); the old ones warn and delegate |
+| `PChap::comments_allowed_on_current_page()`, `hide_comments()`, `filter_comment_blocks()` | 2.1.0 | `pchap()->comments->allowed_on_current_page()`, `filter_comments_template()`, `filter_comment_blocks()` |
+| `pchap_admin_settings_callback_*()` field callbacks, `pchap_admin_advanced_callback_{rewrite_title_priority,rewrite_content_priority,disable_tinymce_buttons}()` | 2.1.0 | `pchap_admin_render_option_field()`, driven by `pchap_get_settings_fields()` |
 | `PChap_Admin::pchap_enqueue_block_editor_assets()` | 1.7.0 | `pchap_register_blocks()` |
 | `pchap_admin_settings_save()`, `pchap_admin_advanced_settings_save()` | 1.7.0 | Settings API (`options.php`); no-ops |
 | `pchap_admin_advanced_callback_build_mpp_postmeta_data()` | 1.7.0 | `pchap_admin_rebuild_postmeta_section()` |

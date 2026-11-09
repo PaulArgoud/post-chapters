@@ -24,69 +24,36 @@ function pchap_admin_advanced_settings_callback_main_section() { }
  * Set the rewrite title priority.
  *
  * @since 1.4
+ * @deprecated 2.1.0 Use pchap_admin_render_option_field().
  */
 function pchap_admin_advanced_callback_rewrite_title_priority() {
-	pchap_admin_render_select_field(
-		'_mpp-rewrite-title-priority',
-		'rewrite-title-priority',
-		pchap_get_rewrite_title_priority(),
-		'rewrite-title-description'
-	);
-	?>
-	<p id="rewrite-title-description" class="description"><?php esc_html_e( 'Some plugins need this higher in order to correctly show the chapter title instead of "Page # of #". If the title works good please leave this to normal.', 'post-chapters' ); ?></p>
-	<?php
+	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
+
+	pchap_admin_render_option_field( array( 'option_name' => '_mpp-rewrite-title-priority' ) );
 }
 
 /**
  * Set the rewrite content priority.
  *
  * @since 1.4
+ * @deprecated 2.1.0 Use pchap_admin_render_option_field().
  */
 function pchap_admin_advanced_callback_rewrite_content_priority() {
-	pchap_admin_render_select_field(
-		'_mpp-rewrite-content-priority',
-		'rewrite-content-priority',
-		pchap_get_rewrite_content_priority(),
-		'rewrite-content-description'
-	);
+	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	$description = sprintf(
-		/* translators: %1$s: URL of the_content filter documentation. */
-		__( 'This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href="%1$s" target="_blank">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal.', 'post-chapters' ),
-		esc_url( 'https://developer.wordpress.org/reference/hooks/the_content/' )
-	);
-	?>
-	<p id="rewrite-content-description" class="description">
-		<?php
-		echo wp_kses(
-			$description,
-			array(
-				'code' => array(),
-				'a'    => array(
-					'href'   => true,
-					'target' => true,
-					'rel'    => true,
-				),
-			)
-		);
-		?>
-	</p>
-	<?php
+	pchap_admin_render_option_field( array( 'option_name' => '_mpp-rewrite-content-priority' ) );
 }
 
 /**
  * Disable the TinyMCE buttons (classic editor).
  *
  * @since 1.4
+ * @deprecated 2.1.0 Use pchap_admin_render_option_field().
  */
 function pchap_admin_advanced_callback_disable_tinymce_buttons() {
-	pchap_admin_render_checkbox_field(
-		'mpp-disable-tinymce-buttons',
-		'disable-tinymce-buttons',
-		pchap_disable_tinymce_buttons(),
-		__( 'Disable TinyMCE Buttons', 'post-chapters' ),
-		__( 'Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts.', 'post-chapters' )
-	);
+	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
+
+	pchap_admin_render_option_field( array( 'option_name' => 'mpp-disable-tinymce-buttons' ) );
 }
 
 /**

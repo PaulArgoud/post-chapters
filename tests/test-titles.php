@@ -224,7 +224,7 @@ class Test_PChap_Titles extends PChap_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 2 );
 		$this->assert_no_active_payload( wp_get_document_title() );
-		$this->assert_no_active_payload( (string) get_echo( array( pchap(), 'pchap_rel_links' ) ) );
+		$this->assert_no_active_payload( (string) get_echo( array( pchap()->seo, 'print_rel_links' ) ) );
 	}
 
 	/**

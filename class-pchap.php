@@ -49,6 +49,24 @@ class PChap {
 	 */
 	public $admin = null;
 
+	/** Components ************************************************************/
+
+	/**
+	 * SEO component: document title, rel links, SEO plugin integrations.
+	 *
+	 * @since 2.1.0
+	 * @var PChap_SEO|null
+	 */
+	public $seo = null;
+
+	/**
+	 * Comments component: comments on all, the first or the last subpage.
+	 *
+	 * @since 2.1.0
+	 * @var PChap_Comments|null
+	 */
+	public $comments = null;
+
 	/** Paths *****************************************************************/
 
 	/**
@@ -313,6 +331,8 @@ class PChap {
 
 		require_once $this->plugin_dir . 'classes/class-pchap-admin.php';
 		require_once $this->plugin_dir . 'classes/class-pchap-shortcodes.php';
+		require_once $this->plugin_dir . 'classes/class-pchap-seo.php';
+		require_once $this->plugin_dir . 'classes/class-pchap-comments.php';
 
 		require_once $this->plugin_dir . 'inc/pchap-admin.php';
 		require_once $this->plugin_dir . 'inc/pchap-functions.php';
@@ -323,6 +343,9 @@ class PChap {
 		require_once $this->plugin_dir . 'inc/pchap-update.php';
 		require_once $this->plugin_dir . 'inc/pchap-blocks.php';
 		require_once $this->plugin_dir . 'inc/pchap-cli.php';
+
+		$this->seo      = new PChap_SEO( $this );
+		$this->comments = new PChap_Comments( $this );
 	}
 
 	/**
@@ -579,10 +602,11 @@ class PChap {
 	 * Format of the current subpage title.
 	 *
 	 * @since 1.7.0
+	 * @since 2.1.0 Public.
 	 *
 	 * @return string 'html' or 'text'.
 	 */
-	private function get_current_title_format() {
+	public function get_current_title_format() {
 		return false === $this->pchap_index ? 'html' : $this->get_title_format( $this->pchap_index );
 	}
 
@@ -652,16 +676,8 @@ class PChap {
 			add_filter( 'wp_link_pages', array( $this, 'filter_wp_link_pages' ) );
 		}
 
-		// Check whether or not to hide comments (classic and block themes).
-		if ( ! $this->comments_allowed_on_current_page() ) {
-			add_filter( 'comments_template', array( $this, 'hide_comments' ) );
-			add_filter( 'pre_render_block', array( $this, 'filter_comment_blocks' ), 10, 2 );
-		}
-
-		// Change the document title only if it's not the first page.
-		if ( $this->current_page > 1 ) {
-			add_filter( 'document_title_parts', array( $this, 'pchap_document_title_parts' ), pchap_get_rewrite_title_priority(), 1 );
-		}
+		// Comments on all, the first or the last subpage (classic and block themes).
+		$this->comments->register_hooks();
 
 		add_filter( 'the_content', array( $this, 'open_content_run' ), PHP_INT_MIN, 1 );
 		add_filter( 'the_content', array( $this, 'pchap_the_content' ), pchap_get_rewrite_content_priority(), 1 );
@@ -669,57 +685,21 @@ class PChap {
 		add_filter( 'pre_render_block', array( $this, 'track_post_content_block' ), PHP_INT_MAX, 2 );
 		add_filter( 'render_block_core/post-content', array( $this, 'untrack_post_content_block' ), PHP_INT_MAX, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-		add_action( 'wp_head', array( $this, 'pchap_rel_links' ) );
 
-		$this->register_seo_integrations();
+		// Document title, rel prev/next links and SEO plugins.
+		$this->seo->register_hooks();
 	}
 
 	/**
-	 * Register the SEO plugin integrations, only for the active plugins.
-	 *
-	 * @since 1.7.0
-	 */
-	private function register_seo_integrations() {
-		// Yoast SEO: %%page%% replacement variable and its own rel prev/next.
-		if ( defined( 'WPSEO_VERSION' ) ) {
-			add_filter( 'wpseo_replacements', array( $this, 'filter_wpseo_replacements' ), 10, 2 );
-			add_filter( 'wpseo_adjacent_rel_url', array( $this, 'filter_seo_adjacent_rel_url' ), 10, 1 );
-			add_filter( 'wpseo_canonical', array( $this, 'filter_wpseo_canonical' ), 10, 2 );
-		}
-
-		// Rank Math: %page% replacement variable and its own rel prev/next.
-		if ( defined( 'RANK_MATH_VERSION' ) ) {
-			add_filter( 'rank_math/replacements', array( $this, 'filter_rank_math_replacements' ), 10, 2 );
-			add_filter( 'rank_math/frontend/disable_adjacent_rel_links', array( $this, 'filter_disable_seo_adjacent_rel_links' ) );
-		}
-
-		// SEOPress: %%page%% (legacy variables and Tags engine).
-		if ( defined( 'SEOPRESS_VERSION' ) ) {
-			add_filter( 'seopress_context_paged', array( $this, 'filter_seopress_context_paged' ) );
-			add_filter( 'seopress_get_tag_page_value', array( $this, 'filter_seopress_tag_page_value' ), 10, 1 );
-		}
-	}
-
-	/**
-	 * Output rel=prev and rel=next links in the <head> for SEO.
+	 * Output rel=prev and rel=next links in the <head>.
 	 *
 	 * @since 1.5.13
+	 * @deprecated 2.1.0 Use pchap()->seo->print_rel_links().
 	 */
 	public function pchap_rel_links() {
-		if ( ! $this->is_multipage_view() || ! is_singular() ) {
-			return;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->print_rel_links()' );
 
-		$current_page = $this->get_current_page();
-		$num_pages    = $this->max_num_pages;
-
-		if ( $current_page > 1 ) {
-			echo '<link rel="prev" href="' . esc_url( pchap_link_page_url( $current_page - 1, '', $this->post_id ) ) . '" />' . "\n";
-		}
-
-		if ( $current_page < $num_pages ) {
-			echo '<link rel="next" href="' . esc_url( pchap_link_page_url( $current_page + 1, '', $this->post_id ) ) . '" />' . "\n";
-		}
+		$this->seo->print_rel_links();
 	}
 
 	/**
@@ -855,228 +835,126 @@ class PChap {
 	}
 
 	/**
-	 * Filter the document title for Post Chapters pages.
-	 *
-	 * Replaces the core "Page N" part with the subpage title (plain text) on subpages >= 2.
+	 * Replace the "Page N" part of the document title with the subpage title.
 	 *
 	 * @since 1.4
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_document_title_parts().
 	 *
 	 * @param array $title The WordPress document title parts.
-	 * @return array the title parts modified by Post Chapters.
+	 * @return array
 	 */
 	public function pchap_document_title_parts( $title ) {
-		if ( ! is_array( $title ) || ! $this->is_multipage_view() || $this->get_current_page() < 2 ) {
-			return $title;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_document_title_parts()' );
 
-		$text = pchap_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
-		if ( '' !== $text ) {
-			$title['page'] = $text;
-		}
-
-		return $title;
+		return $this->seo->filter_document_title_parts( $title );
 	}
 
 	/**
-	 * Plain-text subpage title for SEO integrations, on subpages >= 2 of the multipage post.
+	 * Yoast SEO: %%page%% replacement.
 	 *
 	 * @since 1.7.0
-	 *
-	 * @param mixed $context Optional. Post object/array the SEO plugin is building a title for.
-	 * @return string Empty string when nothing should be replaced.
-	 */
-	private function get_seo_subpage_title( $context = null ) {
-		if ( ! $this->is_multipage_view() || $this->get_current_page() < 2 ) {
-			return '';
-		}
-
-		$context_id = 0;
-		if ( is_object( $context ) && isset( $context->ID ) ) {
-			$context_id = (int) $context->ID;
-		} elseif ( is_array( $context ) && isset( $context['ID'] ) ) {
-			$context_id = (int) $context['ID'];
-		}
-
-		if ( $context_id && $context_id !== $this->post_id ) {
-			return '';
-		}
-
-		return pchap_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
-	}
-
-	/**
-	 * Yoast SEO: replace %%page%% ("{sep} Page X of Y") with "{sep} {subpage title}".
-	 *
-	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_wpseo_replacements().
 	 *
 	 * @param array $replacements Replacement values keyed by %%var%%.
 	 * @param mixed $args         The object the replacements are computed for.
 	 * @return array
 	 */
 	public function filter_wpseo_replacements( $replacements, $args = null ) {
-		if ( ! is_array( $replacements ) || ! isset( $replacements['%%page%%'] ) ) {
-			return $replacements;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_wpseo_replacements()' );
 
-		$text = $this->get_seo_subpage_title( $args );
-		if ( '' === $text ) {
-			return $replacements;
-		}
-
-		$sep = '';
-		if ( isset( $replacements['%%sep%%'] ) && is_string( $replacements['%%sep%%'] ) ) {
-			$sep = $replacements['%%sep%%'];
-		} elseif ( function_exists( 'YoastSEO' ) ) {
-			$yoast = YoastSEO();
-			if ( isset( $yoast->helpers->options ) && method_exists( $yoast->helpers->options, 'get_title_separator' ) ) {
-				$sep = (string) $yoast->helpers->options->get_title_separator();
-			}
-		}
-
-		$replacements['%%page%%'] = ( '' !== $sep ? $sep . ' ' : '' ) . $text;
-
-		return $replacements;
+		return $this->seo->filter_wpseo_replacements( $replacements, $args );
 	}
 
 	/**
-	 * Rank Math: replace %page% ("{sep} Page X of Y") with "{sep} {subpage title}".
+	 * Rank Math: %page% replacement.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_rank_math_replacements().
 	 *
 	 * @param array $replacements Replacement values keyed by %var%.
 	 * @param mixed $args         The object the replacements are computed for.
 	 * @return array
 	 */
 	public function filter_rank_math_replacements( $replacements, $args = null ) {
-		if ( ! is_array( $replacements ) || ! array_key_exists( '%page%', $replacements ) ) {
-			return $replacements;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_rank_math_replacements()' );
 
-		$text = $this->get_seo_subpage_title( $args );
-		if ( '' === $text ) {
-			return $replacements;
-		}
-
-		$sep = '';
-		if ( isset( $replacements['%sep%'] ) && is_string( $replacements['%sep%'] ) ) {
-			$sep = $replacements['%sep%'];
-		} elseif ( class_exists( '\RankMath\Helper' ) && is_callable( array( '\RankMath\Helper', 'get_settings' ) ) ) {
-			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.NamingConventions.ValidHookName.UseUnderscores -- Rank Math's own hook, applied like Rank Math does.
-			$sep = (string) apply_filters( 'rank_math/settings/title_separator', \RankMath\Helper::get_settings( 'titles.title_separator' ) );
-			$sep = htmlentities( $sep, ENT_COMPAT, 'UTF-8', false );
-		}
-
-		$replacements['%page%'] = ( '' !== $sep ? $sep . ' ' : '' ) . $text;
-
-		return $replacements;
+		return $this->seo->filter_rank_math_replacements( $replacements, $args );
 	}
 
 	/**
 	 * SEOPress (legacy dynamic variables): %%page%% on singular subpages.
 	 *
-	 * SEOPress only fills %%page%% for paginated archives, so it is empty on subpages.
-	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_seopress_context_paged().
 	 *
 	 * @param string $value " {sep} Page X of Y" or empty.
 	 * @return string
 	 */
 	public function filter_seopress_context_paged( $value ) {
-		if ( (int) get_query_var( 'paged' ) > 1 ) {
-			return $value;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seopress_context_paged()' );
 
-		$text = $this->get_seo_subpage_title();
-		if ( '' === $text ) {
-			return $value;
-		}
-
-		$sep = '-';
-		if ( function_exists( 'seopress_get_service' ) ) {
-			$option = seopress_get_service( 'TitleOption' );
-			if ( is_object( $option ) && method_exists( $option, 'getSeparator' ) && $option->getSeparator() ) {
-				$sep = htmlspecialchars( (string) $option->getSeparator(), ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401 );
-			}
-		}
-
-		return ' ' . $sep . ' ' . esc_attr( $text );
+		return $this->seo->filter_seopress_context_paged( $value );
 	}
 
 	/**
 	 * SEOPress (Tags engine): %%page%% on singular subpages.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_seopress_tag_page_value().
 	 *
 	 * @param string $value "Page X of Y" or empty.
 	 * @return string
 	 */
 	public function filter_seopress_tag_page_value( $value ) {
-		if ( is_string( $value ) && '' !== $value ) {
-			return $value;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seopress_tag_page_value()' );
 
-		$text = $this->get_seo_subpage_title();
-
-		return '' !== $text ? esc_attr( $text ) : $value;
+		return $this->seo->filter_seopress_tag_page_value( $value );
 	}
 
 	/**
-	 * Yoast SEO: drop its rel prev/next on the multipage post (pchap_rel_links() prints them).
+	 * Yoast SEO: drop its rel prev/next on the multipage post.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_seo_adjacent_rel_url().
 	 *
 	 * @param string $url The adjacent URL.
 	 * @return string
 	 */
 	public function filter_seo_adjacent_rel_url( $url ) {
-		return $this->is_multipage_view() ? '' : $url;
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_seo_adjacent_rel_url()' );
+
+		return $this->seo->filter_seo_adjacent_rel_url( $url );
 	}
 
 	/**
 	 * Yoast SEO: canonical URL of subpages >= 2.
 	 *
-	 * Yoast only paginates the canonical of posts whose saved content holds core
-	 * `<!--nextpage-->` markers, so every subpage of a block or shortcode post would
-	 * declare the first page as its canonical (and be dropped from search results).
-	 * The default canonical (the post permalink) becomes the subpage URL, like core
-	 * rel_canonical() does; a canonical set by the user in Yoast is kept.
-	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_wpseo_canonical().
 	 *
 	 * @param string $canonical    The canonical URL.
 	 * @param mixed  $presentation Optional. The Yoast indexable presentation.
 	 * @return string
 	 */
 	public function filter_wpseo_canonical( $canonical, $presentation = null ) {
-		if ( ! is_string( $canonical ) || '' === $canonical || ! $this->is_multipage_view() || $this->get_current_page() < 2 || ! is_singular() ) {
-			return $canonical;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_wpseo_canonical()' );
 
-		// A canonical set by the user for this post.
-		if ( is_object( $presentation ) && isset( $presentation->model ) && is_object( $presentation->model ) && ! empty( $presentation->model->canonical ) ) {
-			return $canonical;
-		}
-
-		$permalink = get_permalink( $this->post_id );
-		if ( ! $permalink || untrailingslashit( $canonical ) !== untrailingslashit( $permalink ) ) {
-			return $canonical;
-		}
-
-		$url = pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
-
-		return '' !== $url ? $url : $canonical;
+		return $this->seo->filter_wpseo_canonical( $canonical, $presentation );
 	}
 
 	/**
-	 * Rank Math: disable its rel prev/next on the multipage post (pchap_rel_links() prints them).
+	 * Rank Math: disable its rel prev/next on the multipage post.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->seo->filter_disable_seo_adjacent_rel_links().
 	 *
 	 * @param bool $disable Whether to disable the links.
 	 * @return bool
 	 */
 	public function filter_disable_seo_adjacent_rel_links( $disable ) {
-		return $this->is_multipage_view() ? true : $disable;
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->seo->filter_disable_seo_adjacent_rel_links()' );
+
+		return $this->seo->filter_disable_seo_adjacent_rel_links( $disable );
 	}
 
 	/**
@@ -1467,75 +1345,44 @@ class PChap {
 	 * Whether comments are displayed on the current subpage.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->comments->allowed_on_current_page().
 	 *
 	 * @return bool
 	 */
 	public function comments_allowed_on_current_page() {
-		$current_page = $this->get_current_page();
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->comments->allowed_on_current_page()' );
 
-		switch ( pchap_get_comments_on_page() ) {
-			case 'first-page':
-				return 1 === $current_page;
-			case 'last-page':
-				return $current_page === (int) $this->max_num_pages;
-			default:
-				return true;
-		}
+		return $this->comments->allowed_on_current_page();
 	}
 
 	/**
-	 * Hide comments area.
+	 * Replace the comments template with an empty file.
 	 *
 	 * @since 1.0
+	 * @deprecated 2.1.0 Use pchap()->comments->filter_comments_template().
+	 *
+	 * @return string
 	 */
 	public function hide_comments() {
-		// Return an empty file.
-		return PCHAP_PLUGIN_DIR . 'index.php';
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->comments->filter_comments_template()' );
+
+		return $this->comments->filter_comments_template();
 	}
 
 	/**
 	 * Hide the comment blocks of block themes on subpages without comments.
 	 *
 	 * @since 1.7.0
+	 * @deprecated 2.1.0 Use pchap()->comments->filter_comment_blocks().
 	 *
 	 * @param string|null $pre_render   The pre-rendered content.
 	 * @param array       $parsed_block The block being rendered.
 	 * @return string|null
 	 */
 	public function filter_comment_blocks( $pre_render, $parsed_block ) {
-		if ( null !== $pre_render || ! is_array( $parsed_block ) || empty( $parsed_block['blockName'] ) ) {
-			return $pre_render;
-		}
+		_deprecated_function( __METHOD__, '2.1.0', 'pchap()->comments->filter_comment_blocks()' );
 
-		/**
-		 * Filters the blocks hidden on subpages where comments are not displayed.
-		 *
-		 * @since 1.7.0
-		 *
-		 * @param string[] $block_names Block names.
-		 */
-		$block_names = (array) pchap_apply_filters(
-			'pchap_comment_block_names',
-			array(
-				'core/comments',
-				'core/post-comments',
-				'core/post-comments-form',
-				'core/comments-title',
-				'core/comments-pagination',
-				'core/comment-template',
-				'core/comments-query-loop',
-			)
-		);
-
-		if ( ! in_array( $parsed_block['blockName'], $block_names, true ) ) {
-			return $pre_render;
-		}
-
-		if ( ! $this->is_multipage_view() || (int) get_the_ID() !== $this->post_id ) {
-			return $pre_render;
-		}
-
-		return '';
+		return $this->comments->filter_comment_blocks( $pre_render, $parsed_block );
 	}
 
 	/**

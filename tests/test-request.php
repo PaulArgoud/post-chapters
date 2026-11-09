@@ -32,7 +32,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$title = wp_get_document_title();
 		$this->assertStringContainsString( 'Mon article', $title );
 		$this->assertStringNotContainsString( 'Intro', $title );
-		$this->assertFalse( has_filter( 'document_title_parts', array( pchap(), 'pchap_document_title_parts' ) ) );
+		$this->assertFalse( has_filter( 'document_title_parts', array( pchap()->seo, 'filter_document_title_parts' ) ) );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$title = wp_get_document_title();
@@ -64,7 +64,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertSame( 50, has_filter( 'document_title_parts', array( pchap(), 'pchap_document_title_parts' ) ) );
+		$this->assertSame( 50, has_filter( 'document_title_parts', array( pchap()->seo, 'filter_document_title_parts' ) ) );
 	}
 
 	/**
@@ -86,10 +86,10 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 1 );
-		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
+		$head = (string) get_echo( array( pchap()->seo, 'print_rel_links' ) );
 		$this->assertStringNotContainsString( 'rel="prev"', $head );
 		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( pchap_link_page_url( 2, '', $post_id ) ) . '" />', $head );
-		$this->assertSame( 10, has_action( 'wp_head', array( pchap(), 'pchap_rel_links' ) ) );
+		$this->assertSame( 10, has_action( 'wp_head', array( pchap()->seo, 'print_rel_links' ) ) );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$head = (string) get_echo( 'do_action', array( 'wp_head' ) );
@@ -97,7 +97,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( pchap_link_page_url( 3, '', $post_id ) ) . '" />', $head );
 
 		$this->go_to_subpage( $post_id, 3 );
-		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
+		$head = (string) get_echo( array( pchap()->seo, 'print_rel_links' ) );
 		$this->assertStringContainsString( 'rel="prev"', $head );
 		$this->assertStringNotContainsString( 'rel="next"', $head );
 	}
@@ -110,7 +110,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC, array( 'post_name' => 'mon-article' ) );
 
 		$this->go_to_subpage( $post_id, 2 );
-		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
+		$head = (string) get_echo( array( pchap()->seo, 'print_rel_links' ) );
 
 		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( home_url( '/mon-article/' ) ) . '" />', $head );
 		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( home_url( '/mon-article/3/' ) ) . '" />', $head );
@@ -124,7 +124,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 1 );
 
-		$this->assertSame( '', (string) get_echo( array( pchap(), 'pchap_rel_links' ) ) );
+		$this->assertSame( '', (string) get_echo( array( pchap()->seo, 'print_rel_links' ) ) );
 	}
 
 	/**
@@ -256,7 +256,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 				'%%page%%' => 'Page 1 of 3',
 				'%%sep%%'  => '-',
 			),
-			$mpp->filter_wpseo_replacements(
+			$mpp->seo->filter_wpseo_replacements(
 				array(
 					'%%page%%' => 'Page 1 of 3',
 					'%%sep%%'  => '-',
@@ -268,7 +268,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 		$post = get_post( $post_id );
 
-		$yoast = $mpp->filter_wpseo_replacements(
+		$yoast = $mpp->seo->filter_wpseo_replacements(
 			array(
 				'%%page%%' => '- Page 2 of 3',
 				'%%sep%%'  => '-',
@@ -279,9 +279,9 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 
 		// Another post's replacements are left alone.
 		$other = self::factory()->post->create_and_get();
-		$this->assertSame( array( '%%page%%' => 'x' ), $mpp->filter_wpseo_replacements( array( '%%page%%' => 'x' ), $other ) );
+		$this->assertSame( array( '%%page%%' => 'x' ), $mpp->seo->filter_wpseo_replacements( array( '%%page%%' => 'x' ), $other ) );
 
-		$rank_math = $mpp->filter_rank_math_replacements(
+		$rank_math = $mpp->seo->filter_rank_math_replacements(
 			array(
 				'%page%' => 'Page 2 of 3',
 				'%sep%'  => '|',
@@ -290,12 +290,12 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		);
 		$this->assertSame( '| Deux', $rank_math['%page%'] );
 
-		$this->assertSame( ' - Deux', $mpp->filter_seopress_context_paged( '' ) );
-		$this->assertSame( 'Deux', $mpp->filter_seopress_tag_page_value( '' ) );
-		$this->assertSame( 'Page 2 of 3', $mpp->filter_seopress_tag_page_value( 'Page 2 of 3' ) );
+		$this->assertSame( ' - Deux', $mpp->seo->filter_seopress_context_paged( '' ) );
+		$this->assertSame( 'Deux', $mpp->seo->filter_seopress_tag_page_value( '' ) );
+		$this->assertSame( 'Page 2 of 3', $mpp->seo->filter_seopress_tag_page_value( 'Page 2 of 3' ) );
 
-		$this->assertSame( '', $mpp->filter_seo_adjacent_rel_url( 'http://example.org/x' ) );
-		$this->assertTrue( $mpp->filter_disable_seo_adjacent_rel_links( false ) );
+		$this->assertSame( '', $mpp->seo->filter_seo_adjacent_rel_url( 'http://example.org/x' ) );
+		$this->assertTrue( $mpp->seo->filter_disable_seo_adjacent_rel_links( false ) );
 	}
 
 	/**
@@ -309,25 +309,25 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$permalink = get_permalink( $post_id );
 
 		$this->go_to_subpage( $post_id, 1 );
-		$this->assertSame( $permalink, $mpp->filter_wpseo_canonical( $permalink ), 'First page unchanged.' );
+		$this->assertSame( $permalink, $mpp->seo->filter_wpseo_canonical( $permalink ), 'First page unchanged.' );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$this->assertSame( 2, $mpp->get_current_page() );
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->filter_wpseo_canonical( $permalink ) );
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->filter_wpseo_canonical( untrailingslashit( $permalink ) ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( $permalink ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( untrailingslashit( $permalink ) ) );
 
 		// A canonical set by the user, or pointing elsewhere, is kept.
 		$custom = home_url( '/elsewhere/' );
-		$this->assertSame( $custom, $mpp->filter_wpseo_canonical( $custom ) );
+		$this->assertSame( $custom, $mpp->seo->filter_wpseo_canonical( $custom ) );
 
 		$presentation        = new stdClass();
 		$presentation->model = (object) array( 'canonical' => $permalink );
-		$this->assertSame( $permalink, $mpp->filter_wpseo_canonical( $permalink, $presentation ) );
+		$this->assertSame( $permalink, $mpp->seo->filter_wpseo_canonical( $permalink, $presentation ) );
 
 		$presentation->model->canonical = null;
-		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->filter_wpseo_canonical( $permalink, $presentation ) );
+		$this->assertSame( home_url( '/mon-article/2/' ), $mpp->seo->filter_wpseo_canonical( $permalink, $presentation ) );
 
-		$this->assertSame( '', $mpp->filter_wpseo_canonical( '' ), 'An empty canonical (noindex) stays empty.' );
+		$this->assertSame( '', $mpp->seo->filter_wpseo_canonical( '' ), 'An empty canonical (noindex) stays empty.' );
 	}
 
 	/**
@@ -338,13 +338,13 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 
 		if ( ! defined( 'WPSEO_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'wpseo_replacements', array( pchap(), 'filter_wpseo_replacements' ) ) );
+			$this->assertFalse( has_filter( 'wpseo_replacements', array( pchap()->seo, 'filter_wpseo_replacements' ) ) );
 		}
 		if ( ! defined( 'RANK_MATH_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'rank_math/replacements', array( pchap(), 'filter_rank_math_replacements' ) ) );
+			$this->assertFalse( has_filter( 'rank_math/replacements', array( pchap()->seo, 'filter_rank_math_replacements' ) ) );
 		}
 		if ( ! defined( 'SEOPRESS_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'seopress_context_paged', array( pchap(), 'filter_seopress_context_paged' ) ) );
+			$this->assertFalse( has_filter( 'seopress_context_paged', array( pchap()->seo, 'filter_seopress_context_paged' ) ) );
 		}
 	}
 }

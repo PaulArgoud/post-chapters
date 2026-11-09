@@ -222,57 +222,26 @@ class PChap_Admin {
 			);
 		}
 
-		/* Main Settings ******************************************************/
+		// Sections and fields of both screens, from pchap_get_settings_sections()
+		// and pchap_get_settings_fields(). Radio groups are labelled by their
+		// fieldset legend, the other fields by their label_for input.
+		$sections = pchap_get_settings_sections();
+		foreach ( $sections as $section_id => $section ) {
+			add_settings_section( $section_id, $section['title'], $section['callback'], $section['page'] );
+		}
 
-		// Add the main section.
-		add_settings_section( 'pchap_main', __( 'Main Settings', 'post-chapters' ), 'pchap_admin_settings_callback_main_section', 'post-chapters' );
+		foreach ( pchap_get_settings_fields() as $option_name => $field ) {
+			if ( ! isset( $sections[ $field['section'] ] ) ) {
+				continue;
+			}
 
-		// Hide default intro title.
-		add_settings_field( 'mpp-hide-intro-title', __( 'Intro', 'post-chapters' ), 'pchap_admin_settings_callback_hide_intro_title', 'post-chapters', 'pchap_main', array( 'label_for' => 'hide-intro-title' ) );
+			$args = array( 'option_name' => $option_name );
+			if ( 'radio' !== $field['control'] ) {
+				$args['label_for'] = $field['id'];
+			}
 
-		// Display comments on pages (radio group labelled by its fieldset legend).
-		add_settings_field( 'mpp-comments-on-page', __( 'Display comments on', 'post-chapters' ), 'pchap_admin_settings_callback_comments_on_page', 'post-chapters', 'pchap_main' );
-
-		// Add the pagination section.
-		add_settings_section( 'pchap_pagination', __( 'Pagination', 'post-chapters' ), 'pchap_admin_settings_callback_pagination_section', 'post-chapters' );
-
-		// Navigation type.
-		add_settings_field( 'mpp-continue-or-prev-next', __( 'Navigation type', 'post-chapters' ), 'pchap_admin_settings_callback_continue_or_prev_next', 'post-chapters', 'pchap_pagination', array( 'label_for' => 'continue-or-prev-next' ) );
-
-		// Disable the standard WordPress pagination.
-		add_settings_field( 'mpp-disable-standard-pagination', __( 'Disable the standard pagination', 'post-chapters' ), 'pchap_admin_settings_callback_disable_standard_pagination', 'post-chapters', 'pchap_pagination', array( 'label_for' => 'disable-standard-pagination' ) );
-
-		// Add the table of contents section.
-		add_settings_section( 'pchap_toc', __( 'Table of contents', 'post-chapters' ), 'pchap_admin_settings_callback_toc_section', 'post-chapters' );
-
-		// Display the table of contents only on the first page.
-		add_settings_field( 'mpp-toc-only-on-the-first-page', __( 'Only on the first page', 'post-chapters' ), 'pchap_admin_settings_callback_toc_only_on_the_first_page', 'post-chapters', 'pchap_toc', array( 'label_for' => 'toc-only-on-the-first-page' ) );
-
-		// Set the table of contents position.
-		add_settings_field( 'mpp-toc-position', __( 'Position', 'post-chapters' ), 'pchap_admin_settings_callback_toc_position', 'post-chapters', 'pchap_toc', array( 'label_for' => 'toc-position' ) );
-
-		// Define row labels (radio group labelled by its fieldset legend).
-		add_settings_field( 'mpp-toc-row-labels', __( 'Row labels', 'post-chapters' ), 'pchap_admin_settings_callback_toc_row_labels', 'post-chapters', 'pchap_toc' );
-
-		// Hide the table of contents header.
-		add_settings_field( 'mpp-hide-toc-header', __( 'Hide header', 'post-chapters' ), 'pchap_admin_settings_callback_hide_toc_header', 'post-chapters', 'pchap_toc', array( 'label_for' => 'hide-toc-header' ) );
-
-		// Add a link to comments inside the table of contents.
-		add_settings_field( 'mpp-comments-toc-link', __( 'Comments link', 'post-chapters' ), 'pchap_admin_settings_callback_comments_toc_link', 'post-chapters', 'pchap_toc', array( 'label_for' => 'comments-toc-link' ) );
-
-		/* Advanced Settings **************************************************/
-
-		// Add the main section.
-		add_settings_section( 'pchap_advanced', '', 'pchap_admin_advanced_settings_callback_main_section', 'post-chapters-advanced' );
-
-		// Set the title rewrite priority.
-		add_settings_field( '_mpp-rewrite-title-priority', __( 'Rewrite Title Priority', 'post-chapters' ), 'pchap_admin_advanced_callback_rewrite_title_priority', 'post-chapters-advanced', 'pchap_advanced', array( 'label_for' => 'rewrite-title-priority' ) );
-
-		// Set the content rewrite priority.
-		add_settings_field( '_mpp-rewrite-content-priority', __( 'Rewrite Content Priority', 'post-chapters' ), 'pchap_admin_advanced_callback_rewrite_content_priority', 'post-chapters-advanced', 'pchap_advanced', array( 'label_for' => 'rewrite-content-priority' ) );
-
-		// Disable the TinyMCE buttons of the classic editor.
-		add_settings_field( 'mpp-disable-tinymce-buttons', __( 'Disable TinyMCE Buttons', 'post-chapters' ), 'pchap_admin_advanced_callback_disable_tinymce_buttons', 'post-chapters-advanced', 'pchap_advanced', array( 'label_for' => 'disable-tinymce-buttons' ) );
+			add_settings_field( $option_name, $field['title'], 'pchap_admin_render_option_field', $sections[ $field['section'] ]['page'], $field['section'], $args );
+		}
 
 		// The subpage index rebuild is an action (admin-post.php), see pchap_admin_rebuild_postmeta_section().
 	}

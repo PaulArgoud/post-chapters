@@ -72,7 +72,7 @@ class Test_PChap_Comments extends PChap_UnitTestCase {
 				$this->assertSame( '', trim( (string) get_echo( 'comments_template' ) ), 'The replacement template outputs nothing.' );
 			}
 
-			$this->assertSame( $is_visible, pchap()->comments_allowed_on_current_page() );
+			$this->assertSame( $is_visible, pchap()->comments->allowed_on_current_page() );
 		}
 	}
 

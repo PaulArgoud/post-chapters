@@ -90,7 +90,9 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 			$method->invoke( $mpp );
 		}
 
-		// Remove the request hooks (title, content, styles, SEO...) of the previous request.
+		// Remove the request hooks (title, content, styles, SEO...) of the previous request,
+		// registered by the instance and by its components.
+		$owners    = array_filter( array( $mpp, $mpp->seo, $mpp->comments ) );
 		$to_remove = array();
 		foreach ( (array) $wp_filter as $hook_name => $hook ) {
 			if ( ! $hook instanceof WP_Hook ) {
@@ -99,7 +101,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 			foreach ( $hook->callbacks as $priority => $callbacks ) {
 				foreach ( $callbacks as $callback ) {
 					$function = $callback['function'];
-					if ( is_array( $function ) && isset( $function[0], $function[1] ) && $function[0] === $mpp && ! in_array( $function[1], self::$boot_methods, true ) ) {
+					if ( is_array( $function ) && isset( $function[0], $function[1] ) && in_array( $function[0], $owners, true ) && ! in_array( $function[1], self::$boot_methods, true ) ) {
 						$to_remove[] = array( $hook_name, $function, $priority );
 					}
 				}

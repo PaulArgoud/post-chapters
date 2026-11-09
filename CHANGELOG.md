@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The admin stylesheet loads again: 2.0.0 enqueued `admin/css/multipage-admin[.min].css`, a file renamed to `post-chapters-admin[.min].css`, so every admin page requested a missing file (404) and the settings screens lost their styles. The style handle is now `post-chapters-admin`
 
+### Changed
+
+- Code structure: `PChap` no longer holds the SEO and comments code. It moves to two components created with the instance, `pchap()->seo` (`PChap_SEO`: document title, rel prev/next links, Yoast SEO / Rank Math / SEOPress) and `pchap()->comments` (`PChap_Comments`). The former `PChap` methods (e.g. `pchap_rel_links()`, `filter_wpseo_replacements()`, `hide_comments()`) still work, as deprecated methods that delegate
+- The settings screens are built from one description per option, `pchap_get_settings_sections()` and `pchap_get_settings_fields()`, rendered by `pchap_admin_render_option_field()`. The twelve `pchap_admin_*_callback_*()` field callbacks are deprecated wrappers. The HTML of the screens is unchanged
+
 ### Development
 
 - WordPress.org listing assets in `.wordpress-org/`: new screenshots (settings, block editor, a post split into chapters, on WordPress 7.1 with Twenty Twenty-Five), banners (772×250, 1544×500) and icons (128×128, 256×256, SVG)
