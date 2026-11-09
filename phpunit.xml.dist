@@ -23,7 +23,7 @@
 	failOnWarning="true"
 	>
 	<testsuites>
-		<testsuite name="multipage">
+		<testsuite name="post-chapters">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
