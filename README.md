@@ -13,7 +13,8 @@ Post Chapters is the continuation of **Multipage** (`sgr-nextpage-titles`), orig
 
 ## Features
 
-- **Chapter block** for the block editor (works in the iframed editor; posts saved by Multipage stay valid)
+- **Chapter block** for the block editor (works in the iframed editor; posts saved by Multipage stay valid). A heading or a core page break turns into a chapter, and a chapter into a heading, with the block switcher
+- **Chapters panel** in the editor sidebar: the chapters of the post (click to go to one) and a button that turns every H2, H3 or H4 heading at the top level of the post into a chapter, in one undoable step
 - **`[nextpage title="..."]` shortcode** for the classic editor, with a **Chapter** button in the Visual editor (TinyMCE), the Text editor (Quicktags) and the Classic block
 - **Reliable splitting**: blocks, shortcodes and core page breaks can be mixed; every chapter is valid, balanced HTML, even when a shortcode sits inside a paragraph or a heading
 - **Table of contents** with configurable position, labels, header visibility and an optional comments link
@@ -86,6 +87,8 @@ What changes for developers (see the [changelog](CHANGELOG.md#200)):
 ### Block editor
 
 Add a **Chapter** block where a new chapter starts and type its title. Press Enter at the end of the title to continue writing below it.
+
+To split a post that already has headings, open the **Chapters** panel in the document sidebar, choose the heading level and click **Turn N headings into chapters**. Each heading becomes a chapter where it stands; one undo brings the headings back. Only the headings at the top level of the post are turned (not those inside a group or columns).
 
 ### Classic editor
 

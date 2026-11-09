@@ -104,6 +104,21 @@ class Test_PChap_Consistency extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The editor script depends on scripts WordPress registers, and on those its code uses.
+	 */
+	public function test_editor_script_dependencies() {
+		$asset = include PCHAP_PLUGIN_DIR . 'blocks/subpage/index.asset.php';
+
+		foreach ( array( 'wp-blocks', 'wp-block-editor', 'wp-element', 'wp-i18n', 'wp-primitives', 'wp-plugins', 'wp-data', 'wp-components', 'wp-editor', 'wp-dom-ready' ) as $handle ) {
+			$this->assertContains( $handle, $asset['dependencies'], "$handle is not a dependency of the editor script." );
+		}
+
+		foreach ( $asset['dependencies'] as $handle ) {
+			$this->assertTrue( wp_script_is( $handle, 'registered' ), "$handle is not a script of WordPress." );
+		}
+	}
+
+	/**
 	 * The copy of the block metadata in index.js matches block.json (the copy registers the block
 	 * where WordPress did not bootstrap the server definition).
 	 */

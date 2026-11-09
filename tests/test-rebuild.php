@@ -377,11 +377,13 @@ class Test_PChap_Rebuild extends PChap_UnitTestCase {
 		pchap_schedule_postmeta_rebuild();
 		wp_clear_scheduled_hook( $hook );
 
+		// One value: time() may tick between the insert and the assertion.
+		$other_lock = time() . '|other-process';
 		$wpdb->insert(
 			$wpdb->options,
 			array(
 				'option_name'  => '_mpp-rebuild-lock',
-				'option_value' => time() . '|other-process',
+				'option_value' => $other_lock,
 				'autoload'     => 'off',
 			)
 		);
@@ -394,7 +396,7 @@ class Test_PChap_Rebuild extends PChap_UnitTestCase {
 		$this->assertSame( 1, $this->count_cron_events( $hook ), 'Retried later.' );
 		$next = wp_next_scheduled( $hook );
 		$this->assertGreaterThanOrEqual( time() + MINUTE_IN_SECONDS - 5, $next );
-		$this->assertSame( time() . '|other-process', $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = '_mpp-rebuild-lock'" ), 'The other lock is left alone.' );
+		$this->assertSame( $other_lock, $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = '_mpp-rebuild-lock'" ), 'The other lock is left alone.' );
 	}
 
 	/**

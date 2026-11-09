@@ -15,8 +15,13 @@ return array(
 	'dependencies' => array(
 		'wp-block-editor',
 		'wp-blocks',
+		'wp-components',
+		'wp-data',
+		'wp-dom-ready',
+		'wp-editor',
 		'wp-element',
 		'wp-i18n',
+		'wp-plugins',
 		'wp-primitives',
 	),
 	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.0.0',

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Post Chapters 2.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PaulArgoud/post-chapters/issues\n"
-"POT-Creation-Date: 2026-11-09T15:11:50+00:00\n"
+"POT-Creation-Date: 2026-11-09T17:13:39+00:00\n"
 "PO-Revision-Date: 2026-11-07 20:54+0000\n"
 "Last-Translator: Multipage contributors\n"
 "Language-Team: German\n"
@@ -42,26 +42,26 @@ msgstr "Paul ARGOUD, basierend auf Multipage von SGr33n (alias Sergio De Falco, 
 msgid "https://paul.argoud.net"
 msgstr "https://paul.argoud.net"
 
-#: class-pchap.php:535 classes/class-pchap-admin.php:231
+#: class-pchap.php:574 inc/admin/admin-settings.php:152
 msgid "Intro"
 msgstr "Einleitung"
 
 #. translators: %d: chapter number.
-#: class-pchap.php:543
+#: class-pchap.php:582
 #, php-format
 msgid "Chapter %d"
 msgstr "Kapitel %d"
 
 #. translators: %: chapter number (literal percent sign, replaced by the number).
-#: class-pchap.php:1376
+#: class-pchap.php:1273
 msgid "Chapter %"
 msgstr "Kapitel %"
 
-#: class-pchap.php:1393
+#: class-pchap.php:1290
 msgid "Chapter navigation"
 msgstr "Kapitelnavigation"
 
-#: class-pchap.php:1427 classes/class-pchap-admin.php:246
+#: class-pchap.php:1324 inc/admin/admin-settings.php:123
 msgid "Table of contents"
 msgstr "Inhaltsverzeichnis"
 
@@ -73,130 +73,64 @@ msgstr "Optionen von Post Chapters"
 msgid "Post Chapters Advanced Settings"
 msgstr "Erweiterte Einstellungen von Post Chapters"
 
-#: classes/class-pchap-admin.php:228
-msgid "Main Settings"
-msgstr "Allgemeine Einstellungen"
-
-#: classes/class-pchap-admin.php:234 inc/admin/admin-settings.php:149
-msgid "Display comments on"
-msgstr "Kommentare anzeigen auf"
-
-#: classes/class-pchap-admin.php:237
-msgid "Pagination"
-msgstr "Seitennummerierung"
-
-#: classes/class-pchap-admin.php:240
-msgid "Navigation type"
-msgstr "Art der Navigation"
-
-#: classes/class-pchap-admin.php:243
-msgid "Disable the standard pagination"
-msgstr "Standard-Seitennummerierung deaktivieren"
-
-#: classes/class-pchap-admin.php:249
-msgid "Only on the first page"
-msgstr "Nur auf der ersten Seite"
-
-#: classes/class-pchap-admin.php:252
-msgid "Position"
-msgstr "Position"
-
-#: classes/class-pchap-admin.php:255 inc/admin/admin-settings.php:218
-msgid "Row labels"
-msgstr "Zeilenbeschriftungen"
-
-#: classes/class-pchap-admin.php:258
-msgid "Hide header"
-msgstr "Überschrift ausblenden"
-
-#: classes/class-pchap-admin.php:261
-msgid "Comments link"
-msgstr "Link zu den Kommentaren"
-
-#: classes/class-pchap-admin.php:269
-msgid "Rewrite Title Priority"
-msgstr "Priorität für das Umschreiben des Titels"
-
-#: classes/class-pchap-admin.php:272
-msgid "Rewrite Content Priority"
-msgstr "Priorität für das Umschreiben des Inhalts"
-
-#: classes/class-pchap-admin.php:275 inc/admin/admin-advanced-settings.php:87
-msgid "Disable TinyMCE Buttons"
-msgstr "TinyMCE-Buttons deaktivieren"
-
-#: classes/class-pchap-admin.php:320
+#: classes/class-pchap-admin.php:289
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: classes/class-pchap-admin.php:357
+#: classes/class-pchap-admin.php:326
 msgid "chapter"
 msgstr "Kapitel"
 
-#: classes/class-pchap-admin.php:358 classes/class-pchap-admin.php:537
+#: classes/class-pchap-admin.php:327 classes/class-pchap-admin.php:506
 #: inc/admin/tinymce/languages.php:34
 msgid "Start a new chapter"
 msgstr "Neues Kapitel beginnen"
 
-#: classes/class-pchap-admin.php:359 classes/class-pchap-admin.php:538
+#: classes/class-pchap-admin.php:328 classes/class-pchap-admin.php:507
 #: inc/admin/tinymce/languages.php:35
 msgid "Enter the chapter title"
 msgstr "Gib den Titel des Kapitels ein"
 
-#: inc/admin/admin-advanced-settings.php:36
-msgid "Some plugins need this higher in order to correctly show the chapter title instead of \"Page # of #\". If the title works good please leave this to normal."
-msgstr "Einige Plugins benötigen hier einen höheren Wert, damit statt „Seite # von #“ der Titel des Kapitels korrekt angezeigt wird. Wenn der Titel richtig angezeigt wird, belasse diesen Wert bitte auf „Normal“."
-
-#. translators: %1$s: URL of the_content filter documentation.
-#: inc/admin/admin-advanced-settings.php:55
-#, php-format
-msgid "This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal."
-msgstr "Dieser Wert bestimmt die Position des Inhaltsverzeichnisses im Verhältnis zu anderen Plugins, die den Filter <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> verwenden, z. B. ober- oder unterhalb von Social-Media-Buttons oder ähnlichen Beiträgen. Wenn die Position des Inhaltsverzeichnisses passt, belasse diesen Wert bitte auf „Normal“."
-
-#: inc/admin/admin-advanced-settings.php:88
-msgid "Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts."
-msgstr "Deaktiviert den TinyMCE-Button „Kapitel“ im klassischen Editor. Lass diese Option deaktiviert, sofern keine Konflikte mit dem Editor auftreten."
-
 #. translators: %s: date and time of the last rebuild.
-#: inc/admin/admin-advanced-settings.php:123
+#: inc/admin/admin-advanced-settings.php:90
 #, php-format
 msgid "Last rebuilt: %s."
 msgstr "Zuletzt neu aufgebaut: %s."
 
-#: inc/admin/admin-advanced-settings.php:127
+#: inc/admin/admin-advanced-settings.php:94
 msgid "Last rebuilt: unknown date."
 msgstr "Zuletzt neu aufgebaut: Datum unbekannt."
 
-#: inc/admin/admin-advanced-settings.php:129
+#: inc/admin/admin-advanced-settings.php:96
 msgid "The chapter index has never been rebuilt on this site."
 msgstr "Der Kapitelindex wurde auf dieser Website noch nie neu aufgebaut."
 
-#: inc/admin/admin-advanced-settings.php:132
+#: inc/admin/admin-advanced-settings.php:99
 msgid "Chapter index"
 msgstr "Kapitelindex"
 
-#: inc/admin/admin-advanced-settings.php:134
+#: inc/admin/admin-advanced-settings.php:101
 msgid "Post Chapters stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
 msgstr "Post Chapters speichert beim Speichern eines Beitrags die Liste seiner Kapitel. Baue diesen Index nach einem Update oder einem Import neu auf oder wenn das Inhaltsverzeichnis eines Beitrags veraltet wirkt. Die Beiträge werden stapelweise verarbeitet; bei großen Websites werden die verbleibenden Beiträge im Hintergrund verarbeitet."
 
 #. translators: %s: number of posts already checked.
-#: inc/admin/admin-advanced-settings.php:144
+#: inc/admin/admin-advanced-settings.php:111
 #, php-format
 msgid "A rebuild is in progress in the background: %s post checked so far."
 msgid_plural "A rebuild is in progress in the background: %s posts checked so far."
 msgstr[0] "Im Hintergrund läuft ein Neuaufbau: bisher wurde %s Beitrag geprüft."
 msgstr[1] "Im Hintergrund läuft ein Neuaufbau: bisher wurden %s Beiträge geprüft."
 
-#: inc/admin/admin-advanced-settings.php:160
+#: inc/admin/admin-advanced-settings.php:127
 msgid "Rebuild chapter index"
 msgstr "Kapitelindex neu aufbauen"
 
-#: inc/admin/admin-advanced-settings.php:176
+#: inc/admin/admin-advanced-settings.php:143
 msgid "Sorry, you are not allowed to manage options for this site."
 msgstr "Du hast leider nicht die Berechtigung, Optionen für diese Website zu verwalten."
 
 #. translators: %s: number of posts checked.
-#: inc/admin/admin-advanced-settings.php:256
+#: inc/admin/admin-advanced-settings.php:223
 #, php-format
 msgid "%s post checked"
 msgid_plural "%s posts checked"
@@ -204,7 +138,7 @@ msgstr[0] "%s Beitrag geprüft"
 msgstr[1] "%s Beiträge geprüft"
 
 #. translators: %s: number of posts whose chapter index was updated.
-#: inc/admin/admin-advanced-settings.php:261
+#: inc/admin/admin-advanced-settings.php:228
 #, php-format
 msgid "%s post updated"
 msgid_plural "%s posts updated"
@@ -212,7 +146,7 @@ msgstr[0] "%s Beitrag aktualisiert"
 msgstr[1] "%s Beiträge aktualisiert"
 
 #. translators: %s: number of stale chapter indexes removed.
-#: inc/admin/admin-advanced-settings.php:266
+#: inc/admin/admin-advanced-settings.php:233
 #, php-format
 msgid "%s stale entry removed"
 msgid_plural "%s stale entries removed"
@@ -220,46 +154,46 @@ msgstr[0] "%s veralteter Eintrag entfernt"
 msgstr[1] "%s veraltete Einträge entfernt"
 
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
-#: inc/admin/admin-advanced-settings.php:277
+#: inc/admin/admin-advanced-settings.php:244
 #, php-format
 msgid "Chapter index rebuilt: %1$s, %2$s, %3$s."
 msgstr "Kapitelindex neu aufgebaut: %1$s, %2$s, %3$s."
 
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
-#: inc/admin/admin-advanced-settings.php:286
+#: inc/admin/admin-advanced-settings.php:253
 #, php-format
 msgid "Chapter index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background."
 msgstr "Neuaufbau des Kapitelindex gestartet: bisher %1$s, %2$s, %3$s. Die verbleibenden Beiträge werden im Hintergrund verarbeitet."
 
-#: inc/admin/admin-advanced-settings.php:293
+#: inc/admin/admin-advanced-settings.php:260
 msgid "A chapter index rebuild is already running. Please try again in a few minutes."
 msgstr "Ein Neuaufbau des Kapitelindex läuft bereits. Bitte versuche es in ein paar Minuten erneut."
 
-#: inc/admin/admin-advanced-settings.php:333 inc/admin/admin-settings.php:269
+#: inc/admin/admin-advanced-settings.php:300 inc/admin/admin-settings.php:464
 msgid "Post Chapters Settings"
 msgstr "Einstellungen von Post Chapters"
 
-#: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-settings.php:272
+#: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-settings.php:467
 msgid "Post Chapters settings sections"
 msgstr "Bereiche der Einstellungen von Post Chapters"
 
-#: inc/admin/admin-advanced-settings.php:336 inc/admin/admin-functions.php:126
+#: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-functions.php:126
 msgid "Advanced"
 msgstr "Erweitert"
 
-#: inc/admin/admin-advanced-settings.php:338
+#: inc/admin/admin-advanced-settings.php:305
 msgid "Advanced Settings"
 msgstr "Erweiterte Einstellungen"
 
-#: inc/admin/admin-advanced-settings.php:340
+#: inc/admin/admin-advanced-settings.php:307
 msgid "Please leave this settings to their default values, change only if you really know what to do."
 msgstr "Bitte belasse diese Einstellungen auf ihren Standardwerten und ändere sie nur, wenn du genau weißt, was du tust."
 
-#: inc/admin/admin-advanced-settings.php:348 inc/admin/admin-settings.php:280
+#: inc/admin/admin-advanced-settings.php:315 inc/admin/admin-settings.php:475
 msgid "Save Settings"
 msgstr "Einstellungen speichern"
 
-#: inc/admin/admin-functions.php:122 inc/admin/admin-settings.php:272
+#: inc/admin/admin-functions.php:122 inc/admin/admin-settings.php:467
 msgid "Options"
 msgstr "Optionen"
 
@@ -269,33 +203,99 @@ msgstr "Optionen"
 msgid "Custom (%s)"
 msgstr "Individuell (%s)"
 
-#: inc/admin/admin-settings.php:135
+#: inc/admin/admin-settings.php:113
+msgid "Main Settings"
+msgstr "Allgemeine Einstellungen"
+
+#: inc/admin/admin-settings.php:118
+msgid "Pagination"
+msgstr "Seitennummerierung"
+
+#: inc/admin/admin-settings.php:155
 msgid "Hide the default intro title"
 msgstr "Standardtitel der Einleitung ausblenden"
 
-#: inc/admin/admin-settings.php:176
+#: inc/admin/admin-settings.php:160 inc/admin/admin-settings.php:163
+msgid "Display comments on"
+msgstr "Kommentare anzeigen auf"
+
+#: inc/admin/admin-settings.php:168
+msgid "Navigation type"
+msgstr "Art der Navigation"
+
+#: inc/admin/admin-settings.php:175
+msgid "Disable the standard pagination"
+msgstr "Standard-Seitennummerierung deaktivieren"
+
+#: inc/admin/admin-settings.php:178
 msgid "Disable the WordPress standard pagination"
 msgstr "Standard-Seitennummerierung von WordPress deaktivieren"
 
-#: inc/admin/admin-settings.php:177
+#: inc/admin/admin-settings.php:179
 msgid "By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed."
 msgstr "Standardmäßig zeigt WordPress bei Beiträgen, die in Seiten aufgeteilt sind, eine Seitennummerierung an, die nur aus Zahlen besteht. Deaktiviere diese Option, wenn diese Standard-Seitennummerierung trotzdem angezeigt werden soll."
 
-#: inc/admin/admin-settings.php:191
+#: inc/admin/admin-settings.php:184
+msgid "Only on the first page"
+msgstr "Nur auf der ersten Seite"
+
+#: inc/admin/admin-settings.php:187
 msgid "Display the table of contents only on the first page of the post"
 msgstr "Inhaltsverzeichnis nur auf der ersten Seite des Beitrags anzeigen"
 
-#: inc/admin/admin-settings.php:232
+#: inc/admin/admin-settings.php:192
+msgid "Position"
+msgstr "Position"
+
+#: inc/admin/admin-settings.php:199 inc/admin/admin-settings.php:202
+msgid "Row labels"
+msgstr "Zeilenbeschriftungen"
+
+#: inc/admin/admin-settings.php:207
+msgid "Hide header"
+msgstr "Überschrift ausblenden"
+
+#: inc/admin/admin-settings.php:210
 msgid "Hide the table of contents header"
 msgstr "Überschrift des Inhaltsverzeichnisses ausblenden"
 
-#: inc/admin/admin-settings.php:246
+#: inc/admin/admin-settings.php:215
+msgid "Comments link"
+msgstr "Link zu den Kommentaren"
+
+#: inc/admin/admin-settings.php:218
 msgid "Add a link for the comments inside the table of contents"
 msgstr "Im Inhaltsverzeichnis einen Link zu den Kommentaren hinzufügen"
 
-#: inc/admin/admin-settings.php:247
+#: inc/admin/admin-settings.php:219
 msgid "If comments are enabled, this will display, inside the table of contents, a link for the comments list."
 msgstr "Wenn Kommentare aktiviert sind, wird im Inhaltsverzeichnis ein Link zur Liste der Kommentare angezeigt."
+
+#: inc/admin/admin-settings.php:224
+msgid "Rewrite Title Priority"
+msgstr "Priorität für das Umschreiben des Titels"
+
+#: inc/admin/admin-settings.php:227
+msgid "Some plugins need this higher in order to correctly show the chapter title instead of \"Page # of #\". If the title works good please leave this to normal."
+msgstr "Einige Plugins benötigen hier einen höheren Wert, damit statt „Seite # von #“ der Titel des Kapitels korrekt angezeigt wird. Wenn der Titel richtig angezeigt wird, belasse diesen Wert bitte auf „Normal“."
+
+#: inc/admin/admin-settings.php:232
+msgid "Rewrite Content Priority"
+msgstr "Priorität für das Umschreiben des Inhalts"
+
+#. translators: %1$s: URL of the_content filter documentation.
+#: inc/admin/admin-settings.php:237
+#, php-format
+msgid "This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal."
+msgstr "Dieser Wert bestimmt die Position des Inhaltsverzeichnisses im Verhältnis zu anderen Plugins, die den Filter <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> verwenden, z. B. ober- oder unterhalb von Social-Media-Buttons oder ähnlichen Beiträgen. Wenn die Position des Inhaltsverzeichnisses passt, belasse diesen Wert bitte auf „Normal“."
+
+#: inc/admin/admin-settings.php:244 inc/admin/admin-settings.php:247
+msgid "Disable TinyMCE Buttons"
+msgstr "TinyMCE-Buttons deaktivieren"
+
+#: inc/admin/admin-settings.php:248
+msgid "Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts."
+msgstr "Deaktiviert den TinyMCE-Button „Kapitel“ im klassischen Editor. Lass diese Option deaktiviert, sofern keine Konflikte mit dem Editor auftreten."
 
 #: inc/pchap-options.php:170
 msgid "Highest"
@@ -374,7 +374,7 @@ msgid "hidden — Hide the labels, display only the chapter title"
 msgstr "ausgeblendet — Beschriftungen ausblenden, nur den Titel des Kapitels anzeigen"
 
 #. translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type").
-#: inc/pchap-options.php:380
+#: inc/pchap-options.php:381
 #, php-format
 msgid "An invalid value was submitted for the %s setting. The previous value was kept."
 msgstr "Für die Einstellung %s wurde ein ungültiger Wert übermittelt. Der bisherige Wert wurde beibehalten."
@@ -407,21 +407,59 @@ msgstr "Kommentare"
 msgid "Contents"
 msgstr "Inhalt"
 
-#: post-chapters.php:72
+#: post-chapters.php:75
 msgid "Post Chapters is not running yet."
 msgstr "Post Chapters ist noch nicht aktiv."
 
-#: post-chapters.php:73
+#: post-chapters.php:76
 msgid "Deactivate Multipage: Post Chapters replaces it and takes over its settings and content."
 msgstr "Deaktiviere Multipage: Post Chapters ersetzt es und übernimmt seine Einstellungen und Inhalte."
 
-#: post-chapters.php:74
+#: post-chapters.php:77
 msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Post Chapters uses."
 msgstr "Um Multipage anschließend zu entfernen, lösche seinen Ordner auf dem Server statt über die Plugin-Seite: Beim Löschen über die Plugin-Seite entfernen Multipage 1.5.15 und neuer die Einstellungen und den Kapitelindex, die Post Chapters verwendet."
 
-#: blocks/subpage/index.js:119
+#: blocks/subpage/index.js:121
 msgid "Write chapter title…"
 msgstr "Titel des Kapitels eingeben …"
+
+#. translators: %d: number of headings.
+#: blocks/subpage/index.js:273
+msgid "%d heading turned into a chapter. You can undo it."
+msgid_plural "%d headings turned into chapters. You can undo it."
+msgstr[0] "%d Überschrift wurde in ein Kapitel verwandelt. Du kannst das rückgängig machen."
+msgstr[1] "%d Überschriften wurden in Kapitel verwandelt. Du kannst das rückgängig machen."
+
+#: blocks/subpage/index.js:295
+msgid "Untitled chapter"
+msgstr "Kapitel ohne Titel"
+
+#: blocks/subpage/index.js:302
+msgid "Chapters"
+msgstr "Kapitel"
+
+#: blocks/subpage/index.js:305
+msgid "No chapters yet. Add a Chapter block where a chapter starts, or turn headings into chapters."
+msgstr "Noch keine Kapitel. Füge dort, wo ein Kapitel beginnt, einen Kapitel-Block ein oder verwandle Überschriften in Kapitel."
+
+#: blocks/subpage/index.js:307
+msgid "Heading level"
+msgstr "Überschriftenebene"
+
+#: blocks/subpage/index.js:317
+msgid "Only the headings at the top level of the post."
+msgstr "Nur Überschriften auf der obersten Ebene des Beitrags."
+
+#. translators: %d: number of headings.
+#: blocks/subpage/index.js:325
+msgid "Turn %d heading into a chapter"
+msgid_plural "Turn %d headings into chapters"
+msgstr[0] "%d Überschrift in ein Kapitel verwandeln"
+msgstr[1] "%d Überschriften in Kapitel verwandeln"
+
+#: blocks/subpage/index.js:328
+msgid "No heading of this level"
+msgstr "Keine Überschrift dieser Ebene"
 
 #: blocks/subpage/block.json
 msgctxt "block title"

@@ -29,6 +29,8 @@
 	var SVG = wp.primitives.SVG;
 	var Path = wp.primitives.Path;
 	var __ = wp.i18n.__;
+	var _n = wp.i18n._n;
+	var sprintf = wp.i18n.sprintf;
 
 	/**
 	 * Client copy of block.json (keep both files in sync).
@@ -127,14 +129,221 @@
 		);
 	}
 
+	/**
+	 * Transforms. A heading or a core page break becomes a chapter, and a chapter becomes
+	 * a heading. They only change what is in the editor: save() is not concerned.
+	 */
+	var transforms = {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: function( attributes ) {
+					// The content of a heading may be a RichTextData object: its string is the HTML.
+					var content = '' + ( attributes.content || '' );
+					return createBlock( metadata.name, '' === content ? {} : { title: content } );
+				}
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/nextpage' ],
+				transform: function() {
+					return createBlock( metadata.name );
+				}
+			}
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/heading' ],
+				transform: function( attributes ) {
+					return createBlock( 'core/heading', {
+						level: 2,
+						content: 'string' === typeof attributes.title ? attributes.title : ''
+					} );
+				}
+			}
+		]
+	};
+
 	registerBlockType( metadata, {
 		// Settings override the (server or client) metadata: keep the block
 		// on apiVersion 3 whatever the bootstrapped definition says.
 		apiVersion: 3,
 		icon: icon,
 		edit: SubpageEdit,
+		transforms: transforms,
 		save: function( props ) {
 			return el( RawHTML, null, getShortcode( props.attributes ) );
 		}
 	} );
+
+	/**
+	 * Chapters of a list of blocks, at any depth, in document order.
+	 *
+	 * @param {Array} blocks Blocks.
+	 * @param {Array} found  Chapter blocks found so far.
+	 * @return {Array} The Chapter blocks.
+	 */
+	function getChapterBlocks( blocks, found ) {
+		blocks.forEach( function( block ) {
+			if ( metadata.name === block.name ) {
+				found.push( block );
+			}
+			if ( block.innerBlocks && block.innerBlocks.length ) {
+				getChapterBlocks( block.innerBlocks, found );
+			}
+		} );
+
+		return found;
+	}
+
+	/**
+	 * Text of a title, which is HTML.
+	 *
+	 * @param {string} html Title.
+	 * @return {string} Text.
+	 */
+	function plainText( html ) {
+		return new window.DOMParser().parseFromString( '<body>' + html, 'text/html' ).body.textContent || '';
+	}
+
+	/**
+	 * Show a block of the post in the editor canvas.
+	 *
+	 * @param {string} clientId Block client ID.
+	 */
+	function scrollToBlock( clientId ) {
+		window.setTimeout( function() {
+			var canvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+			var doc = canvas && canvas.contentDocument ? canvas.contentDocument : document;
+			var node = doc.querySelector( '[data-block="' + clientId + '"]' );
+
+			if ( node && node.scrollIntoView ) {
+				node.scrollIntoView( { block: 'center' } );
+			}
+		}, 50 );
+	}
+
+	/**
+	 * Document panel: the chapters of the post, and a button that turns the headings into chapters.
+	 *
+	 * @param {Object} props Props: Panel, the PluginDocumentSettingPanel component.
+	 * @return {Element} The panel.
+	 */
+	function ChaptersPanel( props ) {
+		var useState = wp.element.useState;
+		var useSelect = wp.data.useSelect;
+		var useDispatch = wp.data.useDispatch;
+		var Button = wp.components.Button;
+		var SelectControl = wp.components.SelectControl;
+
+		var blocks = useSelect( function( select ) {
+			return select( 'core/block-editor' ).getBlocks();
+		}, [] );
+		var levelState = useState( 2 );
+		var level = levelState[ 0 ];
+		var setLevel = levelState[ 1 ];
+		var blockEditor = useDispatch( 'core/block-editor' );
+		var notices = useDispatch( 'core/notices' );
+
+		var chapters = getChapterBlocks( blocks, [] );
+		var headings = blocks.filter( function( block ) {
+			return 'core/heading' === block.name && level === block.attributes.level;
+		} );
+
+		var turnHeadingsIntoChapters = function() {
+			var count = headings.length;
+
+			// Each heading is replaced where it stands: replaceBlocks() would gather the
+			// replacements at the place of the first heading, as the headings are not adjacent.
+			// The changes after the first are not persistent changes of their own, so a single
+			// undo restores every heading.
+			headings.forEach( function( heading, index ) {
+				if ( index > 0 && blockEditor.__unstableMarkNextChangeAsNotPersistent ) {
+					blockEditor.__unstableMarkNextChangeAsNotPersistent();
+				}
+
+				blockEditor.replaceBlock( heading.clientId, transforms.from[ 0 ].transform( heading.attributes ) );
+			} );
+
+			notices.createSuccessNotice(
+				sprintf(
+					/* translators: %d: number of headings. */
+					_n( '%d heading turned into a chapter. You can undo it.', '%d headings turned into chapters. You can undo it.', count, 'post-chapters' ),
+					count
+				),
+				{ type: 'snackbar' }
+			);
+		};
+
+		var items = chapters.map( function( chapter ) {
+			var text = 'string' === typeof chapter.attributes.title ? plainText( chapter.attributes.title ) : '';
+
+			return el(
+				'li',
+				{ key: chapter.clientId },
+				el(
+					Button,
+					{
+						variant: 'link',
+						onClick: function() {
+							blockEditor.selectBlock( chapter.clientId );
+							scrollToBlock( chapter.clientId );
+						}
+					},
+					'' !== text ? text : __( 'Untitled chapter', 'post-chapters' )
+				)
+			);
+		} );
+
+		return el(
+			props.Panel,
+			{ name: 'post-chapters', title: __( 'Chapters', 'post-chapters' ), className: 'mpp-chapters-panel' },
+			items.length
+				? el( 'ol', { className: 'mpp-chapters-list' }, items )
+				: el( 'p', null, __( 'No chapters yet. Add a Chapter block where a chapter starts, or turn headings into chapters.', 'post-chapters' ) ),
+			el( SelectControl, {
+				label: __( 'Heading level', 'post-chapters' ),
+				value: level,
+				options: [
+					{ label: 'H2', value: 2 },
+					{ label: 'H3', value: 3 },
+					{ label: 'H4', value: 4 }
+				],
+				onChange: function( value ) {
+					setLevel( parseInt( value, 10 ) );
+				},
+				help: __( 'Only the headings at the top level of the post.', 'post-chapters' )
+			} ),
+			el(
+				Button,
+				{ variant: 'secondary', disabled: ! headings.length, onClick: turnHeadingsIntoChapters },
+				headings.length
+					? sprintf(
+						/* translators: %d: number of headings. */
+						_n( 'Turn %d heading into a chapter', 'Turn %d headings into chapters', headings.length, 'post-chapters' ),
+						headings.length
+					)
+					: __( 'No heading of this level', 'post-chapters' )
+			)
+		);
+	}
+
+	// The panel needs the post editor (the Site Editor has no document settings panel).
+	if ( wp.plugins && wp.plugins.registerPlugin && wp.data && wp.components && wp.domReady ) {
+		wp.domReady( function() {
+			var Panel = ( wp.editor && wp.editor.PluginDocumentSettingPanel ) || ( wp.editPost && wp.editPost.PluginDocumentSettingPanel );
+
+			if ( ! Panel ) {
+				return;
+			}
+
+			wp.plugins.registerPlugin( 'post-chapters', {
+				render: function() {
+					return el( ChaptersPanel, { Panel: Panel } );
+				}
+			} );
+		} );
+	}
 }( window.wp ) );

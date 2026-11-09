@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tests for custom post types (flat, hierarchical, plain permalinks), and a CI job that runs the suite with a Redis object cache
 - Tests that catch the mistakes of a release: the version of the plugin header, `PCHAP_VERSION`, `block.json`, `index.asset.php`, `readme.txt`, the README badge and the changelogs must agree; every stylesheet and script the plugin loads must exist (LTR, RTL, minified or not); the block metadata copied in `blocks/subpage/index.js` must match `block.json`. `tests/test-plugin-loaded.php` no longer holds the version, so a release has one place less to change
 
+- **Chapters panel** in the document sidebar of the block editor: the chapters of the post, in order (click one to select it and scroll to it), and a **Turn N headings into chapters** button with a heading level (H2, H3 or H4). Each top-level heading becomes a Chapter block where it stands, with a single undo step and a notice. It runs in the same script as the block (`blocks/subpage/index.js`), which now depends on `wp-plugins`, `wp-data`, `wp-components`, `wp-editor` and `wp-dom-ready`. Checked in the real editor, in English and French
+- **Block transforms**: a heading or a core page break becomes a Chapter block, and a Chapter block becomes a heading, from the block switcher. The saved markup of the block is unchanged
+- Nine strings of the editor interface, translated in French, German, Spanish and Italian; a fourth screenshot of the panel for the WordPress.org listing
+
 ### Fixed
 
 - **Uninstall** (deleting the plugin from the Plugins screen) left traces. With a persistent object cache (Redis, Memcached), the `_mpp_data` index stayed readable from the cache of each post, and the parsed chapters stayed cached; both are now cleared. The events of the background rebuild are removed whatever their arguments. `uninstall.php` now uses `delete_post_meta_by_key()`, `wp_unschedule_hook()` and `wp_cache_flush_group()`. A test lets the plugin live (activation, settings, posts, a rebuild, its lock), uninstalls it, and checks that no table holds anything of it

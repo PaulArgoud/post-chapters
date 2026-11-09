@@ -17,6 +17,19 @@
 	text-align: center;
 }
 
+/* The chapters of the post, in the document panel of the sidebar. */
+.mpp-chapters-list {
+	margin: 0 0 1em 1.25em;
+	padding: 0;
+	list-style: decimal;
+}
+
+.mpp-chapters-list .components-button.is-link {
+	height: auto;
+	text-align: left;
+	text-decoration: none;
+}
+
 /* Subpage placeholder in the Classic block, when it is edited inline (older WordPress versions). */
 .wp-block-freeform.block-library-rich-text__tinymce .wp-more-tag.mce-wp-subpage {
 	background-image: url(../../inc/admin/tinymce/images/subpage-2x.png);

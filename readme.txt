@@ -16,7 +16,8 @@ Post Chapters splits a long post into chapters. Each chapter is a page of its ow
 
 = Features =
 
-* **Chapter block** for the block editor. It works in the iframed editor of recent WordPress versions.
+* **Chapter block** for the block editor. It works in the iframed editor of recent WordPress versions. A heading or a page break turns into a chapter with the block switcher.
+* **Chapters panel** in the editor sidebar: the chapters of the post (click to go to one), and a button that turns all the H2, H3 or H4 headings of a post into chapters, in one undoable step.
 * **`[nextpage title="…"]` shortcode** for the classic editor, with a **Chapter** button in the Visual editor, the Text editor and the Classic block.
 * **Reliable splitting**: Chapter blocks, shortcodes and core page breaks can be mixed. Every chapter is balanced HTML, even when a shortcode sits inside a paragraph or a heading, so the table of contents can never end up inside a heading.
 * **Table of contents** with a configurable position (top left, top right, top, bottom or hidden), row labels, header and an optional link to the comments.
@@ -31,7 +32,7 @@ Post Chapters splits a long post into chapters. Each chapter is a page of its ow
 
 = Usage =
 
-In the block editor, add a **Chapter** block where a new chapter starts and type its title.
+In the block editor, add a **Chapter** block where a new chapter starts and type its title. To split a post that already has headings, open the **Chapters** panel in the sidebar and click **Turn headings into chapters**.
 
 In the classic editor, click the **Chapter** button, or type the shortcode where a new chapter starts:
 
@@ -93,6 +94,7 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 1. The settings page.
 2. The block editor with a Chapter block.
 3. A post split into chapters, with its table of contents.
+4. The Chapters panel of the editor: the chapters of the post, and the button that turns its headings into chapters.
 
 == Changelog ==
 
