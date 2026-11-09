@@ -44,7 +44,7 @@ post-chapters/
 │       ├── admin-actions.php        # admin_init → pchap_admin_init → updater, settings, rebuild action
 │       ├── admin-functions.php      # Admin URL helpers, tabs, Classic Editor detection
 │       ├── admin-settings.php       # Main settings screen (field callbacks and render helpers)
-│       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild subpage index" action
+│       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild chapter index" action
 │       └── tinymce/
 │           ├── languages.php        # Deprecated, never loaded (see PChap_Admin::pchap_wp_mce_translation())
 │           ├── js/plugin[.min].js   # TinyMCE "Subpage" button and placeholders
@@ -294,7 +294,7 @@ Defined in `pchap_get_option_definitions()` (type, default, allowed values, Sett
 | `mpp-comments-toc-link` | boolean | `false` | `post-chapters` | Comments link in the TOC |
 | `_mpp-rewrite-title-priority` | priority | `20` | `post-chapters-advanced` | Priority of the document title filter (UI: 100, 50, 20, 10, 5; any integer is kept) |
 | `_mpp-rewrite-content-priority` | priority | `20` | `post-chapters-advanced` | Priority of the `the_content` filter |
-| `mpp-disable-tinymce-buttons` | boolean | `false` | `post-chapters-advanced` | Disable the TinyMCE Subpage button |
+| `mpp-disable-tinymce-buttons` | boolean | `false` | `post-chapters-advanced` | Disable the TinyMCE Chapter button |
 
 - Both screens post to `options.php`. `pchap_sanitize_option()` stores booleans as `1`/`0` (an unchecked checkbox is posted as `null`), and an invalid value keeps the current valid value and adds one settings error naming the field
 - Getters (`pchap_hide_intro_title()`, `pchap_get_toc_position()`...) read through `pchap_get_option()` (in-memory cache, default applied per call) and `pchap_validate_option_value()`, so they always return a valid value. Legacy stored values (`''`, `'1'`, `'on'`, `'off'`) keep their meaning
@@ -322,7 +322,7 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 - **Batch**: `pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run )`, 200 posts by default (`pchap_rebuild_postmeta_batch_size`). `pchap_run_postmeta_rebuild( $args )` runs batches within an optional time budget, resumes from saved totals and refreshes the lock after each batch
 - **Lock**: `pchap_rebuild_acquire_lock()` (atomic `INSERT IGNORE`; a lock not refreshed for 5 minutes is taken over with a compare-and-set `UPDATE`), `pchap_rebuild_refresh_lock()`, `pchap_rebuild_release_lock()` (owner only), `pchap_is_rebuild_locked()`
 - **Background (WP-Cron)**: `pchap_schedule_postmeta_rebuild()` saves `_mpp-rebuild-state` and schedules the single event `pchap_rebuild_postmeta_batch`. `pchap_cron_rebuild_postmeta()` takes the lock, schedules a watchdog, processes batches for 15 seconds (`pchap_rebuild_cron_time_limit`), then reschedules itself or completes (`pchap_complete_postmeta_rebuild()`). When locked, it retries a minute later
-- **Admin**: the "Rebuild subpage index" form on the Advanced screen posts to `admin-post.php?action=pchap_rebuild_postmeta` (nonce + `manage_options`). `pchap_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`pchap_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `pchap_admin_rebuild_postmeta_notice()`
+- **Admin**: the "Rebuild chapter index" form on the Advanced screen posts to `admin-post.php?action=pchap_rebuild_postmeta` (nonce + `manage_options`). `pchap_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`pchap_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `pchap_admin_rebuild_postmeta_notice()`
 - **WP-CLI**: `wp post-chapters rebuild [--batch-size=<n>] [--dry-run]` and `wp post-chapters status [--format=table|json|yaml|csv]` (`wp multipage` is an alias) (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
 
 ### Install, upgrade, activation
@@ -377,7 +377,7 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 |--------|---------|----------|-------------|
 | `pchap_rebuild_postmeta_batch_size` | `200` | `pchap-update.php` | Posts per rebuild batch |
 | `pchap_rebuild_cron_time_limit` | `15` | `pchap-update.php` | Seconds per background (WP-Cron) run |
-| `pchap_rebuild_admin_time_limit` | `15` | `admin-advanced-settings.php` | Seconds spent by the "Rebuild subpage index" request before handing over to WP-Cron |
+| `pchap_rebuild_admin_time_limit` | `15` | `admin-advanced-settings.php` | Seconds spent by the "Rebuild chapter index" request before handing over to WP-Cron |
 
 ### Admin filters
 
