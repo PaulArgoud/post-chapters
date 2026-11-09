@@ -4,20 +4,20 @@
  * elements a cut would leave, and the table of contents / navigation never end up
  * inside a heading, a paragraph or a link.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
 /**
  * Split HTML tests.
  */
-class Test_Mpp_Split_Html extends WP_UnitTestCase {
+class Test_PChap_Split_Html extends WP_UnitTestCase {
 
 	/**
-	 * Multipage methods hooked once at boot (kept when the request state is reset).
+	 * Post Chapters methods hooked once at boot (kept when the request state is reset).
 	 *
 	 * @var string[]
 	 */
-	private static $boot_methods = array( 'save_post', 'mpp_pre_handle_404', 'mpp_redirect_canonical', 'mpp_post' );
+	private static $boot_methods = array( 'save_post', 'pchap_pre_handle_404', 'pchap_redirect_canonical', 'pchap_post' );
 
 	/**
 	 * Void HTML elements (no end tag).
@@ -39,8 +39,8 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->reset_multipage();
-		if ( function_exists( 'mpp_clear_options_cache' ) ) {
-			mpp_clear_options_cache();
+		if ( function_exists( 'pchap_clear_options_cache' ) ) {
+			pchap_clear_options_cache();
 		}
 	}
 
@@ -50,8 +50,8 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	public function tear_down() {
 		$this->reset_multipage();
 		parent::tear_down();
-		if ( function_exists( 'mpp_clear_options_cache' ) ) {
-			mpp_clear_options_cache();
+		if ( function_exists( 'pchap_clear_options_cache' ) ) {
+			pchap_clear_options_cache();
 		}
 	}
 
@@ -214,7 +214,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 			'two markers in the same wrapper'              => array(
 				'<p>Intro</p><div class="x">[nextpage title="Un"][nextpage title="Deux"] Texte deux.</div>',
 				array( '%%intro%%', 'Un', 'Deux' ),
-				array( '<p>Intro</p>', Multipage_Parser::EMPTY_PAGE_PLACEHOLDER, '<div class="x">Texte deux.</div>' ),
+				array( '<p>Intro</p>', PChap_Parser::EMPTY_PAGE_PLACEHOLDER, '<div class="x">Texte deux.</div>' ),
 			),
 		);
 	}
@@ -229,7 +229,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	 * @param string[] $contents Expected page contents.
 	 */
 	public function test_split_pages( $content, $titles, $contents ) {
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertTrue( $parsed['is_multipage'] );
 		$this->assertSame( $titles, array_column( $parsed['pages'], 'title' ), 'Titles' );
@@ -242,7 +242,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 		}
 
 		// The pages survive WordPress' own splitting unchanged.
-		$joined = Multipage_Parser::build_paginated_content( $parsed['pages'] );
+		$joined = PChap_Parser::build_paginated_content( $parsed['pages'] );
 		$this->assertCount( count( $titles ), explode( '<!--nextpage-->', $joined ) );
 	}
 
@@ -250,7 +250,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	 * Elements that mean something when empty are never dropped, and stay balanced.
 	 */
 	public function test_meaningful_empty_elements_are_kept() {
-		$parsed = Multipage_Parser::parse( '<p>Intro</p><table><tbody><tr><td>[nextpage title="Deux"]</td></tr></tbody></table><p>Texte</p>' );
+		$parsed = PChap_Parser::parse( '<p>Intro</p><table><tbody><tr><td>[nextpage title="Deux"]</td></tr></tbody></table><p>Texte</p>' );
 
 		$this->assertSame(
 			array( '<p>Intro</p><table><tbody><tr><td></td></tr></tbody></table>', '<table><tbody><tr><td></td></tr></tbody></table><p>Texte</p>' ),
@@ -266,7 +266,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	 * Whitespace is kept inside preformatted text.
 	 */
 	public function test_whitespace_is_kept_in_pre() {
-		$parsed = Multipage_Parser::parse( "<p>Intro</p><pre>a = 1; [nextpage title=\"Deux\"]\n  b = 2;</pre>" );
+		$parsed = PChap_Parser::parse( "<p>Intro</p><pre>a = 1; [nextpage title=\"Deux\"]\n  b = 2;</pre>" );
 
 		$this->assertSame( array( '<p>Intro</p><pre>a = 1; </pre>', "<pre>\n  b = 2;</pre>" ), array_column( $parsed['pages'], 'content' ) );
 	}
@@ -389,8 +389,8 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 			$output = $this->render_subpage( $post_id, $number );
 			$label  = sprintf( 'Subpage %d', $number );
 
-			$this->assertSame( count( $expected ), multipage()->max_num_pages, $label . ': number of subpages.' );
-			$this->assertSame( $number, multipage()->get_current_page(), $label . ': current page.' );
+			$this->assertSame( count( $expected ), pchap()->max_num_pages, $label . ': number of subpages.' );
+			$this->assertSame( $number, pchap()->get_current_page(), $label . ': current page.' );
 
 			$this->assert_balanced_html( $output, $label );
 			$this->assertSame( array(), self::find_empty_elements( $output ), $label . ': empty element in ' . $output );
@@ -425,7 +425,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	 * Simulate a front-end request of a subpage and render the main loop content.
 	 *
 	 * Like a real request: WP::main() runs the query, pre_handle_404 and the "wp" action
-	 * (Multipage::mpp_post()); then the loop applies the_content.
+	 * (PChap::pchap_post()); then the loop applies the_content.
 	 *
 	 * @param int $post_id Post ID.
 	 * @param int $number  Subpage number (1-based).
@@ -443,7 +443,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 
 		$this->assertTrue( is_singular(), 'Singular view expected for ' . $url );
 		$this->assertFalse( is_404(), 'Unexpected 404 for ' . $url );
-		$this->assertTrue( multipage()->is_multipage_view(), 'Multipage view expected for ' . $url );
+		$this->assertTrue( pchap()->is_multipage_view(), 'Post Chapters view expected for ' . $url );
 
 		$output = '';
 		while ( have_posts() ) {
@@ -455,7 +455,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Reset the per-request state of the Multipage singleton and remove the request hooks.
+	 * Reset the per-request state of the Post Chapters singleton and remove the request hooks.
 	 *
 	 * The singleton keeps the state of one request (one PHP process per request in
 	 * production); the tests run many requests in one process.
@@ -463,7 +463,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 	private function reset_multipage() {
 		global $wp_filter;
 
-		$mpp = multipage();
+		$mpp = pchap();
 		$ref = new ReflectionObject( $mpp );
 
 		$private = array(
@@ -604,7 +604,7 @@ class Test_Mpp_Split_Html extends WP_UnitTestCase {
 
 		if ( preg_match_all( '/<([a-zA-Z][a-zA-Z0-9-]*)(?:\s(?:[^>"\']++|"[^"]*+"|\'[^\']*+\')*+)?>(?:\s|&nbsp;|&#0*160;|<br\s*\/?>)*<\/\1\s*>/', $html, $matches, PREG_SET_ORDER ) ) {
 			foreach ( $matches as $match ) {
-				if ( ! in_array( strtolower( $match[1] ), Multipage_Parser::KEPT_WHEN_EMPTY_ELEMENTS, true ) ) {
+				if ( ! in_array( strtolower( $match[1] ), PChap_Parser::KEPT_WHEN_EMPTY_ELEMENTS, true ) ) {
 					$found[] = $match[0];
 				}
 			}

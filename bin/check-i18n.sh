@@ -6,7 +6,7 @@
 #   - "wp i18n make-pot" warns about a string (e.g. placeholders without a
 #     "translators:" comment, mismatched singular/plural placeholders);
 #   - a msgid/msgctxt found in the code (PHP, JS, block.json) is missing from
-#     languages/sgr-nextpage-titles.pot;
+#     languages/post-chapters.pot;
 #   - a .po file has untranslated, fuzzy or obsolete (#~) entries, misses a
 #     string of the code, or fails "msgfmt --check";
 #   - a compiled file is missing or stale: .mo, .l10n.php (wp i18n make-php)
@@ -20,15 +20,15 @@
 #               WP_CLI_BIN="php wp-cli.phar" or a wp-env wrapper. It is run
 #               from the plugin root with paths relative to it, and its working
 #               directory must be the plugin root (true for wp-env with
-#               --env-cwd=wp-content/plugins/sgr-nextpage-titles).
+#               --env-cwd=wp-content/plugins/post-chapters).
 #   PHP_BIN     PHP CLI used for the semantic comparisons (default: "php").
 #
 # Refresh workflow (after changing strings), from the plugin root:
-#   wp i18n make-pot . languages/sgr-nextpage-titles.pot --domain=sgr-nextpage-titles \
-#     --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name=Multipage \
-#     --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/sgr-nextpage-titles/issues"}'
+#   wp i18n make-pot . languages/post-chapters.pot --domain=post-chapters \
+#     --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name=Post Chapters \
+#     --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}'
 #   for po in languages/*.po; do
-#     msgmerge --quiet --no-wrap --backup=off --update "$po" languages/sgr-nextpage-titles.pot
+#     msgmerge --quiet --no-wrap --backup=off --update "$po" languages/post-chapters.pot
 #     msgattrib --no-obsolete --no-wrap -o "$po" "$po"
 #   done
 #   (translate the new / fuzzy entries, remove the fuzzy flags)
@@ -39,7 +39,7 @@
 #
 set -euo pipefail
 
-DOMAIN="sgr-nextpage-titles"
+DOMAIN="post-chapters"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LANG_DIR="languages"
 POT="${LANG_DIR}/${DOMAIN}.pot"
@@ -98,8 +98,8 @@ echo "== Extracting strings from the code (wp i18n make-pot)"
 MAKE_POT_LOG="$("${WP[@]}" i18n make-pot . "${CODE_POT}" \
 	--domain="${DOMAIN}" \
 	--exclude="${EXCLUDE}" \
-	--package-name=Multipage \
-	--headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/sgr-nextpage-titles/issues"}' \
+	--package-name=Post Chapters \
+	--headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}' \
 	"${WP_EXTRA[@]+"${WP_EXTRA[@]}"}" 2>&1)" || {
 	echo "${MAKE_POT_LOG}" >&2
 	echo "Error: wp i18n make-pot failed." >&2

@@ -2,10 +2,10 @@
 /**
  * End-to-end invariant: WordPress' own pagination matches the parser.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * For every corpus item: create the post, request its first page and every
@@ -16,7 +16,7 @@
  * @group multipage
  * @group request
  */
-class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
+class Test_PChap_Request_Invariant extends PChap_UnitTestCase {
 
 	/**
 	 * Data provider: the shared corpus.
@@ -25,7 +25,7 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 	 */
 	public function data_corpus() {
 		$data = array();
-		foreach ( Mpp_Test_Corpus::items() as $name => $item ) {
+		foreach ( PChap_Test_Corpus::items() as $name => $item ) {
 			$data[ $name ] = array( $item['content'], $item['titles'] );
 		}
 		return $data;
@@ -65,7 +65,7 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 	 */
 	private function assert_every_subpage( $content, $titles ) {
 		$post_id  = $this->create_post( $content );
-		$parsed   = Multipage_Parser::parse( get_post( $post_id )->post_content );
+		$parsed   = PChap_Parser::parse( get_post( $post_id )->post_content );
 		$expected = count( $parsed['pages'] );
 
 		$this->assertTrue( $parsed['is_multipage'] );
@@ -85,10 +85,10 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 			$this->assertCount( $expected, $GLOBALS['pages'], "WordPress \$pages on subpage {$number}." );
 			$this->assertSame( $number, (int) $GLOBALS['page'] );
 			$this->assertSame( $expected > 1 ? 1 : 0, (int) $GLOBALS['multipage'] );
-			$this->assertSame( $number, multipage()->get_current_page() );
+			$this->assertSame( $number, pchap()->get_current_page() );
 
 			// Each subpage renders its own title, once, as the page heading.
-			$title_html = mpp_get_subpage_title_html( $titles[ $number - 1 ], multipage()->get_title_format( $number - 1 ) );
+			$title_html = pchap_get_subpage_title_html( $titles[ $number - 1 ], pchap()->get_title_format( $number - 1 ) );
 			$this->assertSame( 1, substr_count( $html, '<h2>' . $title_html . '</h2>' ), "Heading of subpage {$number}: {$html}" );
 			$this->assertStringContainsString( '<span class="current" aria-current="page">' . $title_html . '</span>', $html, "Current TOC item of subpage {$number}." );
 			$this->assertSame( 1, substr_count( $html, 'mpp-toc-container' ), 'One table of contents.' );
@@ -135,8 +135,8 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 		$this->go_to( add_query_arg( 'page', 1, get_permalink( $post_id ) ) );
 
 		$this->assertFalse( is_404() );
-		$this->assertSame( 1, multipage()->get_current_page() );
-		$this->assertSame( 1, multipage()->page );
+		$this->assertSame( 1, pchap()->get_current_page() );
+		$this->assertSame( 1, pchap()->page );
 	}
 
 	/**
@@ -150,7 +150,7 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 
 		$this->assertFalse( is_404() );
 		$this->assertSame( 3, (int) $GLOBALS['numpages'] );
-		$this->assertFalse( multipage()->mpp_data );
+		$this->assertFalse( pchap()->pchap_data );
 		$this->assertStringContainsString( 'Two', $html );
 		$this->assertStringNotContainsString( 'mpp-toc', $html );
 		$this->assertStringNotContainsString( 'mpp-post-navigation', $html );
@@ -163,7 +163,7 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 	 * A fresh get_post() instance of the multipage post gets the same pages (content_pagination).
 	 */
 	public function test_fresh_post_instance_gets_the_same_pages() {
-		$post_id = $this->create_post( Mpp_Test_Corpus::items()['classic shortcodes inside p']['content'] );
+		$post_id = $this->create_post( PChap_Test_Corpus::items()['classic shortcodes inside p']['content'] );
 
 		$this->go_to_subpage( $post_id, 2 );
 
@@ -175,14 +175,14 @@ class Test_Mpp_Request_Invariant extends Mpp_UnitTestCase {
 		$postdata = $query->generate_postdata( $fresh );
 
 		$this->assertSame( 3, $postdata['numpages'] );
-		$this->assertSame( array_column( multipage()->pages, 'content' ), $postdata['pages'] );
+		$this->assertSame( array_column( pchap()->pages, 'content' ), $postdata['pages'] );
 	}
 
 	/**
 	 * The raw post content stored in the database is never modified by a request.
 	 */
 	public function test_request_does_not_modify_the_stored_content() {
-		$content = Mpp_Test_Corpus::items()['blocks 1.7']['content'];
+		$content = PChap_Test_Corpus::items()['blocks 1.7']['content'];
 		$post_id = $this->create_post( $content );
 
 		$this->render_subpage( $post_id, 2 );

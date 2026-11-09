@@ -1,5 +1,5 @@
 /**
- * Multipage "Subpage" block (multipage/subpage) - editor script.
+ * Post Chapters "Subpage" block (multipage/subpage) - editor script.
  *
  * Buildless: plain ES5 using the wp.* globals, no JSX and no build step.
  * The block metadata (title, category, attributes, supports...) lives in
@@ -9,7 +9,7 @@
  * server definitions (third-party or front-end editors); where both exist,
  * the server definition wins.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since   1.7.0
  */
 ( function( wp ) {
@@ -40,11 +40,11 @@
 	var metadata = {
 		apiVersion: 3,
 		name: 'multipage/subpage',
-		title: 'Subpage',
+		title: 'Chapter',
 		category: 'design',
-		description: 'Add a subpage break to split your post into multiple pages.',
-		keywords: [ 'multipage', 'page' ],
-		textdomain: 'sgr-nextpage-titles',
+		description: 'Start a new chapter: split your post into pages, each with its own title.',
+		keywords: [ 'chapter', 'multipage', 'page' ],
+		textdomain: 'post-chapters',
 		attributes: {
 			title: {
 				type: 'string',
@@ -116,7 +116,7 @@
 					onChange: function( value ) {
 						setAttributes( { title: value } );
 					},
-					placeholder: __( 'Write subpage title…', 'sgr-nextpage-titles' ),
+					placeholder: __( 'Write chapter title…', 'post-chapters' ),
 					allowedFormats: [],
 					withoutInteractiveFormatting: true,
 					disableLineBreaks: true,

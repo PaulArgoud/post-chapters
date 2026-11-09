@@ -2,12 +2,12 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "multipage/subpage",
-	"version": "1.7.1",
-	"title": "Subpage",
+	"version": "2.0.0",
+	"title": "Chapter",
 	"category": "design",
-	"description": "Add a subpage break to split your post into multiple pages.",
-	"keywords": [ "multipage", "page" ],
-	"textdomain": "sgr-nextpage-titles",
+	"description": "Start a new chapter: split your post into pages, each with its own title.",
+	"keywords": [ "chapter", "multipage", "page" ],
+	"textdomain": "post-chapters",
 	"attributes": {
 		"title": {
 			"type": "string",

@@ -2,21 +2,21 @@
 /**
  * Subpage index rebuild tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Function mpp_add_post_multipage_meta(), batching, the WP-Cron routine and the lock.
+ * Function pchap_add_post_multipage_meta(), batching, the WP-Cron routine and the lock.
  *
  * @group multipage
  * @group rebuild
  */
-class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
+class Test_PChap_Rebuild extends PChap_UnitTestCase {
 
 	/**
-	 * Multipage content.
+	 * Post Chapters content.
 	 *
 	 * @var string
 	 */
@@ -26,8 +26,8 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	 * Clean up the rebuild state.
 	 */
 	public function tear_down() {
-		mpp_rebuild_release_lock();
-		wp_clear_scheduled_hook( mpp_get_rebuild_cron_hook() );
+		pchap_rebuild_release_lock();
+		wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 		parent::tear_down();
 	}
 
@@ -47,7 +47,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$ids = array(
 			'publish' => $this->create_post( self::MULTIPAGE ),
 			'draft'   => $this->create_post( self::MULTIPAGE, array( 'post_status' => 'draft' ) ),
-			'block'   => $this->create_post( Mpp_Test_Corpus::items()['blocks 1.7']['content'] ),
+			'block'   => $this->create_post( PChap_Test_Corpus::items()['blocks 1.7']['content'] ),
 			'plain'   => $this->create_post( 'Plain post' ),
 			'stale'   => $this->create_post( 'Was multipage once' ),
 		);
@@ -83,9 +83,9 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	public function test_full_rebuild() {
 		$ids = $this->create_fixture();
 
-		$this->assertSame( 4, mpp_count_postmeta_rebuild_candidates(), 'publish, draft, block and stale.' );
+		$this->assertSame( 4, pchap_count_postmeta_rebuild_candidates(), 'publish, draft, block and stale.' );
 
-		$stats = mpp_add_post_multipage_meta();
+		$stats = pchap_add_post_multipage_meta();
 
 		$this->assertSame( 4, $stats['processed'] );
 		$this->assertSame( 3, $stats['updated'] );
@@ -93,7 +93,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$this->assertSame( 0, $stats['unchanged'] );
 		$this->assertTrue( $stats['done'] );
 
-		$this->assertSame( Multipage_Parser::multipage_return_array( get_post( $ids['publish'] )->post_content ), get_post_meta( $ids['publish'], '_mpp_data', true ) );
+		$this->assertSame( PChap_Parser::multipage_return_array( get_post( $ids['publish'] )->post_content ), get_post_meta( $ids['publish'], '_mpp_data', true ) );
 		$this->assertNotEmpty( get_post_meta( $ids['draft'], '_mpp_data', true ) );
 		$this->assertNotEmpty( get_post_meta( $ids['block'], '_mpp_data', true ) );
 		$this->assertSame( array(), get_post_meta( $ids['plain'], '_mpp_data', false ) );
@@ -104,7 +104,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$this->assertGreaterThan( 0, (int) get_option( '_mpp-postmeta-built' ) );
 
 		// Second run: everything is up to date.
-		$stats = mpp_add_post_multipage_meta( false );
+		$stats = pchap_add_post_multipage_meta( false );
 		$this->assertSame( 3, $stats['processed'] );
 		$this->assertSame( 3, $stats['unchanged'] );
 		$this->assertSame( 0, $stats['updated'] );
@@ -124,10 +124,10 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 				'missing_index'   => 3,
 				'stale_index'     => 1,
 			),
-			mpp_get_postmeta_index_stats()
+			pchap_get_postmeta_index_stats()
 		);
 
-		mpp_add_post_multipage_meta();
+		pchap_add_post_multipage_meta();
 
 		$this->assertSame(
 			array(
@@ -136,7 +136,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 				'missing_index'   => 0,
 				'stale_index'     => 0,
 			),
-			mpp_get_postmeta_index_stats()
+			pchap_get_postmeta_index_stats()
 		);
 	}
 
@@ -144,11 +144,11 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	 * Backslashes survive the rebuild, and outdated meta is replaced.
 	 */
 	public function test_rebuild_updates_outdated_meta_and_keeps_backslashes() {
-		$post_id = $this->create_post( "Intro\n\n" . Mpp_Test_Corpus::block( 'a\\b' ) . "\n\nTwo" );
+		$post_id = $this->create_post( "Intro\n\n" . PChap_Test_Corpus::block( 'a\\b' ) . "\n\nTwo" );
 		update_post_meta( $post_id, '_mpp_data', array( 'old' => 'Old' ) );
 		add_post_meta( $post_id, '_mpp_data', array( 'duplicate' => 'Row' ) );
 
-		$stats = mpp_add_post_multipage_meta( false );
+		$stats = pchap_add_post_multipage_meta( false );
 
 		$this->assertSame( 1, $stats['updated'] );
 		$rows = get_post_meta( $post_id, '_mpp_data', false );
@@ -168,7 +168,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	public function test_dry_run() {
 		$ids = $this->create_fixture();
 
-		$stats = mpp_run_postmeta_rebuild( array( 'dry_run' => true ) );
+		$stats = pchap_run_postmeta_rebuild( array( 'dry_run' => true ) );
 
 		$this->assertSame( 3, $stats['updated'] );
 		$this->assertSame( 1, $stats['deleted'] );
@@ -177,7 +177,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * Batching with a small batch size (mpp_rebuild_postmeta_batch_size filter).
+	 * Batching with a small batch size (pchap_rebuild_postmeta_batch_size filter).
 	 */
 	public function test_batching() {
 		$ids = array();
@@ -187,15 +187,15 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$this->delete_all_meta();
 
 		add_filter(
-			'mpp_rebuild_postmeta_batch_size',
+			'pchap_rebuild_postmeta_batch_size',
 			static function () {
 				return 2;
 			}
 		);
-		$this->assertSame( 2, mpp_get_rebuild_batch_size() );
+		$this->assertSame( 2, pchap_get_rebuild_batch_size() );
 
 		$batches = array();
-		$stats   = mpp_run_postmeta_rebuild(
+		$stats   = pchap_run_postmeta_rebuild(
 			array(
 				'callback' => static function ( $batch ) use ( &$batches ) {
 					$batches[] = $batch['processed'];
@@ -216,7 +216,7 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 
 		// A single batch, after a cursor.
 		$this->delete_all_meta();
-		$batch = mpp_process_postmeta_batch( $ids[2], 2 );
+		$batch = pchap_process_postmeta_batch( $ids[2], 2 );
 		$this->assertSame( 2, $batch['processed'] );
 		$this->assertSame( $ids[4], $batch['last_id'] );
 		$this->assertSame( array(), get_post_meta( $ids[0], '_mpp_data', false ) );
@@ -227,41 +227,41 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	 * The batch size is never below 1.
 	 */
 	public function test_batch_size_minimum() {
-		add_filter( 'mpp_rebuild_postmeta_batch_size', '__return_zero' );
+		add_filter( 'pchap_rebuild_postmeta_batch_size', '__return_zero' );
 
-		$this->assertSame( 1, mpp_get_rebuild_batch_size() );
+		$this->assertSame( 1, pchap_get_rebuild_batch_size() );
 	}
 
 	/**
 	 * Scheduling: state saved, a single event, no duplicates.
 	 */
 	public function test_schedule_rebuild() {
-		$hook = mpp_get_rebuild_cron_hook();
+		$hook = pchap_get_rebuild_cron_hook();
 
-		$this->assertFalse( mpp_get_postmeta_rebuild_state() );
-		$this->assertFalse( mpp_ensure_postmeta_rebuild_event(), 'Nothing to schedule without a pending rebuild.' );
+		$this->assertFalse( pchap_get_postmeta_rebuild_state() );
+		$this->assertFalse( pchap_ensure_postmeta_rebuild_event(), 'Nothing to schedule without a pending rebuild.' );
 
-		$this->assertTrue( mpp_schedule_postmeta_rebuild() );
-		$this->assertTrue( mpp_schedule_postmeta_rebuild() );
-		$this->assertTrue( mpp_schedule_postmeta_rebuild( false ) );
+		$this->assertTrue( pchap_schedule_postmeta_rebuild() );
+		$this->assertTrue( pchap_schedule_postmeta_rebuild() );
+		$this->assertTrue( pchap_schedule_postmeta_rebuild( false ) );
 
 		$this->assertSame( 1, $this->count_cron_events( $hook ) );
-		$state = mpp_get_postmeta_rebuild_state();
+		$state = pchap_get_postmeta_rebuild_state();
 		$this->assertSame( 0, $state['cursor'] );
 		$this->assertGreaterThan( 0, $state['started'] );
 
 		// restart = false keeps a pending cursor.
-		mpp_save_postmeta_rebuild_state(
+		pchap_save_postmeta_rebuild_state(
 			array(
 				'cursor'    => 42,
 				'processed' => 3,
 			)
 		);
-		mpp_schedule_postmeta_rebuild( false );
-		$this->assertSame( 42, mpp_get_postmeta_rebuild_state()['cursor'] );
+		pchap_schedule_postmeta_rebuild( false );
+		$this->assertSame( 42, pchap_get_postmeta_rebuild_state()['cursor'] );
 
-		mpp_schedule_postmeta_rebuild( true );
-		$this->assertSame( 0, mpp_get_postmeta_rebuild_state()['cursor'] );
+		pchap_schedule_postmeta_rebuild( true );
+		$this->assertSame( 0, pchap_get_postmeta_rebuild_state()['cursor'] );
 	}
 
 	/**
@@ -269,24 +269,24 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	 */
 	public function test_cron_routine_completes() {
 		$ids  = $this->create_fixture();
-		$hook = mpp_get_rebuild_cron_hook();
+		$hook = pchap_get_rebuild_cron_hook();
 
 		add_filter(
-			'mpp_rebuild_postmeta_batch_size',
+			'pchap_rebuild_postmeta_batch_size',
 			static function () {
 				return 2;
 			}
 		);
 
-		mpp_schedule_postmeta_rebuild();
+		pchap_schedule_postmeta_rebuild();
 		$this->assertSame( 1, $this->count_cron_events( $hook ) );
 
 		do_action( $hook );
 
-		$this->assertFalse( mpp_get_postmeta_rebuild_state(), 'State deleted.' );
+		$this->assertFalse( pchap_get_postmeta_rebuild_state(), 'State deleted.' );
 		$this->assertSame( 0, $this->count_cron_events( $hook ), 'No event left (watchdog removed).' );
-		$this->assertFalse( mpp_is_rebuild_locked(), 'Lock released.' );
-		$this->assertFalse( _mpp_rebuild_held_lock() );
+		$this->assertFalse( pchap_is_rebuild_locked(), 'Lock released.' );
+		$this->assertFalse( _pchap_rebuild_held_lock() );
 
 		$last = get_option( '_mpp-rebuild-last' );
 		$this->assertSame( 4, $last['processed'] );
@@ -305,10 +305,10 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$post_id = $this->create_post( self::MULTIPAGE );
 		$this->delete_all_meta();
 
-		mpp_cron_rebuild_postmeta();
+		pchap_cron_rebuild_postmeta();
 
 		$this->assertSame( array(), get_post_meta( $post_id, '_mpp_data', false ) );
-		$this->assertSame( 0, $this->count_cron_events( mpp_get_rebuild_cron_hook() ) );
+		$this->assertSame( 0, $this->count_cron_events( pchap_get_rebuild_cron_hook() ) );
 	}
 
 	/**
@@ -320,20 +320,20 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 			$ids[] = $this->create_post( self::MULTIPAGE );
 		}
 		$this->delete_all_meta();
-		$hook = mpp_get_rebuild_cron_hook();
+		$hook = pchap_get_rebuild_cron_hook();
 
 		add_filter(
-			'mpp_rebuild_postmeta_batch_size',
+			'pchap_rebuild_postmeta_batch_size',
 			static function () {
 				return 1;
 			}
 		);
-		add_filter( 'mpp_rebuild_cron_time_limit', '__return_zero' ); // Clamped to 1 second.
+		add_filter( 'pchap_rebuild_cron_time_limit', '__return_zero' ); // Clamped to 1 second.
 
 		// Make the first batch exceed the 1 second budget.
 		$slowed = false;
 		add_filter(
-			'mpp_parser_is_meaningful_content',
+			'pchap_parser_is_meaningful_content',
 			static function ( $meaningful ) use ( &$slowed ) {
 				if ( ! $slowed ) {
 					$slowed = true;
@@ -343,22 +343,22 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 			}
 		);
 
-		mpp_schedule_postmeta_rebuild();
-		mpp_cron_rebuild_postmeta();
+		pchap_schedule_postmeta_rebuild();
+		pchap_cron_rebuild_postmeta();
 
-		$state = mpp_get_postmeta_rebuild_state();
+		$state = pchap_get_postmeta_rebuild_state();
 		$this->assertIsArray( $state, 'Rebuild still pending.' );
 		$this->assertSame( $ids[0], $state['cursor'] );
 		$this->assertSame( 1, $state['processed'] );
 		$this->assertSame( 1, $this->count_cron_events( $hook ), 'Next run scheduled, watchdog removed.' );
-		$this->assertFalse( mpp_is_rebuild_locked() );
+		$this->assertFalse( pchap_is_rebuild_locked() );
 		$this->assertNotEmpty( get_post_meta( $ids[0], '_mpp_data', true ) );
 		$this->assertSame( array(), get_post_meta( $ids[2], '_mpp_data', false ) );
 
 		// The next run finishes.
-		mpp_cron_rebuild_postmeta();
+		pchap_cron_rebuild_postmeta();
 
-		$this->assertFalse( mpp_get_postmeta_rebuild_state() );
+		$this->assertFalse( pchap_get_postmeta_rebuild_state() );
 		$this->assertSame( 0, $this->count_cron_events( $hook ) );
 		$this->assertSame( 3, get_option( '_mpp-rebuild-last' )['processed'], 'Totals carried over the runs.' );
 		$this->assertNotEmpty( get_post_meta( $ids[2], '_mpp_data', true ) );
@@ -372,9 +372,9 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 
 		$post_id = $this->create_post( self::MULTIPAGE );
 		$this->delete_all_meta();
-		$hook = mpp_get_rebuild_cron_hook();
+		$hook = pchap_get_rebuild_cron_hook();
 
-		mpp_schedule_postmeta_rebuild();
+		pchap_schedule_postmeta_rebuild();
 		wp_clear_scheduled_hook( $hook );
 
 		$wpdb->insert(
@@ -385,12 +385,12 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 				'autoload'     => 'off',
 			)
 		);
-		$this->assertTrue( mpp_is_rebuild_locked() );
+		$this->assertTrue( pchap_is_rebuild_locked() );
 
-		mpp_cron_rebuild_postmeta();
+		pchap_cron_rebuild_postmeta();
 
 		$this->assertSame( array(), get_post_meta( $post_id, '_mpp_data', false ), 'Nothing processed.' );
-		$this->assertIsArray( mpp_get_postmeta_rebuild_state(), 'Still pending.' );
+		$this->assertIsArray( pchap_get_postmeta_rebuild_state(), 'Still pending.' );
 		$this->assertSame( 1, $this->count_cron_events( $hook ), 'Retried later.' );
 		$next = wp_next_scheduled( $hook );
 		$this->assertGreaterThanOrEqual( time() + MINUTE_IN_SECONDS - 5, $next );
@@ -406,22 +406,22 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		$post_id = $this->create_post( self::MULTIPAGE );
 		$this->delete_all_meta();
 
-		mpp_schedule_postmeta_rebuild();
+		pchap_schedule_postmeta_rebuild();
 
 		$wpdb->insert(
 			$wpdb->options,
 			array(
 				'option_name'  => '_mpp-rebuild-lock',
-				'option_value' => ( time() - mpp_get_rebuild_lock_ttl() - 10 ) . '|dead-process',
+				'option_value' => ( time() - pchap_get_rebuild_lock_ttl() - 10 ) . '|dead-process',
 				'autoload'     => 'off',
 			)
 		);
-		$this->assertFalse( mpp_is_rebuild_locked() );
+		$this->assertFalse( pchap_is_rebuild_locked() );
 
-		mpp_cron_rebuild_postmeta();
+		pchap_cron_rebuild_postmeta();
 
 		$this->assertNotEmpty( get_post_meta( $post_id, '_mpp_data', true ) );
-		$this->assertFalse( mpp_get_postmeta_rebuild_state() );
+		$this->assertFalse( pchap_get_postmeta_rebuild_state() );
 		$this->assertNull( $wpdb->get_var( "SELECT option_value FROM {$wpdb->options} WHERE option_name = '_mpp-rebuild-lock'" ), 'Lock released.' );
 	}
 
@@ -431,34 +431,34 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	public function test_lock_primitives() {
 		global $wpdb;
 
-		$this->assertFalse( mpp_is_rebuild_locked() );
-		$this->assertFalse( mpp_rebuild_refresh_lock(), 'Nothing to refresh.' );
+		$this->assertFalse( pchap_is_rebuild_locked() );
+		$this->assertFalse( pchap_rebuild_refresh_lock(), 'Nothing to refresh.' );
 
-		$this->assertTrue( mpp_rebuild_acquire_lock() );
-		$this->assertTrue( mpp_is_rebuild_locked() );
-		$held = _mpp_rebuild_held_lock();
+		$this->assertTrue( pchap_rebuild_acquire_lock() );
+		$this->assertTrue( pchap_is_rebuild_locked() );
+		$held = _pchap_rebuild_held_lock();
 		$this->assertIsString( $held );
 
 		// A second acquisition fails while the lock is fresh.
-		$this->assertFalse( mpp_rebuild_acquire_lock() );
-		$this->assertSame( $held, _mpp_rebuild_held_lock() );
+		$this->assertFalse( pchap_rebuild_acquire_lock() );
+		$this->assertSame( $held, _pchap_rebuild_held_lock() );
 
-		$this->assertTrue( mpp_rebuild_refresh_lock() );
+		$this->assertTrue( pchap_rebuild_refresh_lock() );
 
 		// Taken over by another process: refresh fails and release leaves it alone.
 		$wpdb->update( $wpdb->options, array( 'option_value' => time() . '|thief' ), array( 'option_name' => '_mpp-rebuild-lock' ) );
-		$this->assertFalse( mpp_rebuild_refresh_lock() );
-		$this->assertFalse( _mpp_rebuild_held_lock() );
-		mpp_rebuild_release_lock();
-		$this->assertTrue( mpp_is_rebuild_locked() );
+		$this->assertFalse( pchap_rebuild_refresh_lock() );
+		$this->assertFalse( _pchap_rebuild_held_lock() );
+		pchap_rebuild_release_lock();
+		$this->assertTrue( pchap_is_rebuild_locked() );
 
 		$wpdb->delete( $wpdb->options, array( 'option_name' => '_mpp-rebuild-lock' ) );
-		$this->assertFalse( mpp_is_rebuild_locked() );
+		$this->assertFalse( pchap_is_rebuild_locked() );
 
-		$this->assertTrue( mpp_rebuild_acquire_lock() );
-		mpp_rebuild_release_lock();
-		$this->assertFalse( mpp_is_rebuild_locked() );
-		$this->assertFalse( _mpp_rebuild_held_lock() );
+		$this->assertTrue( pchap_rebuild_acquire_lock() );
+		pchap_rebuild_release_lock();
+		$this->assertFalse( pchap_is_rebuild_locked() );
+		$this->assertFalse( _pchap_rebuild_held_lock() );
 	}
 
 	/**
@@ -472,9 +472,9 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 		}
 		$this->delete_all_meta();
 
-		$this->assertTrue( mpp_rebuild_acquire_lock() );
+		$this->assertTrue( pchap_rebuild_acquire_lock() );
 
-		$stats = mpp_run_postmeta_rebuild(
+		$stats = pchap_run_postmeta_rebuild(
 			array(
 				'batch_size' => 1,
 				'callback'   => static function () use ( $wpdb ) {
@@ -492,19 +492,19 @@ class Test_Mpp_Rebuild extends Mpp_UnitTestCase {
 	 * Activation schedules a rebuild, deactivation removes the event.
 	 */
 	public function test_activation_and_deactivation() {
-		$hook = mpp_get_rebuild_cron_hook();
+		$hook = pchap_get_rebuild_cron_hook();
 
-		mpp_activation();
+		pchap_activation();
 		$this->assertSame( 1, $this->count_cron_events( $hook ) );
-		$this->assertIsArray( mpp_get_postmeta_rebuild_state() );
-		$this->assertSame( 1, did_action( 'mpp_activation' ) );
+		$this->assertIsArray( pchap_get_postmeta_rebuild_state() );
+		$this->assertSame( 1, did_action( 'pchap_activation' ) );
 
-		mpp_deactivation();
+		pchap_deactivation();
 		$this->assertSame( 0, $this->count_cron_events( $hook ) );
-		$this->assertSame( 1, did_action( 'mpp_deactivation' ) );
+		$this->assertSame( 1, did_action( 'pchap_deactivation' ) );
 
 		// Activation hooks are registered for the plugin basename.
-		$this->assertSame( 10, has_action( 'activate_' . multipage()->basename, 'mpp_activation' ) );
-		$this->assertSame( 10, has_action( 'deactivate_' . multipage()->basename, 'mpp_deactivation' ) );
+		$this->assertSame( 10, has_action( 'activate_' . pchap()->basename, 'pchap_activation' ) );
+		$this->assertSame( 10, has_action( 'deactivate_' . pchap()->basename, 'pchap_deactivation' ) );
 	}
 }

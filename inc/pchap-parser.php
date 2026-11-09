@@ -1,12 +1,12 @@
 <?php
 /**
- * Multipage Content Parser.
+ * Post Chapters Content Parser.
  *
  * Single source of truth for the subpage structure of a post: it finds the
  * subpage markers (Gutenberg blocks, classic [nextpage] shortcodes and core
  * page breaks) in document order and splits the content into pages.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Parser
  * @since 1.5.14
  */
@@ -15,11 +15,11 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Multipage content parser.
+ * Post Chapters content parser.
  *
  * @since 1.5.14
  */
-class Multipage_Parser {
+class PChap_Parser {
 
 	/**
 	 * Placeholder used for a titled subpage that has no body.
@@ -168,7 +168,7 @@ class Multipage_Parser {
 	 *
 	 * @param string $content The post content.
 	 * @return array {
-	 *     @type bool  $is_multipage Whether the post is a Multipage post.
+	 *     @type bool  $is_multipage Whether the post is a Post Chapters post.
 	 *     @type bool  $has_intro    Whether the first page is the automatic intro.
 	 *     @type array $pages        Ordered list of pages. Each page is an array with the keys
 	 *                               'slug' (string), 'title' (string, raw, '' when untitled,
@@ -412,7 +412,7 @@ class Multipage_Parser {
 			 * @param bool   $meaningful Whether the fragment is meaningful.
 			 * @param string $html       The fragment.
 			 */
-			$meaningful = (bool) apply_filters( 'mpp_parser_is_meaningful_content', $meaningful, $html );
+			$meaningful = (bool) pchap_apply_filters( 'pchap_parser_is_meaningful_content', $meaningful, $html );
 		}
 
 		return $meaningful;
@@ -536,7 +536,7 @@ class Multipage_Parser {
 	public static function parse_nextpage_shortcode( $content ) {
 		$matches = array( array() );
 
-		if ( is_string( $content ) && preg_match_all( MPP_PATTERN, $content, $found ) ) {
+		if ( is_string( $content ) && preg_match_all( PCHAP_PATTERN, $content, $found ) ) {
 			$matches = $found;
 		}
 
@@ -876,7 +876,7 @@ class Multipage_Parser {
 	 * elements" step: core empties any value holding a "<" that does not close (e.g. the
 	 * raw-text title "a < b & c"), which made such titles fall back to "Page N". The
 	 * values are never output as is: titles are sanitized for their output context by
-	 * mpp_get_subpage_title_html() / mpp_get_subpage_title_text() ('text' format, where
+	 * pchap_get_subpage_title_html() / pchap_get_subpage_title_text() ('text' format, where
 	 * a stray "<" is text), slugs by sanitize_title().
 	 *
 	 * @since 1.7.0

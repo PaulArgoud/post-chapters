@@ -18,10 +18,10 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
 ## Getting Started
 
 1. Fork the repository on GitHub
-2. Clone your fork into a folder named `sgr-nextpage-titles` (wp-env mounts it under that name):
+2. Clone your fork into a folder named `post-chapters` (wp-env mounts it under that name):
    ```bash
-   git clone https://github.com/<your-username>/sgr-nextpage-titles.git
-   cd sgr-nextpage-titles
+   git clone https://github.com/<your-username>/post-chapters.git
+   cd post-chapters
    ```
 3. Install the development tools:
    ```bash
@@ -38,22 +38,22 @@ You can also use another local environment (Local, DDEV...): symlink or copy the
 ## Project Structure
 
 ```
-sgr-nextpage-titles/
-  sgr-nextpage-titles.php       # Plugin entry point (header, MPP_VERSION)
-  class-mpp.php                 # Multipage class: request setup, rendering, SEO
+post-chapters/
+  post-chapters.php       # Plugin entry point (header, PCHAP_VERSION)
+  class-pchap.php                 # Multipage class: request setup, rendering, SEO
   uninstall.php                 # Data cleanup (multisite aware)
   blocks/subpage/               # Subpage block: block.json, index.js, index.asset.php, editor.css
   classes/
-    class-mpp-admin.php         # Admin: menus, Settings API, editor buttons
-    class-mpp-shortcodes.php    # [nextpage] shortcode handler
+    class-pchap-admin.php         # Admin: menus, Settings API, editor buttons
+    class-pchap-shortcodes.php    # [nextpage] shortcode handler
   inc/
-    mpp-parser.php              # Multipage_Parser: content splitting
-    mpp-template.php            # Titles, navigation & TOC rendering
-    mpp-options.php             # Option definitions, validation, getters
-    mpp-update.php              # Upgrades, subpage index rebuild, WP-Cron
-    mpp-blocks.php              # Block registration, JS translations
-    mpp-cli.php                 # wp multipage rebuild|status
-    mpp-functions.php           # Version getters, text domain
+    pchap-parser.php              # PChap_Parser: content splitting
+    pchap-template.php            # Titles, navigation & TOC rendering
+    pchap-options.php             # Option definitions, validation, getters
+    pchap-update.php              # Upgrades, subpage index rebuild, WP-Cron
+    pchap-blocks.php              # Block registration, JS translations
+    pchap-cli.php                 # wp multipage rebuild|status
+    pchap-functions.php           # Version getters, text domain
     admin/                      # Settings screens, TinyMCE plugin
   css/, admin/css/              # Frontend and admin styles (LTR / RTL, minified)
   languages/                    # .pot, .po, .mo, .l10n.php, .json
@@ -73,17 +73,17 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 | `composer test:wp-env` | PHPUnit suite inside the running wp-env `tests-cli` container |
 | `composer test` | PHPUnit with the local PHP, when the WordPress test library is available (`WP_TESTS_DIR`) |
 | `bin/check-i18n.sh` | Translation files in sync with the code (see [Translations](#translations)) |
-| `bin/build-zip.sh` | Release archive `build/sgr-nextpage-titles.zip` |
+| `bin/build-zip.sh` | Release archive `build/post-chapters.zip` |
 
 ### Coding standards
 
-`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `sgr-nextpage-titles` text domain and the global prefixes `mpp_`, `_mpp_` (internal helpers) and `multipage`.
+`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `post-chapters` text domain and the global prefixes `pchap_`, `_pchap_` (internal helpers) and `multipage`.
 
 - Follow the [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/)
 - Strict comparisons (`===` / `!==`) and Yoda conditions
-- Escape all output late: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses()` / `wp_kses_post()`. Subpage titles go through `mpp_get_subpage_title_html()` or `mpp_get_subpage_title_text()`
+- Escape all output late: `esc_html()`, `esc_attr()`, `esc_url()`, `wp_kses()` / `wp_kses_post()`. Subpage titles go through `pchap_get_subpage_title_html()` or `pchap_get_subpage_title_text()`
 - Sanitize all input: `sanitize_text_field()`, `sanitize_key()`, `intval()`, `wp_unslash()`; check nonces and capabilities
-- Settings are declared in `mpp_get_option_definitions()` and saved through the Settings API, never with a custom save handler
+- Settings are declared in `pchap_get_option_definitions()` and saved through the Settings API, never with a custom save handler
 - Use `$this` (not `&$this`) in callback arrays; avoid deprecated WordPress functions (e.g. `time()` instead of `current_time( 'timestamp' )`)
 - PHP 7.4 syntax only, and every class property declared explicitly (no dynamic properties, PHP 8.2+)
 - Never translate a string before `init`
@@ -99,13 +99,13 @@ The suite uses PHPUnit 9.6 and the WordPress test library. It runs inside wp-env
 npx wp-env start
 composer test:wp-env
 # A subset:
-npx wp-env run tests-cli --env-cwd=wp-content/plugins/sgr-nextpage-titles vendor/bin/phpunit --filter Test_Mpp_Split_Html
-npx wp-env run tests-cli --env-cwd=wp-content/plugins/sgr-nextpage-titles vendor/bin/phpunit --group parser
+npx wp-env run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --filter Test_PChap_Split_Html
+npx wp-env run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --group parser
 ```
 
 - The configuration is strict: PHP notices, warnings and deprecations, risky tests and unexpected output fail the run
-- Test classes extend `Mpp_UnitTestCase` (`tests/includes/class-mpp-unittestcase.php`), which resets the `Multipage` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
-- Content cases shared by several tests live in `Mpp_Test_Corpus` (`tests/includes/class-mpp-test-corpus.php`); add a case there when you fix a parsing bug
+- Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `Multipage` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
+- Content cases shared by several tests live in `PChap_Test_Corpus` (`tests/includes/class-pchap-test-corpus.php`); add a case there when you fix a parsing bug
 - Splitting changes must keep every page balanced (tags and block delimiters) and must not leave empty elements: see `tests/test-split-html.php` and `tests/test-request-invariant.php`
 - CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx wp-env start`
 
@@ -128,21 +128,21 @@ Also check your change by hand in the browser: the block editor, the classic edi
 
 ## Translations
 
-- Text domain: `sgr-nextpage-titles`. Every string with a placeholder needs a `/* translators: */` comment, and counts use `_n()`
-- `languages/sgr-nextpage-titles.pot` is the template; `.po` files are the sources (not shipped); `.mo`, `.l10n.php` and `.json` (JavaScript, named after the md5 of `blocks/subpage/index.js`) are generated and committed
-- The bundled files take precedence over the language packs installed in `wp-content/languages/plugins` (those of translate.wordpress.org belong to the original plugin), for the bundled locales only; see `mpp_prefer_bundled_translations()`
+- Text domain: `post-chapters`. Every string with a placeholder needs a `/* translators: */` comment, and counts use `_n()`
+- `languages/post-chapters.pot` is the template; `.po` files are the sources (not shipped); `.mo`, `.l10n.php` and `.json` (JavaScript, named after the md5 of `blocks/subpage/index.js`) are generated and committed
+- The bundled files take precedence over the language packs installed in `wp-content/languages/plugins` (those of translate.wordpress.org belong to the original plugin), for the bundled locales only; see `pchap_prefer_bundled_translations()`
 
 To refresh the files after changing strings, from the plugin root:
 
 ```bash
 # 1. Template (reads PHP, JavaScript and block.json)
-wp i18n make-pot . languages/sgr-nextpage-titles.pot --domain=sgr-nextpage-titles \
+wp i18n make-pot . languages/post-chapters.pot --domain=post-chapters \
   --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name=Multipage \
-  --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/sgr-nextpage-titles/issues"}'
+  --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}'
 
 # 2. Merge the new strings into every catalog, drop obsolete entries
 for po in languages/*.po; do
-  msgmerge --quiet --no-wrap --backup=off --update "$po" languages/sgr-nextpage-titles.pot
+  msgmerge --quiet --no-wrap --backup=off --update "$po" languages/post-chapters.pot
   msgattrib --no-obsolete --no-wrap -o "$po" "$po"
 done
 
@@ -167,9 +167,9 @@ French translations follow the French typography rules (non-breaking space befor
 bin/build-zip.sh
 ```
 
-The archive `build/sgr-nextpage-titles.zip` holds one top-level `sgr-nextpage-titles/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `MPP_VERSION` in `sgr-nextpage-titles.php` and `version` in `blocks/subpage/block.json`, and the database version in `Multipage::setup_globals()` when an upgrade routine is added.
+The archive `build/post-chapters.zip` holds one top-level `post-chapters/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `PCHAP_VERSION` in `post-chapters.php` and `version` in `blocks/subpage/block.json`, and the database version in `PChap::setup_globals()` when an upgrade routine is added.
 
-The plugin header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles`, so WordPress never offers to replace this version with the older WordPress.org listing of the same slug (owned by its original author). Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
+The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with the older WordPress.org listing of the same slug (owned by its original author). Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
 
 ## Submitting a Pull Request
 
@@ -181,7 +181,7 @@ The plugin header declares `Update URI: https://github.com/PaulArgoud/sgr-nextpa
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/PaulArgoud/sgr-nextpage-titles/issues)
+- Use [GitHub Issues](https://github.com/PaulArgoud/post-chapters/issues)
 - Include your WordPress version, PHP version, theme, editor (block or classic) and any relevant error messages
 - For display problems, include the post content (Code editor view) or the shortcodes used
 - Describe the steps to reproduce the problem

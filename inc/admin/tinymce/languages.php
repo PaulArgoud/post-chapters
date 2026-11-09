@@ -1,16 +1,16 @@
 <?php
 /**
- * Add Internationalization to Multipage TinyMCE Plugin.
+ * Add Internationalization to Post Chapters TinyMCE Plugin.
  *
  * This file is based on wp-includes/js/tinymce/langs/wp-langs.php
  *
  * Not loaded by the plugin anymore: the TinyMCE strings are added through
- * the 'wp_mce_translation' filter (MPP_Admin::mpp_wp_mce_translation()).
+ * the 'wp_mce_translation' filter (PChap_Admin::pchap_wp_mce_translation()).
  * Kept for backward compatibility only.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.3
- * @deprecated 1.5 Use MPP_Admin::mpp_wp_mce_translation().
+ * @deprecated 1.5 Use PChap_Admin::pchap_wp_mce_translation().
  */
 
 // Exit if accessed directly.
@@ -31,8 +31,8 @@ if ( ! function_exists( 'multipage_tinymce_plugin_translation' ) ) {
 	 */
 	function multipage_tinymce_plugin_translation() {
 		$strings = array(
-			'new_subpage'         => __( 'Start a new Subpage', 'sgr-nextpage-titles' ),
-			'enter_subpage_title' => __( 'Enter the subpage title', 'sgr-nextpage-titles' ),
+			'new_subpage'         => __( 'Start a new chapter', 'post-chapters' ),
+			'enter_subpage_title' => __( 'Enter the chapter title', 'post-chapters' ),
 		);
 
 		$locale     = _WP_Editors::$mce_locale;

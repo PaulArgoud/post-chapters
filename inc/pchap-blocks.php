@@ -1,10 +1,10 @@
 <?php
 /**
- * Multipage Blocks.
+ * Post Chapters Blocks.
  *
  * Registers the "Subpage" block (multipage/subpage) from its block.json.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Blocks
  * @since 1.7.0
  */
@@ -12,9 +12,9 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-if ( ! function_exists( 'mpp_register_blocks' ) ) {
+if ( ! function_exists( 'pchap_register_blocks' ) ) {
 	/**
-	 * Register the Multipage blocks.
+	 * Register the Post Chapters blocks.
 	 *
 	 * Runs on every request (front end, admin, REST) so that the block type
 	 * is known everywhere; the editor script and style are only enqueued by
@@ -24,12 +24,12 @@ if ( ! function_exists( 'mpp_register_blocks' ) ) {
 	 *
 	 * @return void
 	 */
-	function mpp_register_blocks() {
-		if ( ! function_exists( 'register_block_type' ) || ! defined( 'MPP_PLUGIN_DIR' ) ) {
+	function pchap_register_blocks() {
+		if ( ! function_exists( 'register_block_type' ) || ! defined( 'PCHAP_PLUGIN_DIR' ) ) {
 			return;
 		}
 
-		$block_type = register_block_type( MPP_PLUGIN_DIR . 'blocks/subpage' );
+		$block_type = register_block_type( PCHAP_PLUGIN_DIR . 'blocks/subpage' );
 
 		if ( ! $block_type instanceof WP_Block_Type ) {
 			return;
@@ -39,7 +39,7 @@ if ( ! function_exists( 'mpp_register_blocks' ) ) {
 		 * JS translations. No $path on purpose: core resolves the files itself
 		 * (WP_LANG_DIR/plugins first; WP 6.9+ also falls back to the folder
 		 * registered by load_plugin_textdomain()), and
-		 * mpp_load_bundled_script_translation_file() swaps a language pack of
+		 * pchap_load_bundled_script_translation_file() swaps a language pack of
 		 * the original plugin for the bundled file, or provides the bundled
 		 * file as the last resort (6.3 to 6.8 never look into the plugin folder
 		 * by themselves).
@@ -49,21 +49,21 @@ if ( ! function_exists( 'mpp_register_blocks' ) ) {
 			: array( generate_block_asset_handle( 'multipage/subpage', 'editorScript' ) );
 
 		foreach ( $handles as $handle ) {
-			wp_set_script_translations( $handle, 'sgr-nextpage-titles' );
+			wp_set_script_translations( $handle, 'post-chapters' );
 		}
 	}
 }
 
-add_action( 'init', 'mpp_register_blocks' );
+add_action( 'init', 'pchap_register_blocks' );
 
-if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
+if ( ! function_exists( 'pchap_load_bundled_script_translation_file' ) ) {
 	/**
 	 * Use the JS translations bundled in /languages.
 	 *
 	 * Hooked to 'load_script_translation_file', for a script of this plugin that
 	 * uses the plugin text domain only. A file of WP_LANG_DIR/plugins (a language
-	 * pack of the original plugin, see mpp_prefer_bundled_translations()) is
-	 * replaced by the bundled "sgr-nextpage-titles-{locale}-{md5}.json" file of
+	 * pack, see pchap_prefer_bundled_translations()) is
+	 * replaced by the bundled "post-chapters-{locale}-{md5}.json" file of
 	 * the same locale, when there is one. load_script_textdomain() calls
 	 * load_script_translations() with $file = false once every regular location
 	 * failed: the bundled file is then the last resort.
@@ -76,8 +76,8 @@ if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 	 * @param string       $domain The text domain.
 	 * @return string|false Path to the translation file, or the original value.
 	 */
-	function mpp_load_bundled_script_translation_file( $file, $handle, $domain ) {
-		if ( 'sgr-nextpage-titles' !== $domain || ! defined( 'MPP_PLUGIN_DIR' ) || ! defined( 'MPP__PLUGIN_FILE' ) ) {
+	function pchap_load_bundled_script_translation_file( $file, $handle, $domain ) {
+		if ( 'post-chapters' !== $domain || ! defined( 'PCHAP_PLUGIN_DIR' ) || ! defined( 'PCHAP__PLUGIN_FILE' ) ) {
 			return $file;
 		}
 
@@ -94,7 +94,7 @@ if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 		// Path of the script relative to the plugin folder, as core computes it
 		// for the md5 part of the file name (e.g. "blocks/subpage/index.js").
 		$src_path    = (string) wp_parse_url( $wp_scripts->registered[ $handle ]->src, PHP_URL_PATH );
-		$plugin_path = trailingslashit( (string) wp_parse_url( plugins_url( '', MPP__PLUGIN_FILE ), PHP_URL_PATH ) );
+		$plugin_path = trailingslashit( (string) wp_parse_url( plugins_url( '', PCHAP__PLUGIN_FILE ), PHP_URL_PATH ) );
 
 		if ( '' === $src_path || '/' === $plugin_path || 0 !== strpos( $src_path, $plugin_path ) ) {
 			return $file;
@@ -107,18 +107,18 @@ if ( ! function_exists( 'mpp_load_bundled_script_translation_file' ) ) {
 			$relative = substr( $relative, 0, -7 ) . '.js';
 		}
 
-		$basename = 'sgr-nextpage-titles-' . determine_locale() . '-' . md5( $relative ) . '.json';
+		$basename = 'post-chapters-' . determine_locale() . '-' . md5( $relative ) . '.json';
 
 		if ( false === $file ) {
-			$bundled = MPP_PLUGIN_DIR . 'languages/' . $basename;
+			$bundled = PCHAP_PLUGIN_DIR . 'languages/' . $basename;
 			return is_readable( $bundled ) ? $bundled : $file;
 		}
 
-		// A language pack of the original plugin (see mpp_prefer_bundled_translations()).
-		$bundled = mpp_get_bundled_translation_file( $file, $basename );
+		// A language pack of the original plugin (see pchap_prefer_bundled_translations()).
+		$bundled = pchap_get_bundled_translation_file( $file, $basename );
 
 		return '' !== $bundled ? $bundled : $file;
 	}
 }
 
-add_filter( 'load_script_translation_file', 'mpp_load_bundled_script_translation_file', 10, 3 );
+add_filter( 'load_script_translation_file', 'pchap_load_bundled_script_translation_file', 10, 3 );

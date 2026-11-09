@@ -40,7 +40,7 @@ The content before the first subpage becomes the intro page. A subpage without a
 
 = Credits =
 
-Multipage was created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Since version 1.5.13 it has been maintained by Paul Argoud, with the original author credited in the code. Development happens on [GitHub](https://github.com/PaulArgoud/sgr-nextpage-titles).
+Multipage was created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Since version 1.5.13 it has been maintained by Paul Argoud, with the original author credited in the code. Development happens on [GitHub](https://github.com/PaulArgoud/post-chapters).
 
 == Installation ==
 
@@ -48,7 +48,7 @@ Multipage was created by Sergio De Falco (SGr33n, Envire Web Solutions), who dev
 2. Configure the plugin under **Settings > Multipage**.
 3. Add Subpage blocks or `[nextpage title="…"]` shortcodes to your posts.
 
-To install manually, upload the `sgr-nextpage-titles` folder to `/wp-content/plugins/`, then activate **Multipage** in the **Plugins** menu.
+To install manually, upload the `post-chapters` folder to `/wp-content/plugins/`, then activate **Multipage** in the **Plugins** menu.
 
 == Frequently Asked Questions ==
 
@@ -84,7 +84,7 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 Release Date: November 8th, 2026
 
 * Bug fixes:
-	* The bundled French, German, Italian and Spanish translations are now used even when an old language pack of the original plugin is installed (strings such as "Continue:" stayed in English). The `mpp_prefer_bundled_translations` filter gives the language packs precedence back.
+	* The bundled French, German, Italian and Spanish translations are now used even when an old language pack of the original plugin is installed (strings such as "Continue:" stayed in English). The `pchap_prefer_bundled_translations` filter gives the language packs precedence back.
 	* With a persistent object cache (Redis, Memcached), pages are no longer served from a parse made by another build of the same version.
 
 = 1.7.0 =
@@ -118,7 +118,7 @@ Release Date: Jun, 16th, 2021
 * Enhancements:
 	* Compatibility check.
 
-The full history, including older versions and developer notes, is in [CHANGELOG.md](https://github.com/PaulArgoud/sgr-nextpage-titles/blob/main/CHANGELOG.md).
+The full history, including older versions and developer notes, is in [CHANGELOG.md](https://github.com/PaulArgoud/post-chapters/blob/main/CHANGELOG.md).
 
 == Upgrade Notice ==
 

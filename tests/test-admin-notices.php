@@ -2,19 +2,19 @@
 /**
  * Admin notices tests: invalid setting values and subpage index rebuild results.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 // phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited -- The tests set up and restore the settings fields and errors globals.
 
 /**
- * The settings errors added by mpp_sanitize_option() and mpp_admin_rebuild_postmeta_notice().
+ * The settings errors added by pchap_sanitize_option() and pchap_admin_rebuild_postmeta_notice().
  *
  * @group multipage
  * @group admin
  */
-class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
+class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 
 	/**
 	 * Saved $wp_settings_fields.
@@ -32,7 +32,7 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 		parent::set_up();
 
 		require_once ABSPATH . 'wp-admin/includes/template.php';
-		require_once MPP_PLUGIN_DIR . 'inc/admin/admin-advanced-settings.php';
+		require_once PCHAP_PLUGIN_DIR . 'inc/admin/admin-advanced-settings.php';
 
 		$this->saved_fields            = $wp_settings_fields;
 		$GLOBALS['wp_settings_errors'] = array();
@@ -49,15 +49,15 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * Register the settings fields as the admin does (MPP_Admin::register_admin_settings()),
+	 * Register the settings fields as the admin does (PChap_Admin::register_admin_settings()),
 	 * without keeping the settings themselves (their sanitize callbacks are not needed).
 	 */
 	private function register_fields() {
-		$admin = new MPP_Admin();
+		$admin = new PChap_Admin();
 		$admin->register_admin_settings();
 
-		foreach ( array_keys( mpp_get_option_definitions() ) as $option_name ) {
-			$definition = mpp_get_option_definition( $option_name );
+		foreach ( array_keys( pchap_get_option_definitions() ) as $option_name ) {
+			$definition = pchap_get_option_definition( $option_name );
 			unregister_setting( $definition['group'], $option_name );
 		}
 	}
@@ -79,13 +79,13 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 	/**
 	 * The invalid value notice names the setting by its label on the settings screen.
 	 *
-	 * Each test uses its own option: mpp_sanitize_option() reports an option once per request.
+	 * Each test uses its own option: pchap_sanitize_option() reports an option once per request.
 	 */
 	public function test_invalid_value_notice_uses_the_field_label() {
 		$this->register_fields();
 
 		update_option( 'mpp-comments-on-page', 'last-page' );
-		$this->assertSame( 'last-page', mpp_sanitize_option( 'nope', 'mpp-comments-on-page' ) );
+		$this->assertSame( 'last-page', pchap_sanitize_option( 'nope', 'mpp-comments-on-page' ) );
 
 		$errors = $this->errors( 'mpp-comments-on-page' );
 		$this->assertArrayHasKey( 'mpp-invalid-mpp-comments-on-page', $errors );
@@ -102,7 +102,7 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 	public function test_invalid_value_notice_falls_back_to_the_option_name() {
 		$GLOBALS['wp_settings_fields'] = array();
 
-		$this->assertSame( 20, mpp_sanitize_option( 'abc', '_mpp-rewrite-content-priority' ) );
+		$this->assertSame( 20, pchap_sanitize_option( 'abc', '_mpp-rewrite-content-priority' ) );
 
 		$errors = $this->errors( '_mpp-rewrite-content-priority' );
 		$this->assertSame(
@@ -116,17 +116,17 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 	 */
 	public function test_field_label_is_escaped() {
 		$GLOBALS['wp_settings_fields'] = array(
-			'multipage' => array(
-				'mpp_toc' => array(
+			'post-chapters' => array(
+				'pchap_toc' => array(
 					'mpp-hide-intro-title' => array( 'title' => '<b>Intro</b> &amp; "more"' ),
 				),
 			),
 		);
 
-		$this->assertSame( 'Intro & "more"', _mpp_get_option_field_label( 'mpp-hide-intro-title' ) );
+		$this->assertSame( 'Intro & "more"', _pchap_get_option_field_label( 'mpp-hide-intro-title' ) );
 
-		$GLOBALS['wp_settings_fields']['multipage']['mpp_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
-		$this->assertSame( 'mpp-hide-intro-title', _mpp_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
+		$GLOBALS['wp_settings_fields']['post-chapters']['pchap_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
+		$this->assertSame( 'mpp-hide-intro-title', _pchap_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
 	}
 
 	/**
@@ -139,9 +139,9 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 	 * @param string $expected Expected message.
 	 */
 	public function test_rebuild_notice( $query, $type, $expected ) {
-		$_GET = array_merge( array( 'page' => 'mpp-advanced-settings' ), $query );
+		$_GET = array_merge( array( 'page' => 'post-chapters-advanced' ), $query );
 
-		mpp_admin_rebuild_postmeta_notice();
+		pchap_admin_rebuild_postmeta_notice();
 
 		$errors = array_values( $this->errors( 'mpp-rebuild' ) );
 		$this->assertCount( 1, $errors );
@@ -163,7 +163,7 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 					'mpp-deleted'   => '1',
 				),
 				'success',
-				'Subpage index rebuilt: 1 post checked, 1 post updated, 1 stale entry removed.',
+				'Chapter index rebuilt: 1 post checked, 1 post updated, 1 stale entry removed.',
 			),
 			'done, plural'         => array(
 				array(
@@ -173,12 +173,12 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 					'mpp-deleted'   => '0',
 				),
 				'success',
-				'Subpage index rebuilt: 1,234 posts checked, 2 posts updated, 0 stale entries removed.',
+				'Chapter index rebuilt: 1,234 posts checked, 2 posts updated, 0 stale entries removed.',
 			),
 			'done, missing counts' => array(
 				array( 'mpp-rebuild' => 'done' ),
 				'success',
-				'Subpage index rebuilt: 0 posts checked, 0 posts updated, 0 stale entries removed.',
+				'Chapter index rebuilt: 0 posts checked, 0 posts updated, 0 stale entries removed.',
 			),
 			'partial'              => array(
 				array(
@@ -188,12 +188,12 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 					'mpp-deleted'   => '1',
 				),
 				'info',
-				'Subpage index rebuild started: 1 post checked, 0 posts updated, 1 stale entry removed so far. The remaining posts are processed in the background.',
+				'Chapter index rebuild started: 1 post checked, 0 posts updated, 1 stale entry removed so far. The remaining posts are processed in the background.',
 			),
 			'locked'               => array(
 				array( 'mpp-rebuild' => 'locked' ),
 				'warning',
-				'A subpage index rebuild is already running. Please try again in a few minutes.',
+				'A chapter index rebuild is already running. Please try again in a few minutes.',
 			),
 			'negative counts'      => array(
 				array(
@@ -203,7 +203,7 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 					'mpp-deleted'   => '1',
 				),
 				'success',
-				'Subpage index rebuilt: 3 posts checked, 0 posts updated, 1 stale entry removed.',
+				'Chapter index rebuilt: 3 posts checked, 0 posts updated, 1 stale entry removed.',
 			),
 		);
 	}
@@ -217,21 +217,21 @@ class Test_Mpp_Admin_Notices extends Mpp_UnitTestCase {
 				array(),
 				array( 'mpp-rebuild' => 'done' ),
 				array(
-					'page'        => 'multipage',
+					'page'        => 'post-chapters',
 					'mpp-rebuild' => 'done',
 				),
 				array(
-					'page'        => 'mpp-advanced-settings',
+					'page'        => 'post-chapters-advanced',
 					'mpp-rebuild' => 'unknown',
 				),
 				array(
-					'page'        => 'mpp-advanced-settings',
+					'page'        => 'post-chapters-advanced',
 					'mpp-rebuild' => '',
 				),
 			) as $query
 		) {
 			$_GET = $query;
-			mpp_admin_rebuild_postmeta_notice();
+			pchap_admin_rebuild_postmeta_notice();
 			$this->assertSame( array(), get_settings_errors( 'mpp-rebuild' ), wp_json_encode( $query ) );
 		}
 	}

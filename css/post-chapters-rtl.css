@@ -1,9 +1,12 @@
 /*
-Plugin Name: Multipage
-Plugin URI: https://wordpress.org/plugins/sgr-nextpage-titles/
+Plugin Name: Post Chapters
+Plugin URI: https://wordpress.org/plugins/post-chapters/
 Author: Paul ARGOUD
 Author URI: https://paul.argoud.net
 License: GPL v3
+
+Right-to-left version of multipage.css (navigation mirrored; the explicit
+"align left" / "align right" table of contents positions are kept as is).
 */
 
 /**
@@ -48,6 +51,7 @@ License: GPL v3
 	display: table;
 }
 
+/* "Align left" and "align right" are physical positions: not mirrored. */
 .mpp-toc-container.top-left {
 	float: left;
 	margin-top: 0.7rem;
@@ -85,8 +89,8 @@ License: GPL v3
 }
 
 nav.mpp-post-navigation.next-previous .nav-links a[rel="next"] {
-	text-align: right;
-	float: right;
+	text-align: left;
+	float: left;
 }
 
 nav.mpp-post-navigation .nav-links a {
@@ -100,7 +104,7 @@ nav.mpp-post-navigation.next-previous .nav-links a {
 }
 
 nav.mpp-post-navigation.continue {
-	text-align: right;
+	text-align: left;
 }
 
 /**

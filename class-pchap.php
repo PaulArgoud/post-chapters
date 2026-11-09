@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Multipage class: bootstrap, request setup and frontend rendering.
+ * Main Post Chapters class: bootstrap, request setup and frontend rendering.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 0.6
  */
 
@@ -11,11 +11,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Load the Main Multipage Class
+ * Load the Main Post Chapters Class
  *
  * @since 0.6
  */
-class Multipage {
+class PChap {
 
 	/** Versions **************************************************************/
 
@@ -45,7 +45,7 @@ class Multipage {
 	/**
 	 * Admin instance.
 	 *
-	 * @var MPP_Admin|null
+	 * @var PChap_Admin|null
 	 */
 	public $admin = null;
 
@@ -79,21 +79,21 @@ class Multipage {
 	 */
 	public $plugin_url = '';
 
-	/** Multipage Data ********************************************************/
+	/** Post Chapters Data ********************************************************/
 
 	/**
 	 * Subpages of the current post: slug => display title (fallbacks applied), or false.
 	 *
 	 * @var array|false
 	 */
-	public $mpp_data = false;
+	public $pchap_data = false;
 
 	/**
 	 * 0-based index of the current subpage, or false.
 	 *
 	 * @var int|false
 	 */
-	public $mpp_index = false;
+	public $pchap_index = false;
 
 	/**
 	 * Raw value of the "page" query var (0 when absent). See $current_page for the 1-based page.
@@ -121,7 +121,7 @@ class Multipage {
 	 *
 	 * @var string
 	 */
-	public $mpp_pagename = '';
+	public $pchap_pagename = '';
 
 	/**
 	 * ID of the multipage post being viewed (0 when none).
@@ -140,7 +140,7 @@ class Multipage {
 	public $current_page = 1;
 
 	/**
-	 * Parsed pages of the current post (see Multipage_Parser::parse()).
+	 * Parsed pages of the current post (see PChap_Parser::parse()).
 	 *
 	 * @since 1.7.0
 	 * @var array
@@ -176,14 +176,14 @@ class Multipage {
 	private $hooks_registered = false;
 
 	/**
-	 * Re-entrancy guard for mpp_the_content().
+	 * Re-entrancy guard for pchap_the_content().
 	 *
 	 * @var bool
 	 */
 	private $rendering = false;
 
 	/**
-	 * Hashes of the contents produced by mpp_the_content() and of the final the_content
+	 * Hashes of the contents produced by pchap_the_content() and of the final the_content
 	 * outputs it decorated, to never decorate twice.
 	 *
 	 * @var array
@@ -191,7 +191,7 @@ class Multipage {
 	private $rendered_hashes = array();
 
 	/**
-	 * The final the_content outputs decorated by mpp_the_content(), see close_content_run().
+	 * The final the_content outputs decorated by pchap_the_content(), see close_content_run().
 	 *
 	 * @var string[]
 	 */
@@ -201,7 +201,7 @@ class Multipage {
 	 * The the_content runs in progress (innermost last), see open_content_run().
 	 *
 	 * Each entry: 'known' (the input already contains a decorated output) and 'decorated'
-	 * (mpp_the_content() decorated this run).
+	 * (pchap_the_content() decorated this run).
 	 *
 	 * @var array
 	 */
@@ -215,7 +215,7 @@ class Multipage {
 	private $post_content_depth = 0;
 
 	/**
-	 * Main Multipage Instance.
+	 * Main Post Chapters Instance.
 	 *
 	 * @since 1.4
 	 */
@@ -226,7 +226,7 @@ class Multipage {
 
 		// Only run these methods if they haven't been run previously.
 		if ( null === $instance ) {
-			$instance = new Multipage();
+			$instance = new PChap();
 			$instance->constants();
 			$instance->setup_globals();
 			$instance->includes();
@@ -239,7 +239,7 @@ class Multipage {
 	}
 
 	/**
-	 * Use Multipage::instance().
+	 * Use PChap::instance().
 	 */
 	private function __construct() {
 		// Do nothing.
@@ -253,22 +253,22 @@ class Multipage {
 	private function constants() {
 
 		// Path and URL.
-		if ( ! defined( 'MPP_PLUGIN_DIR' ) ) {
-			define( 'MPP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+		if ( ! defined( 'PCHAP_PLUGIN_DIR' ) ) {
+			define( 'PCHAP_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 		}
 
-		if ( ! defined( 'MPP_PLUGIN_URL' ) ) {
-			define( 'MPP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+		if ( ! defined( 'PCHAP_PLUGIN_URL' ) ) {
+			define( 'PCHAP_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 		}
 
 		// MPP pattern constant (kept for backward compatibility; the parser uses its own patterns).
-		if ( ! defined( 'MPP_PATTERN' ) ) {
-			define( 'MPP_PATTERN', '/\[nextpage[^\]]*\]/' );
+		if ( ! defined( 'PCHAP_PATTERN' ) ) {
+			define( 'PCHAP_PATTERN', '/\[nextpage[^\]]*\]/' );
 		}
 
 		// MPP Gutenberg constant (kept for backward compatibility).
-		if ( ! defined( 'MPP_GUTENBERG_PATTERN' ) ) {
-			define( 'MPP_GUTENBERG_PATTERN', '/<!-- wp:multipage\/subpage[\s\S]*?<!-- \/wp:multipage\/subpage -->/' );
+		if ( ! defined( 'PCHAP_GUTENBERG_PATTERN' ) ) {
+			define( 'PCHAP_GUTENBERG_PATTERN', '/<!-- wp:multipage\/subpage[\s\S]*?<!-- \/wp:multipage\/subpage -->/' );
 		}
 	}
 
@@ -281,20 +281,20 @@ class Multipage {
 
 		// Versions.
 
-		$this->version    = MPP_VERSION;
-		$this->db_version = 1700;
+		$this->version    = PCHAP_VERSION;
+		$this->db_version = 2000;
 
 		// Paths.
 
-		$this->file       = MPP_PLUGIN_DIR . 'sgr-nextpage-titles.php';
-		$this->basename   = basename( MPP_PLUGIN_DIR ) . '/sgr-nextpage-titles.php';
-		$this->plugin_dir = MPP_PLUGIN_DIR;
-		$this->plugin_url = MPP_PLUGIN_URL;
+		$this->file       = PCHAP_PLUGIN_DIR . 'post-chapters.php';
+		$this->basename   = basename( PCHAP_PLUGIN_DIR ) . '/post-chapters.php';
+		$this->plugin_dir = PCHAP_PLUGIN_DIR;
+		$this->plugin_url = PCHAP_PLUGIN_URL;
 
-		// Multipage data.
+		// Post Chapters data.
 
-		$this->mpp_data  = false;
-		$this->mpp_index = false;
+		$this->pchap_data  = false;
+		$this->pchap_index = false;
 	}
 
 	/**
@@ -308,21 +308,21 @@ class Multipage {
 
 		// Load the admin.
 		if ( is_admin() ) {
-			add_action( 'init', 'mpp_admin' );
+			add_action( 'init', 'pchap_admin' );
 		}
 
-		require_once $this->plugin_dir . 'classes/class-mpp-admin.php';
-		require_once $this->plugin_dir . 'classes/class-mpp-shortcodes.php';
+		require_once $this->plugin_dir . 'classes/class-pchap-admin.php';
+		require_once $this->plugin_dir . 'classes/class-pchap-shortcodes.php';
 
-		require_once $this->plugin_dir . 'inc/mpp-admin.php';
-		require_once $this->plugin_dir . 'inc/mpp-functions.php';
-		require_once $this->plugin_dir . 'inc/mpp-options.php';
-		require_once $this->plugin_dir . 'inc/mpp-parser.php';
-		require_once $this->plugin_dir . 'inc/mpp-shortcodes.php';
-		require_once $this->plugin_dir . 'inc/mpp-template.php';
-		require_once $this->plugin_dir . 'inc/mpp-update.php';
-		require_once $this->plugin_dir . 'inc/mpp-blocks.php';
-		require_once $this->plugin_dir . 'inc/mpp-cli.php';
+		require_once $this->plugin_dir . 'inc/pchap-admin.php';
+		require_once $this->plugin_dir . 'inc/pchap-functions.php';
+		require_once $this->plugin_dir . 'inc/pchap-options.php';
+		require_once $this->plugin_dir . 'inc/pchap-parser.php';
+		require_once $this->plugin_dir . 'inc/pchap-shortcodes.php';
+		require_once $this->plugin_dir . 'inc/pchap-template.php';
+		require_once $this->plugin_dir . 'inc/pchap-update.php';
+		require_once $this->plugin_dir . 'inc/pchap-blocks.php';
+		require_once $this->plugin_dir . 'inc/pchap-cli.php';
 	}
 
 	/**
@@ -333,11 +333,11 @@ class Multipage {
 	private function setup_actions() {
 
 		// Add actions to plugin activation and deactivation hooks.
-		add_action( 'activate_' . $this->basename, 'mpp_activation' );
-		add_action( 'deactivate_' . $this->basename, 'mpp_deactivation' );
+		add_action( 'activate_' . $this->basename, 'pchap_activation' );
+		add_action( 'deactivate_' . $this->basename, 'pchap_deactivation' );
 
 		// If the plugin is being deactivated, do not add any actions.
-		if ( mpp_is_deactivation( $this->basename ) ) {
+		if ( pchap_is_deactivation( $this->basename ) ) {
 			return;
 		}
 
@@ -345,10 +345,10 @@ class Multipage {
 		add_action( 'save_post', array( $this, 'save_post' ), 10, 1 );
 
 		// Decide whether the requested subpage exists (valid subpages are not 404).
-		add_filter( 'pre_handle_404', array( $this, 'mpp_pre_handle_404' ), 100, 2 );
+		add_filter( 'pre_handle_404', array( $this, 'pchap_pre_handle_404' ), 100, 2 );
 
 		// Prevent WordPress from redirecting valid multipage subpages to the base URL.
-		add_filter( 'redirect_canonical', array( $this, 'mpp_redirect_canonical' ), 10, 2 );
+		add_filter( 'redirect_canonical', array( $this, 'pchap_redirect_canonical' ), 10, 2 );
 	}
 
 	/**
@@ -357,7 +357,7 @@ class Multipage {
 	 * @since 1.5
 	 */
 	private function frontend_init() {
-		add_action( 'wp', array( $this, 'mpp_post' ) );
+		add_action( 'wp', array( $this, 'pchap_post' ) );
 	}
 
 	/**
@@ -415,15 +415,15 @@ class Multipage {
 		$this->max_num_pages = count( $this->pages );
 		$this->is_valid_page = $this->current_page <= $this->max_num_pages;
 
-		$this->mpp_data = array();
+		$this->pchap_data = array();
 		foreach ( $this->pages as $index => $page ) {
-			$this->mpp_data[ $page['slug'] ] = $this->get_display_title( $page, $index + 1 );
+			$this->pchap_data[ $page['slug'] ] = $this->get_display_title( $page, $index + 1 );
 		}
 
 		if ( $this->is_valid_page ) {
-			$this->mpp_index    = $this->current_page - 1;
-			$this->mpp_pagename = $this->pages[ $this->mpp_index ]['slug'];
-			$this->page_title   = $this->mpp_data[ $this->mpp_pagename ];
+			$this->pchap_index    = $this->current_page - 1;
+			$this->pchap_pagename = $this->pages[ $this->pchap_index ]['slug'];
+			$this->page_title     = $this->pchap_data[ $this->pchap_pagename ];
 		}
 
 		return true;
@@ -439,28 +439,28 @@ class Multipage {
 	 * under the same version number.
 	 *
 	 * @since 1.7.0
-	 * @since 1.7.1 The cache key depends on the parser code, not only on MPP_VERSION.
+	 * @since 1.7.1 The cache key depends on the parser code, not only on PCHAP_VERSION.
 	 *
 	 * @param string $content The post content.
-	 * @return array See Multipage_Parser::parse().
+	 * @return array See PChap_Parser::parse().
 	 */
 	private static function parse_content( $content ) {
 		$content = (string) $content;
 
 		// Cheap bail out, before hashing: no plugin marker at all.
 		if ( false === strpos( $content, 'wp:multipage/subpage' ) && false === strpos( $content, '[nextpage' ) ) {
-			return Multipage_Parser::parse( '' );
+			return PChap_Parser::parse( '' );
 		}
 
 		$key    = 'parse-' . self::parser_revision() . '-' . md5( $content );
-		$parsed = wp_cache_get( $key, 'multipage' );
+		$parsed = wp_cache_get( $key, 'post-chapters' );
 
 		if ( is_array( $parsed ) && isset( $parsed['is_multipage'], $parsed['pages'] ) && is_array( $parsed['pages'] ) ) {
 			return $parsed;
 		}
 
-		$parsed = Multipage_Parser::parse( $content );
-		wp_cache_set( $key, $parsed, 'multipage', DAY_IN_SECONDS );
+		$parsed = PChap_Parser::parse( $content );
+		wp_cache_set( $key, $parsed, 'post-chapters', DAY_IN_SECONDS );
 
 		return $parsed;
 	}
@@ -476,8 +476,8 @@ class Multipage {
 		static $revision = null;
 
 		if ( null === $revision ) {
-			$hash     = is_readable( MPP_PLUGIN_DIR . 'inc/mpp-parser.php' ) ? md5_file( MPP_PLUGIN_DIR . 'inc/mpp-parser.php' ) : false;
-			$revision = MPP_VERSION . '-' . ( is_string( $hash ) ? substr( $hash, 0, 12 ) : '0' );
+			$hash     = is_readable( PCHAP_PLUGIN_DIR . 'inc/pchap-parser.php' ) ? md5_file( PCHAP_PLUGIN_DIR . 'inc/pchap-parser.php' ) : false;
+			$revision = PCHAP_VERSION . '-' . ( is_string( $hash ) ? substr( $hash, 0, 12 ) : '0' );
 		}
 
 		return $revision;
@@ -508,17 +508,17 @@ class Multipage {
 	 * @since 1.7.0
 	 */
 	private function reset_data() {
-		$this->is_multipage  = false;
-		$this->is_valid_page = false;
-		$this->post_id       = 0;
-		$this->pages         = array();
-		$this->page          = 0;
-		$this->current_page  = 1;
-		$this->max_num_pages = 0;
-		$this->mpp_data      = false;
-		$this->mpp_index     = false;
-		$this->mpp_pagename  = '';
-		$this->page_title    = '';
+		$this->is_multipage   = false;
+		$this->is_valid_page  = false;
+		$this->post_id        = 0;
+		$this->pages          = array();
+		$this->page           = 0;
+		$this->current_page   = 1;
+		$this->max_num_pages  = 0;
+		$this->pchap_data     = false;
+		$this->pchap_index    = false;
+		$this->pchap_pagename = '';
+		$this->page_title     = '';
 	}
 
 	/**
@@ -532,15 +532,15 @@ class Multipage {
 	 */
 	private function get_display_title( $page, $number ) {
 		if ( 'intro' === $page['kind'] ) {
-			return __( 'Intro', 'sgr-nextpage-titles' );
+			return __( 'Intro', 'post-chapters' );
 		}
 
 		if ( '' !== $page['title'] ) {
 			return $page['title'];
 		}
 
-		/* translators: %d: subpage number. */
-		$title = sprintf( __( 'Page %d', 'sgr-nextpage-titles' ), $number );
+		/* translators: %d: chapter number. */
+		$title = sprintf( __( 'Chapter %d', 'post-chapters' ), $number );
 
 		/**
 		 * Filters the fallback title of an untitled subpage.
@@ -551,11 +551,11 @@ class Multipage {
 		 * @param int    $number The subpage number (1-based).
 		 * @param array  $page   The parsed page.
 		 */
-		return (string) apply_filters( 'mpp_untitled_subpage_title', $title, $number, $page );
+		return (string) pchap_apply_filters( 'pchap_untitled_subpage_title', $title, $number, $page );
 	}
 
 	/**
-	 * Format of a subpage title, for mpp_get_subpage_title_html() and mpp_get_subpage_title_text().
+	 * Format of a subpage title, for pchap_get_subpage_title_html() and pchap_get_subpage_title_text().
 	 *
 	 * Classic [nextpage] titles may be raw text ('text'); block titles are HTML-encoded
 	 * RichText strings, and so are the translated fallbacks ('html').
@@ -583,7 +583,7 @@ class Multipage {
 	 * @return string 'html' or 'text'.
 	 */
 	private function get_current_title_format() {
-		return false === $this->mpp_index ? 'html' : $this->get_title_format( $this->mpp_index );
+		return false === $this->pchap_index ? 'html' : $this->get_title_format( $this->pchap_index );
 	}
 
 	/**
@@ -616,7 +616,7 @@ class Multipage {
 	 *
 	 * @since 1.5
 	 */
-	public function mpp_post() {
+	public function pchap_post() {
 		if ( $this->hooks_registered ) {
 			return;
 		}
@@ -639,7 +639,7 @@ class Multipage {
 
 		// Rebuild the content so that WordPress' own splitting yields exactly our pages.
 		// $wp_query->post, $wp_query->posts[0] and the global $post are the same object.
-		$post->post_content = Multipage_Parser::build_paginated_content( $this->pages );
+		$post->post_content = PChap_Parser::build_paginated_content( $this->pages );
 
 		$this->hooks_registered = true;
 
@@ -647,7 +647,7 @@ class Multipage {
 		add_filter( 'content_pagination', array( $this, 'filter_content_pagination' ), 10, 2 );
 
 		// Check whether or not to hide the standard WordPress pagination.
-		if ( mpp_disable_standard_pagination() ) {
+		if ( pchap_disable_standard_pagination() ) {
 			add_filter( 'wp_link_pages_args', array( $this, 'hide_standard_pagination' ) );
 			add_filter( 'wp_link_pages', array( $this, 'filter_wp_link_pages' ) );
 		}
@@ -660,16 +660,16 @@ class Multipage {
 
 		// Change the document title only if it's not the first page.
 		if ( $this->current_page > 1 ) {
-			add_filter( 'document_title_parts', array( $this, 'mpp_document_title_parts' ), mpp_get_rewrite_title_priority(), 1 );
+			add_filter( 'document_title_parts', array( $this, 'pchap_document_title_parts' ), pchap_get_rewrite_title_priority(), 1 );
 		}
 
 		add_filter( 'the_content', array( $this, 'open_content_run' ), PHP_INT_MIN, 1 );
-		add_filter( 'the_content', array( $this, 'mpp_the_content' ), mpp_get_rewrite_content_priority(), 1 );
+		add_filter( 'the_content', array( $this, 'pchap_the_content' ), pchap_get_rewrite_content_priority(), 1 );
 		add_filter( 'the_content', array( $this, 'close_content_run' ), PHP_INT_MAX, 1 );
 		add_filter( 'pre_render_block', array( $this, 'track_post_content_block' ), PHP_INT_MAX, 2 );
 		add_filter( 'render_block_core/post-content', array( $this, 'untrack_post_content_block' ), PHP_INT_MAX, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-		add_action( 'wp_head', array( $this, 'mpp_rel_links' ) );
+		add_action( 'wp_head', array( $this, 'pchap_rel_links' ) );
 
 		$this->register_seo_integrations();
 	}
@@ -705,7 +705,7 @@ class Multipage {
 	 *
 	 * @since 1.5.13
 	 */
-	public function mpp_rel_links() {
+	public function pchap_rel_links() {
 		if ( ! $this->is_multipage_view() || ! is_singular() ) {
 			return;
 		}
@@ -714,11 +714,11 @@ class Multipage {
 		$num_pages    = $this->max_num_pages;
 
 		if ( $current_page > 1 ) {
-			echo '<link rel="prev" href="' . esc_url( _mpp_link_page_url( $current_page - 1, '', $this->post_id ) ) . '" />' . "\n";
+			echo '<link rel="prev" href="' . esc_url( _pchap_link_page_url( $current_page - 1, '', $this->post_id ) ) . '" />' . "\n";
 		}
 
 		if ( $current_page < $num_pages ) {
-			echo '<link rel="next" href="' . esc_url( _mpp_link_page_url( $current_page + 1, '', $this->post_id ) ) . '" />' . "\n";
+			echo '<link rel="next" href="' . esc_url( _pchap_link_page_url( $current_page + 1, '', $this->post_id ) ) . '" />' . "\n";
 		}
 	}
 
@@ -741,7 +741,7 @@ class Multipage {
 			return;
 		}
 
-		$_mpp_data = Multipage_Parser::multipage_return_array( $post->post_content );
+		$_mpp_data = PChap_Parser::multipage_return_array( $post->post_content );
 
 		if ( empty( $_mpp_data ) ) {
 			delete_post_meta( $post_id, $key );
@@ -754,17 +754,17 @@ class Multipage {
 	}
 
 	/**
-	 * Delegates to Multipage_Parser.
+	 * Delegates to PChap_Parser.
 	 *
-	 * @deprecated 1.5.14 Use Multipage_Parser::multipage_return_array() directly.
+	 * @deprecated 1.5.14 Use PChap_Parser::multipage_return_array() directly.
 	 *
 	 * @param string $content The post content.
 	 * @return array|false
 	 */
 	public static function multipage_return_array( $content ) {
-		_deprecated_function( __METHOD__, '1.5.14', 'Multipage_Parser::multipage_return_array()' );
+		_deprecated_function( __METHOD__, '1.5.14', 'PChap_Parser::multipage_return_array()' );
 
-		return Multipage_Parser::multipage_return_array( $content );
+		return PChap_Parser::multipage_return_array( $content );
 	}
 
 	/**
@@ -837,7 +837,7 @@ class Multipage {
 	}
 
 	/**
-	 * Filter the document title for Multipage pages.
+	 * Filter the document title for Post Chapters pages.
 	 *
 	 * No longer hooked: SEO plugins are handled by dedicated integrations
 	 * (see register_seo_integrations()). Kept for backward compatibility.
@@ -850,26 +850,26 @@ class Multipage {
 	 * @param string $title Original page title.
 	 * @return string The title, unchanged.
 	 */
-	public function mpp_the_title( $title ) {
+	public function pchap_the_title( $title ) {
 		return $title;
 	}
 
 	/**
-	 * Filter the document title for Multipage pages.
+	 * Filter the document title for Post Chapters pages.
 	 *
 	 * Replaces the core "Page N" part with the subpage title (plain text) on subpages >= 2.
 	 *
 	 * @since 1.4
 	 *
 	 * @param array $title The WordPress document title parts.
-	 * @return array the title parts modified by Multipage.
+	 * @return array the title parts modified by Post Chapters.
 	 */
-	public function mpp_document_title_parts( $title ) {
+	public function pchap_document_title_parts( $title ) {
 		if ( ! is_array( $title ) || ! $this->is_multipage_view() || $this->get_current_page() < 2 ) {
 			return $title;
 		}
 
-		$text = mpp_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
+		$text = pchap_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
 		if ( '' !== $text ) {
 			$title['page'] = $text;
 		}
@@ -901,7 +901,7 @@ class Multipage {
 			return '';
 		}
 
-		return mpp_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
+		return pchap_get_subpage_title_text( $this->page_title, $this->get_current_title_format() );
 	}
 
 	/**
@@ -1021,7 +1021,7 @@ class Multipage {
 	}
 
 	/**
-	 * Yoast SEO: drop its rel prev/next on the multipage post (mpp_rel_links() prints them).
+	 * Yoast SEO: drop its rel prev/next on the multipage post (pchap_rel_links() prints them).
 	 *
 	 * @since 1.7.0
 	 *
@@ -1062,13 +1062,13 @@ class Multipage {
 			return $canonical;
 		}
 
-		$url = _mpp_link_page_url( $this->get_current_page(), '', $this->post_id );
+		$url = _pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
 
 		return '' !== $url ? $url : $canonical;
 	}
 
 	/**
-	 * Rank Math: disable its rel prev/next on the multipage post (mpp_rel_links() prints them).
+	 * Rank Math: disable its rel prev/next on the multipage post (pchap_rel_links() prints them).
 	 *
 	 * @since 1.7.0
 	 *
@@ -1161,7 +1161,7 @@ class Multipage {
 	 *
 	 * Remembers whether the input is a final the_content output that was already
 	 * decorated: themes and page builders sometimes apply the_content to rendered HTML,
-	 * which the filters running before mpp_the_content() (wpautop, wptexturize...) alter
+	 * which the filters running before pchap_the_content() (wpautop, wptexturize...) alter
 	 * again, so only the run's original input can be recognized.
 	 *
 	 * @since 1.7.0
@@ -1281,14 +1281,14 @@ class Multipage {
 	}
 
 	/**
-	 * Filter the WordPress post content for Multipage pages.
+	 * Filter the WordPress post content for Post Chapters pages.
 	 *
 	 * @since 0.6
 	 *
 	 * @param string $content Original page content.
-	 * @return string the content enhanced by Multipage.
+	 * @return string the content enhanced by Post Chapters.
 	 */
-	public function mpp_the_content( $content ) {
+	public function pchap_the_content( $content ) {
 		// Table of contents should not be the only content in the post.
 		if ( ! is_string( $content ) || '' === $content ) {
 			return $content;
@@ -1323,7 +1323,7 @@ class Multipage {
 	}
 
 	/**
-	 * Remove the empty-page placeholder (see Multipage_Parser::EMPTY_PAGE_PLACEHOLDER).
+	 * Remove the empty-page placeholder (see PChap_Parser::EMPTY_PAGE_PLACEHOLDER).
 	 *
 	 * The placeholder is an HTML comment that keeps a titled subpage without body alive
 	 * through WordPress' splitting; it may have been wrapped in a paragraph by wpautop().
@@ -1334,13 +1334,13 @@ class Multipage {
 	 * @return string
 	 */
 	private static function strip_empty_page_placeholder( $content ) {
-		if ( false === strpos( $content, Multipage_Parser::EMPTY_PAGE_PLACEHOLDER ) ) {
+		if ( false === strpos( $content, PChap_Parser::EMPTY_PAGE_PLACEHOLDER ) ) {
 			return $content;
 		}
 
-		$stripped = preg_replace( '#(?:<p>\s*)?' . preg_quote( Multipage_Parser::EMPTY_PAGE_PLACEHOLDER, '#' ) . '(?:\s*</p>)?\s*#', '', $content );
+		$stripped = preg_replace( '#(?:<p>\s*)?' . preg_quote( PChap_Parser::EMPTY_PAGE_PLACEHOLDER, '#' ) . '(?:\s*</p>)?\s*#', '', $content );
 
-		return null === $stripped ? str_replace( Multipage_Parser::EMPTY_PAGE_PLACEHOLDER, '', $content ) : $stripped;
+		return null === $stripped ? str_replace( PChap_Parser::EMPTY_PAGE_PLACEHOLDER, '', $content ) : $stripped;
 	}
 
 	/**
@@ -1361,19 +1361,19 @@ class Multipage {
 		 *
 		 * @param string $template The template, `%s` is replaced by the title HTML.
 		 */
-		$page_title_template = apply_filters( 'mpp_page_title_template', '<h2>%s</h2>' );
+		$page_title_template = pchap_apply_filters( 'pchap_page_title_template', '<h2>%s</h2>' );
 
 		$is_intro   = 1 === $current_page && ! empty( $this->pages ) && 'intro' === $this->pages[0]['kind'];
-		$page_title = mpp_hide_intro_title() && $is_intro ? '' : sprintf( (string) $page_title_template, mpp_get_subpage_title_html( $this->page_title, $this->get_current_title_format() ) );
+		$page_title = pchap_hide_intro_title() && $is_intro ? '' : sprintf( (string) $page_title_template, pchap_get_subpage_title_html( $this->page_title, $this->get_current_title_format() ) );
 
-		$toc_labels   = mpp_get_toc_row_labels();
-		$toc_position = mpp_get_toc_position();
+		$toc_labels   = pchap_get_toc_row_labels();
+		$toc_position = pchap_get_toc_position();
 
 		switch ( $toc_labels ) {
 			case 'page':
 				$toc_row_separator = ': ';
-				/* translators: %: subpage number (literal percent sign, replaced by the number). */
-				$toc_row_pagelink = esc_html__( 'Page %', 'sgr-nextpage-titles' );
+				/* translators: %: chapter number (literal percent sign, replaced by the number). */
+				$toc_row_pagelink = esc_html__( 'Chapter %', 'post-chapters' );
 				break;
 			case 'hidden':
 				$toc_row_separator = '';
@@ -1385,12 +1385,12 @@ class Multipage {
 				break;
 		}
 
-		$continue_or_prev_next = mpp_get_continue_or_prev_next();
+		$continue_or_prev_next = pchap_get_continue_or_prev_next();
 		if ( 'hidden' !== $continue_or_prev_next ) {
-			$navigation = mpp_link_pages(
+			$navigation = pchap_link_pages(
 				$this,
 				array(
-					'before'                => '<nav class="mpp-post-navigation ' . sanitize_html_class( $continue_or_prev_next ) . '" aria-label="' . esc_attr__( 'Subpage navigation', 'sgr-nextpage-titles' ) . '"><div class="nav-links">',
+					'before'                => '<nav class="mpp-post-navigation ' . sanitize_html_class( $continue_or_prev_next ) . '" aria-label="' . esc_attr__( 'Chapter navigation', 'post-chapters' ) . '"><div class="nav-links">',
 					'after'                 => '</div></nav>',
 					'continue_or_prev_next' => $continue_or_prev_next,
 				)
@@ -1401,16 +1401,16 @@ class Multipage {
 
 		// Get comments link.
 		$comments_link = '';
-		if ( mpp_comments_toc_link() ) {
-			switch ( mpp_get_comments_on_page() ) {
+		if ( pchap_comments_toc_link() ) {
+			switch ( pchap_get_comments_on_page() ) {
 				case 'all':
 					$comments_link = '<a href="#comments">';
 					break;
 				case 'first-page':
-					$comments_link = _mpp_link_page( 1, '', 'comments' );
+					$comments_link = _pchap_link_page( 1, '', 'comments' );
 					break;
 				case 'last-page':
-					$comments_link = _mpp_link_page( $this->max_num_pages, '', 'comments' );
+					$comments_link = _pchap_link_page( $this->max_num_pages, '', 'comments' );
 					break;
 				default:
 					$comments_link = '';
@@ -1418,13 +1418,13 @@ class Multipage {
 			}
 		}
 
-		$toc = mpp_toc(
+		$toc = pchap_toc(
 			$this,
 			array(
-				'hide_header' => mpp_hide_toc_header(),
+				'hide_header' => pchap_hide_toc_header(),
 				'comments'    => $comments_link,
 				'position'    => $toc_position,
-				'before'      => '<nav class="mpp-toc toc" aria-label="' . esc_attr__( 'Table of contents', 'sgr-nextpage-titles' ) . '"><ul>',
+				'before'      => '<nav class="mpp-toc toc" aria-label="' . esc_attr__( 'Table of contents', 'post-chapters' ) . '"><ul>',
 				'after'       => '</ul></nav>',
 				'separator'   => $toc_row_separator,
 				'pagelink'    => $toc_row_pagelink,
@@ -1435,7 +1435,7 @@ class Multipage {
 		$output = $page_title;
 
 		// Add the table of contents.
-		$show_toc = 'hidden' !== $toc_position && ! ( mpp_toc_only_on_the_first_page() && $current_page > 1 );
+		$show_toc = 'hidden' !== $toc_position && ! ( pchap_toc_only_on_the_first_page() && $current_page > 1 );
 
 		if ( ! $show_toc ) {
 			$output .= $content;
@@ -1455,7 +1455,7 @@ class Multipage {
 		 * @param string $toc        The table of contents HTML.
 		 * @param string $content    The original content.
 		 */
-		$output = apply_filters( 'mpp_the_content', $output, $page_title, $toc, $content );
+		$output = pchap_apply_filters( 'pchap_the_content', $output, $page_title, $toc, $content );
 
 		// Add the page navigation.
 		$output .= $navigation;
@@ -1473,7 +1473,7 @@ class Multipage {
 	public function comments_allowed_on_current_page() {
 		$current_page = $this->get_current_page();
 
-		switch ( mpp_get_comments_on_page() ) {
+		switch ( pchap_get_comments_on_page() ) {
 			case 'first-page':
 				return 1 === $current_page;
 			case 'last-page':
@@ -1490,7 +1490,7 @@ class Multipage {
 	 */
 	public function hide_comments() {
 		// Return an empty file.
-		return MPP_PLUGIN_DIR . 'index.php';
+		return PCHAP_PLUGIN_DIR . 'index.php';
 	}
 
 	/**
@@ -1514,8 +1514,8 @@ class Multipage {
 		 *
 		 * @param string[] $block_names Block names.
 		 */
-		$block_names = (array) apply_filters(
-			'mpp_comment_block_names',
+		$block_names = (array) pchap_apply_filters(
+			'pchap_comment_block_names',
 			array(
 				'core/comments',
 				'core/post-comments',
@@ -1541,35 +1541,51 @@ class Multipage {
 	/**
 	 * Styles applied to public-facing pages
 	 *
+	 * A theme can override the stylesheet with css/post-chapters[-rtl][.min].css
+	 * (child theme first, then parent theme). In each theme, the
+	 * css/multipage[-rtl][.min].css name used by Multipage is still honoured,
+	 * after the new one.
+	 *
 	 * @since 0.6
+	 * @since 2.0.0 Looks for css/post-chapters*.css first, css/multipage*.css as a fallback.
 	 */
 	public function enqueue_styles() {
 		// Use minified libraries if SCRIPT_DEBUG is turned off.
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
+		$rtl    = is_rtl() ? '-rtl' : '';
 
-		// LTR or RTL.
-		$file = ( is_rtl() ? 'css/multipage-rtl' : 'css/multipage' ) . $suffix . '.css';
+		$file     = 'css/post-chapters' . $rtl . $suffix . '.css';
+		$location = '';
+		$handle   = '';
 
-		if ( file_exists( trailingslashit( get_stylesheet_directory() ) . $file ) ) {
-			// Child theme.
-			$location = trailingslashit( get_stylesheet_directory_uri() );
-			$handle   = get_stylesheet() . '-multipage';
-		} elseif ( file_exists( trailingslashit( get_template_directory() ) . $file ) ) {
-			// Parent theme.
-			$location = trailingslashit( get_template_directory_uri() );
-			$handle   = get_template() . '-multipage';
-		} else {
-			// Multipage Plugin Default Style.
-			$location = trailingslashit( MPP_PLUGIN_URL );
-			$handle   = 'multipage';
-
-			// Never point to a missing file.
-			if ( ! file_exists( MPP_PLUGIN_DIR . $file ) ) {
-				$file = 'css/multipage' . $suffix . '.css';
+		$themes = array(
+			array( get_stylesheet_directory(), get_stylesheet_directory_uri(), get_stylesheet() ),
+			array( get_template_directory(), get_template_directory_uri(), get_template() ),
+		);
+		foreach ( $themes as $theme ) {
+			foreach ( array( 'post-chapters', 'multipage' ) as $basename ) {
+				$candidate = 'css/' . $basename . $rtl . $suffix . '.css';
+				if ( file_exists( trailingslashit( $theme[0] ) . $candidate ) ) {
+					$file     = $candidate;
+					$location = trailingslashit( $theme[1] );
+					$handle   = $theme[2] . '-post-chapters';
+					break 2;
+				}
 			}
 		}
 
-		// Enqueue the Multipage Plugin styling.
+		if ( '' === $location ) {
+			// Post Chapters default style.
+			$location = trailingslashit( PCHAP_PLUGIN_URL );
+			$handle   = 'post-chapters';
+
+			// Never point to a missing file.
+			if ( ! file_exists( PCHAP_PLUGIN_DIR . $file ) ) {
+				$file = 'css/post-chapters' . $suffix . '.css';
+			}
+		}
+
+		// Enqueue the Post Chapters styling.
 		wp_enqueue_style( $handle, $location . $file, array(), $this->version, 'screen' );
 	}
 
@@ -1587,14 +1603,14 @@ class Multipage {
 	 * @param string $requested_url The requested URL.
 	 * @return string|false The redirect URL, or false to cancel the redirect.
 	 */
-	public function mpp_redirect_canonical( $redirect_url, $requested_url ) {
+	public function pchap_redirect_canonical( $redirect_url, $requested_url ) {
 		unset( $requested_url );
 
 		if ( ! $redirect_url || ! $this->setup() || ! $this->is_valid_page || $this->get_current_page() < 2 ) {
 			return $redirect_url;
 		}
 
-		$expected = _mpp_link_page_url( $this->get_current_page(), '', $this->post_id );
+		$expected = _pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
 
 		if ( '' !== $expected && self::is_same_page_url( $redirect_url, $expected ) ) {
 			return $redirect_url;
@@ -1648,7 +1664,7 @@ class Multipage {
 	 * @param WP_Query $wp_query WordPress Query object.
 	 * @return bool Whether to short-circuit default header status handling.
 	 */
-	public function mpp_pre_handle_404( $preempt, $wp_query ) {
+	public function pchap_pre_handle_404( $preempt, $wp_query ) {
 		if ( ! $this->setup( $wp_query ) ) {
 			return $preempt;
 		}

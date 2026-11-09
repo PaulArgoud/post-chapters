@@ -4,7 +4,7 @@
  *
  * Read by register_block_type() for the block.json "editorScript" field.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.7.0
  */
 
@@ -19,5 +19,5 @@ return array(
 		'wp-i18n',
 		'wp-primitives',
 	),
-	'version'      => defined( 'MPP_VERSION' ) ? MPP_VERSION : '1.7.1',
+	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.0.0',
 );

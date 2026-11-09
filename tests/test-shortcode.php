@@ -2,10 +2,10 @@
 /**
  * [nextpage] shortcode tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * The [nextpage] shortcode where the content is not split (feeds, REST, do_shortcode()).
@@ -13,7 +13,7 @@
  * @group multipage
  * @group shortcode
  */
-class Test_Mpp_Shortcode extends Mpp_UnitTestCase {
+class Test_PChap_Shortcode extends PChap_UnitTestCase {
 
 	/**
 	 * Classic multipage content.
@@ -31,7 +31,7 @@ class Test_Mpp_Shortcode extends Mpp_UnitTestCase {
 		$this->assertSame( 'ab', do_shortcode( 'a[nextpage]b' ) );
 		$this->assertSame( 'a<!--nextpage-->b', do_shortcode( 'a<!--nextpage-->b' ), 'Core breaks untouched.' );
 		$this->assertSame( 'a[nextpage title="X"]b', do_shortcode( 'a[[nextpage title="X"]]b' ), 'Escaped shortcode displayed literally.' );
-		$this->assertSame( '', Multipage_Plugin_Shortcodes::nextpage( array( 'title' => 'X' ), null ) );
+		$this->assertSame( '', PChap_Shortcodes::nextpage( array( 'title' => 'X' ), null ) );
 	}
 
 	/**
@@ -76,7 +76,7 @@ class Test_Mpp_Shortcode extends Mpp_UnitTestCase {
 		$this->reset_multipage();
 		$this->go_to( home_url( '/?feed=rss2' ) );
 		$this->assertTrue( is_feed() );
-		$this->assertFalse( multipage()->is_multipage_view() );
+		$this->assertFalse( pchap()->is_multipage_view() );
 
 		$query = new WP_Query( array( 'p' => $post_id ) );
 		$query->the_post();
@@ -92,7 +92,7 @@ class Test_Mpp_Shortcode extends Mpp_UnitTestCase {
 	 * Block content with the saved shortcode, rendered outside a multipage view.
 	 */
 	public function test_block_content_outside_multipage_view() {
-		$html = apply_filters( 'the_content', Mpp_Test_Corpus::items()['blocks 1.7']['content'] );
+		$html = apply_filters( 'the_content', PChap_Test_Corpus::items()['blocks 1.7']['content'] );
 
 		$this->assertStringContainsString( 'BODY-2', $html );
 		$this->assertStringNotContainsString( '[nextpage', $html );

@@ -1,14 +1,14 @@
 <?php
 /**
- * Content corpus shared by the Multipage tests.
+ * Content corpus shared by the Post Chapters tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Multipage post contents, as saved by the classic editor, the block editor
+ * Post Chapters post contents, as saved by the classic editor, the block editor
  * (1.7 and legacy 1.6 serializations) and by hand, with the expected pages.
  *
  * Every item gives:
@@ -18,7 +18,7 @@
  *
  * The content of page N contains the marker "BODY-N" and no other BODY marker.
  */
-class Mpp_Test_Corpus {
+class PChap_Test_Corpus {
 
 	/**
 	 * Subpage block, as serialized by the 1.6 and 1.7 block editors.
@@ -96,7 +96,7 @@ class Mpp_Test_Corpus {
 			),
 			'classic untitled shortcodes'          => array(
 				'content' => "BODY-1\n\n[nextpage]\n\nBODY-2\n\n[nextpage title=\"\"]\n\nBODY-3",
-				'titles'  => array( 'Intro', 'Page 2', 'Page 3' ),
+				'titles'  => array( 'Intro', 'Chapter 2', 'Chapter 3' ),
 				'kinds'   => array( 'intro', 'shortcode', 'shortcode' ),
 			),
 			'classic CRLF'                         => array(
@@ -131,7 +131,7 @@ class Mpp_Test_Corpus {
 			),
 			'blocks legacy default title false'    => array(
 				'content' => call_user_func( $p, 'BODY-1' ) . "\n\n" . call_user_func( $b, null ) . "\n\n" . call_user_func( $p, 'BODY-2' ) . "\n\n" . call_user_func( $b, null ) . "\n\n" . call_user_func( $p, 'BODY-3' ),
-				'titles'  => array( 'Intro', 'Page 2', 'Page 3' ),
+				'titles'  => array( 'Intro', 'Chapter 2', 'Chapter 3' ),
 				'kinds'   => array( 'intro', 'block', 'block' ),
 			),
 			'blocks self-closing'                  => array(
@@ -161,12 +161,12 @@ class Mpp_Test_Corpus {
 			),
 			'mixed blocks shortcodes core breaks'  => array(
 				'content' => call_user_func( $p, 'BODY-1' ) . "\n\n" . call_user_func( $b, 'Bloc' ) . "\n\n" . call_user_func( $p, 'BODY-2' ) . "\n\n<!-- wp:shortcode -->\n[nextpage title=\"Code\"]\n<!-- /wp:shortcode -->\n\n" . call_user_func( $p, 'BODY-3' ) . "\n\n<!-- wp:nextpage -->\n<!--nextpage-->\n<!-- /wp:nextpage -->\n\n" . call_user_func( $p, 'BODY-4' ),
-				'titles'  => array( 'Intro', 'Bloc', 'Code', 'Page 4' ),
+				'titles'  => array( 'Intro', 'Bloc', 'Code', 'Chapter 4' ),
 				'kinds'   => array( 'intro', 'block', 'shortcode', 'core' ),
 			),
 			'classic shortcodes and core breaks'   => array(
 				'content' => "BODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2\n\n<!--nextpage-->\n\nBODY-3",
-				'titles'  => array( 'Intro', 'Deux', 'Page 3' ),
+				'titles'  => array( 'Intro', 'Deux', 'Chapter 3' ),
 				'kinds'   => array( 'intro', 'shortcode', 'core' ),
 			),
 		);

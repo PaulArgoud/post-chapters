@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-	PHPUnit configuration for the Multipage plugin.
+	PHPUnit configuration for the Post Chapters plugin.
 
 	The tests need the WordPress PHPUnit test library: run them inside the
 	wp-env "tests-cli" container, e.g. "composer test:wp-env" once

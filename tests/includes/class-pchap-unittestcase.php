@@ -1,29 +1,29 @@
 <?php
 /**
- * Base test case of the Multipage test suite.
+ * Base test case of the Post Chapters test suite.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Shared helpers: resets the Multipage singleton between requests, creates
+ * Shared helpers: resets the Post Chapters singleton between requests, creates
  * posts, simulates front-end requests and renders the main loop.
  *
- * The Multipage instance is a singleton that keeps per-request state (one
+ * The Post Chapters instance is a singleton that keeps per-request state (one
  * PHP process = one request in production). The test suite runs many
  * requests in one process, so the state and the hooks registered by
- * Multipage::mpp_post() are reset before every simulated request.
+ * PChap::pchap_post() are reset before every simulated request.
  */
-abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
+abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 
 	/**
-	 * Multipage methods hooked once at boot (kept when the request state is reset).
+	 * Post Chapters methods hooked once at boot (kept when the request state is reset).
 	 *
 	 * @var string[]
 	 */
-	private static $boot_methods = array( 'save_post', 'mpp_pre_handle_404', 'mpp_redirect_canonical', 'mpp_post' );
+	private static $boot_methods = array( 'save_post', 'pchap_pre_handle_404', 'pchap_redirect_canonical', 'pchap_post' );
 
 	/**
 	 * Reset the plugin state before each test.
@@ -31,8 +31,8 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->reset_multipage();
-		mpp_clear_options_cache();
-		_mpp_rebuild_held_lock( false );
+		pchap_clear_options_cache();
+		_pchap_rebuild_held_lock( false );
 	}
 
 	/**
@@ -43,20 +43,20 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		$this->reset_multipage();
-		mpp_clear_options_cache();
-		_mpp_rebuild_held_lock( false );
+		pchap_clear_options_cache();
+		_pchap_rebuild_held_lock( false );
 		parent::tear_down();
-		mpp_clear_options_cache();
+		pchap_clear_options_cache();
 	}
 
 	/**
-	 * Reset the per-request state of the Multipage singleton and remove the
-	 * hooks registered by Multipage::mpp_post().
+	 * Reset the per-request state of the Post Chapters singleton and remove the
+	 * hooks registered by PChap::pchap_post().
 	 */
 	protected function reset_multipage() {
 		global $wp_filter;
 
-		$mpp = multipage();
+		$mpp = pchap();
 		$ref = new ReflectionObject( $mpp );
 
 		$private = array(
@@ -131,7 +131,7 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 
 		$args = array_merge(
 			array(
-				'post_title'   => 'Multipage test post',
+				'post_title'   => 'Post Chapters test post',
 				'post_status'  => 'publish',
 				'post_type'    => 'post',
 				'post_author'  => $admin_id,
@@ -213,7 +213,7 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Update several Multipage options.
+	 * Update several Post Chapters options.
 	 *
 	 * @param array $options Option name => value.
 	 */
@@ -221,7 +221,7 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 		foreach ( $options as $name => $value ) {
 			update_option( $name, $value );
 		}
-		mpp_clear_options_cache();
+		pchap_clear_options_cache();
 	}
 
 	/**
@@ -249,7 +249,7 @@ abstract class Mpp_UnitTestCase extends WP_UnitTestCase {
 	 * @return string[]
 	 */
 	protected function current_display_titles() {
-		$data = multipage()->mpp_data;
+		$data = pchap()->pchap_data;
 
 		return is_array( $data ) ? array_values( $data ) : array();
 	}

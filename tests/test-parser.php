@@ -1,24 +1,24 @@
 <?php
 /**
- * Tests of Multipage_Parser.
+ * Tests of PChap_Parser.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Multipage_Parser::parse(), multipage_return_array() and build_paginated_content().
+ * PChap_Parser::parse(), multipage_return_array() and build_paginated_content().
  *
  * @group multipage
  * @group parser
  */
-class Test_Mpp_Parser extends Mpp_UnitTestCase {
+class Test_PChap_Parser extends PChap_UnitTestCase {
 
 	/**
 	 * Titles of the parsed pages.
 	 *
-	 * @param array $parsed Result of Multipage_Parser::parse().
+	 * @param array $parsed Result of PChap_Parser::parse().
 	 * @return string[]
 	 */
 	private function titles( $parsed ) {
@@ -28,7 +28,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	/**
 	 * Slugs of the parsed pages.
 	 *
-	 * @param array $parsed Result of Multipage_Parser::parse().
+	 * @param array $parsed Result of PChap_Parser::parse().
 	 * @return string[]
 	 */
 	private function slugs( $parsed ) {
@@ -38,7 +38,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	/**
 	 * Kinds of the parsed pages.
 	 *
-	 * @param array $parsed Result of Multipage_Parser::parse().
+	 * @param array $parsed Result of PChap_Parser::parse().
 	 * @return string[]
 	 */
 	private function kinds( $parsed ) {
@@ -52,7 +52,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 */
 	public function data_corpus() {
 		$data = array();
-		foreach ( Mpp_Test_Corpus::items() as $name => $item ) {
+		foreach ( PChap_Test_Corpus::items() as $name => $item ) {
 			$data[ $name ] = array( $item['content'], $item['titles'], $item['kinds'] );
 		}
 		return $data;
@@ -68,7 +68,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * @param string[] $kinds   Expected kinds.
 	 */
 	public function test_corpus_pages( $content, $titles, $kinds ) {
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertTrue( $parsed['is_multipage'] );
 		$this->assertSame( $kinds, $this->kinds( $parsed ), 'Page kinds.' );
@@ -105,8 +105,8 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * @param string $content Post content.
 	 */
 	public function test_build_paginated_content_round_trips_through_wordpress_split( $content ) {
-		$parsed = Multipage_Parser::parse( $content );
-		$built  = Multipage_Parser::build_paginated_content( $parsed['pages'] );
+		$parsed = PChap_Parser::parse( $content );
+		$built  = PChap_Parser::build_paginated_content( $parsed['pages'] );
 
 		$post = new WP_Post(
 			(object) array(
@@ -129,9 +129,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Blocks with JSON attributes: title, slug and kind.
 	 */
 	public function test_subpage_blocks_with_attributes() {
-		$content = Mpp_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . Mpp_Test_Corpus::block( 'First' ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'One' ) . "\n\n<!-- wp:multipage/subpage {\"title\":\"Second\",\"slug\":\"my-custom-slug\"} -->\n[nextpage title=\"Second\"]\n<!-- /wp:multipage/subpage -->\n\n" . Mpp_Test_Corpus::paragraph( 'Two' );
+		$content = PChap_Test_Corpus::paragraph( 'Intro' ) . "\n\n" . PChap_Test_Corpus::block( 'First' ) . "\n\n" . PChap_Test_Corpus::paragraph( 'One' ) . "\n\n<!-- wp:multipage/subpage {\"title\":\"Second\",\"slug\":\"my-custom-slug\"} -->\n[nextpage title=\"Second\"]\n<!-- /wp:multipage/subpage -->\n\n" . PChap_Test_Corpus::paragraph( 'Two' );
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', 'First', 'Second' ), $this->titles( $parsed ) );
 		$this->assertSame( array( 'intro', 'first', 'my-custom-slug' ), $this->slugs( $parsed ) );
@@ -144,7 +144,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	public function test_legacy_block_serialization_is_counted_once() {
 		$content = "<!-- wp:paragraph -->\n<p>Intro</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:multipage/subpage {\"title\":\"Deux\"} -->\n[nextpage title=\"Deux\"]\n<!-- /wp:multipage/subpage -->\n\n<!-- wp:paragraph -->\n<p>Texte deux</p>\n<!-- /wp:paragraph -->";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertCount( 2, $parsed['pages'] );
 		$this->assertSame(
@@ -152,7 +152,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 				'intro' => '%%intro%%',
 				'deux'  => 'Deux',
 			),
-			Multipage_Parser::multipage_return_array( $content )
+			PChap_Parser::multipage_return_array( $content )
 		);
 		$this->assertStringContainsString( 'Texte deux', $parsed['pages'][1]['content'] );
 		$this->assertStringNotContainsString( '[nextpage', $parsed['pages'][1]['content'] );
@@ -162,9 +162,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * An attribute-less block (default title false) saved [nextpage title="false"]: the title is empty, not "false".
 	 */
 	public function test_legacy_default_false_title_is_untitled() {
-		$content = Mpp_Test_Corpus::paragraph( 'Intro' ) . "\n\n<!-- wp:multipage/subpage -->\n[nextpage title=\"false\"]\n<!-- /wp:multipage/subpage -->\n\n" . Mpp_Test_Corpus::paragraph( 'Two' );
+		$content = PChap_Test_Corpus::paragraph( 'Intro' ) . "\n\n<!-- wp:multipage/subpage -->\n[nextpage title=\"false\"]\n<!-- /wp:multipage/subpage -->\n\n" . PChap_Test_Corpus::paragraph( 'Two' );
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', '' ), $this->titles( $parsed ) );
 		$this->assertSame( array( 'intro', 'page-2' ), $this->slugs( $parsed ) );
@@ -175,9 +175,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * A block with "title": false in its JSON is untitled too.
 	 */
 	public function test_block_with_false_title_attribute_is_untitled() {
-		$content = "<!-- wp:multipage/subpage {\"title\":false} /-->\n" . Mpp_Test_Corpus::paragraph( 'One' );
+		$content = "<!-- wp:multipage/subpage {\"title\":false} /-->\n" . PChap_Test_Corpus::paragraph( 'One' );
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertTrue( $parsed['is_multipage'] );
 		$this->assertSame( array( '' ), $this->titles( $parsed ) );
@@ -188,9 +188,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Self-closing subpage blocks.
 	 */
 	public function test_self_closing_blocks() {
-		$content = "<!-- wp:multipage/subpage {\"title\":\"Un\"} /-->\n" . Mpp_Test_Corpus::paragraph( 'One' ) . "\n<!-- wp:multipage/subpage {\"title\":\"Deux\"} /-->\n" . Mpp_Test_Corpus::paragraph( 'Two' );
+		$content = "<!-- wp:multipage/subpage {\"title\":\"Un\"} /-->\n" . PChap_Test_Corpus::paragraph( 'One' ) . "\n<!-- wp:multipage/subpage {\"title\":\"Deux\"} /-->\n" . PChap_Test_Corpus::paragraph( 'Two' );
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertFalse( $parsed['has_intro'] );
 		$this->assertSame( array( 'Un', 'Deux' ), $this->titles( $parsed ) );
@@ -205,9 +205,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * @param bool   $expected_intro  Whether an intro page is expected.
 	 */
 	public function test_intro_detection( $before, $expected_intro ) {
-		$content = $before . "\n\n" . Mpp_Test_Corpus::block( 'Un' ) . "\n\n" . Mpp_Test_Corpus::paragraph( 'One' );
+		$content = $before . "\n\n" . PChap_Test_Corpus::block( 'Un' ) . "\n\n" . PChap_Test_Corpus::paragraph( 'One' );
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertTrue( $parsed['is_multipage'] );
 		$this->assertSame( $expected_intro, $parsed['has_intro'] );
@@ -221,7 +221,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 */
 	public function data_intro_detection() {
 		return array(
-			'text'              => array( Mpp_Test_Corpus::paragraph( 'Some intro text' ), true ),
+			'text'              => array( PChap_Test_Corpus::paragraph( 'Some intro text' ), true ),
 			'plain text'        => array( 'Hello', true ),
 			'image only'        => array( "<!-- wp:image -->\n<figure class=\"wp-block-image\"><img src=\"https://example.org/a.jpg\" alt=\"\"/></figure>\n<!-- /wp:image -->", true ),
 			'embed iframe'      => array( '<iframe src="https://example.org/embed"></iframe>', true ),
@@ -246,7 +246,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	public function test_script_and_style_before_first_marker_are_kept_on_page_one( $before, $needle ) {
 		$content = $before . "\n[nextpage title=\"Un\"]\n\nOne\n\n[nextpage title=\"Deux\"]\n\nTwo";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertFalse( $parsed['has_intro'] );
 		$this->assertSame( array( 'Un', 'Deux' ), $this->titles( $parsed ) );
@@ -272,7 +272,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Untitled shortcodes get an empty title and a page-N slug.
 	 */
 	public function test_untitled_shortcodes() {
-		$parsed = Multipage_Parser::parse( "Intro\n\n[nextpage]\n\nTwo\n\n[nextpage title=\"\"]\n\nThree\n\n[nextpage title=\"Four\"]\n\nFour" );
+		$parsed = PChap_Parser::parse( "Intro\n\n[nextpage]\n\nTwo\n\n[nextpage title=\"\"]\n\nThree\n\n[nextpage title=\"Four\"]\n\nFour" );
 
 		$this->assertSame( array( '%%intro%%', '', '', 'Four' ), $this->titles( $parsed ) );
 		$this->assertSame( array( 'intro', 'page-2', 'page-3', 'four' ), $this->slugs( $parsed ) );
@@ -285,7 +285,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	public function test_mixed_markers_in_document_order() {
 		$content = "Intro\n\n[nextpage title=\"A\"]\n\nBody A\n\n<!--nextpage-->\n\nBody core\n\n<!-- wp:multipage/subpage {\"title\":\"C\"} /-->\n\nBody C\n\n[nextpage title=\"D\"]\n\nBody D";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', 'A', '', 'C', 'D' ), $this->titles( $parsed ) );
 		$this->assertSame( array( 'intro', 'shortcode', 'core', 'block', 'shortcode' ), $this->kinds( $parsed ) );
@@ -301,11 +301,11 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * @param string $content Post content.
 	 */
 	public function test_not_multipage( $content ) {
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertFalse( $parsed['is_multipage'] );
 		$this->assertSame( array(), $parsed['pages'] );
-		$this->assertFalse( Multipage_Parser::multipage_return_array( $content ) );
+		$this->assertFalse( PChap_Parser::multipage_return_array( $content ) );
 	}
 
 	/**
@@ -318,7 +318,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 			'empty'                         => array( '' ),
 			'plain text'                    => array( 'Hello world' ),
 			'core page breaks only'         => array( "One\n<!--nextpage-->\nTwo\n<!--nextpage-->\nThree" ),
-			'core nextpage blocks only'     => array( Mpp_Test_Corpus::paragraph( 'One' ) . "\n<!-- wp:nextpage -->\n<!--nextpage-->\n<!-- /wp:nextpage -->\n" . Mpp_Test_Corpus::paragraph( 'Two' ) ),
+			'core nextpage blocks only'     => array( PChap_Test_Corpus::paragraph( 'One' ) . "\n<!-- wp:nextpage -->\n<!--nextpage-->\n<!-- /wp:nextpage -->\n" . PChap_Test_Corpus::paragraph( 'Two' ) ),
 			'escaped shortcode'             => array( "Intro\n\n[[nextpage title=\"Deux\"]]\n\nText" ),
 			'shortcode in HTML comment'     => array( "Intro\n<!-- [nextpage title=\"Deux\"] -->\nText" ),
 			'shortcode in attribute'        => array( "<p><span data-x=\"[nextpage title='Deux']\">Intro</span> text</p>" ),
@@ -336,7 +336,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	public function test_escaped_and_commented_markers_are_ignored_next_to_real_ones() {
 		$content = "Intro [[nextpage title=\"Escaped\"]]\n<!-- [nextpage title=\"Commented\"] -->\n<span title=\"[nextpage title=Attr]\">x</span>\n\n[nextpage title=\"Real\"]\n\nBody";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', 'Real' ), $this->titles( $parsed ) );
 		$this->assertStringContainsString( '[[nextpage title="Escaped"]]', $parsed['pages'][0]['content'] );
@@ -348,11 +348,11 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	public function test_duplicate_titles_get_unique_slugs() {
 		$content = "[nextpage title=\"Same\"]\n\nA\n\n[nextpage title=\"Same\"]\n\nB\n\n<!-- wp:multipage/subpage {\"title\":\"Same\"} /-->\n\nC\n\n[nextpage title=\"Other\" slug=\"same\"]\n\nD";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( 'same', 'same-1', 'same-2', 'same-3' ), $this->slugs( $parsed ) );
 
-		$array = Multipage_Parser::multipage_return_array( $content );
+		$array = PChap_Parser::multipage_return_array( $content );
 		$this->assertSame( array( 'same', 'same-1', 'same-2', 'same-3' ), array_keys( $array ) );
 		$this->assertSame( array( 'Same', 'Same', 'Same', 'Other' ), array_values( $array ) );
 	}
@@ -361,7 +361,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * A title which is also "intro" does not collide with the intro slug.
 	 */
 	public function test_title_intro_does_not_collide_with_intro_page() {
-		$parsed = Multipage_Parser::parse( "Hello\n\n[nextpage title=\"Intro\"]\n\nBody" );
+		$parsed = PChap_Parser::parse( "Hello\n\n[nextpage title=\"Intro\"]\n\nBody" );
 
 		$this->assertSame( array( 'intro', 'intro-1' ), $this->slugs( $parsed ) );
 	}
@@ -370,7 +370,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * The slug attribute wins over the title, and is sanitized.
 	 */
 	public function test_slug_attribute() {
-		$parsed = Multipage_Parser::parse( "[nextpage title=\"Deux\" slug=\"Custom Slug!\"]\n\nA\n\n<!-- wp:multipage/subpage {\"title\":\"Trois\",\"slug\":\"block-slug\"} /-->\n\nB" );
+		$parsed = PChap_Parser::parse( "[nextpage title=\"Deux\" slug=\"Custom Slug!\"]\n\nA\n\n<!-- wp:multipage/subpage {\"title\":\"Trois\",\"slug\":\"block-slug\"} /-->\n\nB" );
 
 		$this->assertSame( array( 'custom-slug', 'block-slug' ), $this->slugs( $parsed ) );
 		$this->assertSame( array( 'Deux', 'Trois' ), $this->titles( $parsed ) );
@@ -380,9 +380,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * CRLF line endings.
 	 */
 	public function test_crlf_line_endings() {
-		$content = "<p>Intro</p>\r\n<p>[nextpage title=\"Deux\"]</p>\r\n<p>Two</p>\r\n" . str_replace( "\n", "\r\n", Mpp_Test_Corpus::block( 'Trois' ) ) . "\r\n<p>Three</p>";
+		$content = "<p>Intro</p>\r\n<p>[nextpage title=\"Deux\"]</p>\r\n<p>Two</p>\r\n" . str_replace( "\n", "\r\n", PChap_Test_Corpus::block( 'Trois' ) ) . "\r\n<p>Three</p>";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', 'Deux', 'Trois' ), $this->titles( $parsed ) );
 		$this->assertStringContainsString( 'Three', $parsed['pages'][2]['content'] );
@@ -393,9 +393,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Unicode and emoji titles are kept as is; slugs are not empty.
 	 */
 	public function test_unicode_and_emoji_titles() {
-		$content = "Intro\n\n[nextpage title=\"Éléphant 🐘\"]\n\nA\n\n" . Mpp_Test_Corpus::block( 'Ünïcödé — 日本' ) . "\n\nB\n\n[nextpage title=\"🎉\"]\n\nC";
+		$content = "Intro\n\n[nextpage title=\"Éléphant 🐘\"]\n\nA\n\n" . PChap_Test_Corpus::block( 'Ünïcödé — 日本' ) . "\n\nB\n\n[nextpage title=\"🎉\"]\n\nC";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( '%%intro%%', 'Éléphant 🐘', 'Ünïcödé — 日本', '🎉' ), $this->titles( $parsed ) );
 		$slugs = $this->slugs( $parsed );
@@ -407,9 +407,9 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Titles with quotes, ampersands and HTML, as saved by both editors.
 	 */
 	public function test_titles_with_special_characters() {
-		$content = Mpp_Test_Corpus::block( 'Tom &amp; Jerry' ) . "\n\nA\n\n" . Mpp_Test_Corpus::block( 'Say "hi"' ) . "\n\nB\n\n[nextpage title='He said \"yes\"']\n\nC\n\n[nextpage title=\"a < b & c\"]\n\nD";
+		$content = PChap_Test_Corpus::block( 'Tom &amp; Jerry' ) . "\n\nA\n\n" . PChap_Test_Corpus::block( 'Say "hi"' ) . "\n\nB\n\n[nextpage title='He said \"yes\"']\n\nC\n\n[nextpage title=\"a < b & c\"]\n\nD";
 
-		$parsed = Multipage_Parser::parse( $content );
+		$parsed = PChap_Parser::parse( $content );
 
 		$this->assertSame( array( 'Tom &amp; Jerry', 'Say "hi"', 'He said "yes"', 'a < b & c' ), $this->titles( $parsed ) );
 	}
@@ -418,8 +418,8 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * A marker inside a group block closes and reopens the group: every page is self-contained.
 	 */
 	public function test_marker_inside_group_block_keeps_pages_balanced() {
-		$item   = Mpp_Test_Corpus::items()['blocks inside a group'];
-		$parsed = Multipage_Parser::parse( $item['content'] );
+		$item   = PChap_Test_Corpus::items()['blocks inside a group'];
+		$parsed = PChap_Parser::parse( $item['content'] );
 
 		foreach ( $parsed['pages'] as $page ) {
 			$this->assertSame( substr_count( $page['content'], '<!-- wp:group' ), substr_count( $page['content'], '<!-- /wp:group -->' ) );
@@ -433,8 +433,8 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Inline markers inside an element close and reopen it (the real-world h3 case).
 	 */
 	public function test_marker_inside_heading_leaves_balanced_pages() {
-		$item   = Mpp_Test_Corpus::items()['classic shortcodes inside h3 style'];
-		$parsed = Multipage_Parser::parse( $item['content'] );
+		$item   = PChap_Test_Corpus::items()['classic shortcodes inside h3 style'];
+		$parsed = PChap_Parser::parse( $item['content'] );
 
 		$this->assertCount( 3, $parsed['pages'] );
 		foreach ( $parsed['pages'] as $page ) {
@@ -455,7 +455,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 				'deux'   => 'Deux',
 				'page-3' => '',
 			),
-			Multipage_Parser::multipage_return_array( $content )
+			PChap_Parser::multipage_return_array( $content )
 		);
 	}
 
@@ -464,7 +464,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 */
 	public function test_non_string_input() {
 		foreach ( array( null, false, 0, array() ) as $input ) {
-			$parsed = Multipage_Parser::parse( $input );
+			$parsed = PChap_Parser::parse( $input );
 			$this->assertFalse( $parsed['is_multipage'] );
 		}
 	}
@@ -473,17 +473,17 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Method build_paginated_content(): block break for block content, bare break for classic content.
 	 */
 	public function test_build_paginated_content_separators() {
-		$this->assertSame( 'a<!--nextpage-->b', Multipage_Parser::build_paginated_content( array( 'a', 'b' ) ) );
-		$this->assertSame( '<!-- wp:paragraph --><p>a</p><!-- /wp:paragraph -->' . Multipage_Parser::BLOCK_PAGE_BREAK . 'b', Multipage_Parser::build_paginated_content( array( '<!-- wp:paragraph --><p>a</p><!-- /wp:paragraph -->', 'b' ) ) );
-		$this->assertSame( 'a<!--nextpage-->b', Multipage_Parser::build_paginated_content( array( array( 'content' => 'a' ), array( 'content' => 'b' ) ), false ) );
-		$this->assertSame( 'a' . Multipage_Parser::BLOCK_PAGE_BREAK . 'b', Multipage_Parser::build_paginated_content( array( 'a', 'b' ), true ) );
+		$this->assertSame( 'a<!--nextpage-->b', PChap_Parser::build_paginated_content( array( 'a', 'b' ) ) );
+		$this->assertSame( '<!-- wp:paragraph --><p>a</p><!-- /wp:paragraph -->' . PChap_Parser::BLOCK_PAGE_BREAK . 'b', PChap_Parser::build_paginated_content( array( '<!-- wp:paragraph --><p>a</p><!-- /wp:paragraph -->', 'b' ) ) );
+		$this->assertSame( 'a<!--nextpage-->b', PChap_Parser::build_paginated_content( array( array( 'content' => 'a' ), array( 'content' => 'b' ) ), false ) );
+		$this->assertSame( 'a' . PChap_Parser::BLOCK_PAGE_BREAK . 'b', PChap_Parser::build_paginated_content( array( 'a', 'b' ), true ) );
 	}
 
 	/**
 	 * A titled subpage without body is kept (placeholder), so the page count does not change.
 	 */
 	public function test_titled_empty_subpage_is_kept() {
-		$parsed = Multipage_Parser::parse( "Intro\n\n[nextpage title=\"Empty\"]\n\n[nextpage title=\"Full\"]\n\nBody" );
+		$parsed = PChap_Parser::parse( "Intro\n\n[nextpage title=\"Empty\"]\n\n[nextpage title=\"Full\"]\n\nBody" );
 
 		$this->assertSame( array( '%%intro%%', 'Empty', 'Full' ), $this->titles( $parsed ) );
 		$this->assertNotSame( '', $parsed['pages'][1]['content'] );
@@ -493,7 +493,7 @@ class Test_Mpp_Parser extends Mpp_UnitTestCase {
 	 * Two adjacent untitled breaks do not create an empty page.
 	 */
 	public function test_adjacent_untitled_breaks_do_not_create_empty_pages() {
-		$parsed = Multipage_Parser::parse( "Intro\n\n[nextpage]\n\n[nextpage]\n\nBody" );
+		$parsed = PChap_Parser::parse( "Intro\n\n[nextpage]\n\n[nextpage]\n\nBody" );
 
 		$this->assertCount( 2, $parsed['pages'] );
 		$this->assertStringContainsString( 'Body', $parsed['pages'][1]['content'] );

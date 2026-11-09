@@ -1,8 +1,8 @@
 <?php
 /**
- * Multipage Templates.
+ * Post Chapters Templates.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Templates
  * @since 1.5
  */
@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @return array Allowed tags for wp_kses().
  */
-function mpp_get_subpage_title_allowed_html() {
+function pchap_get_subpage_title_allowed_html() {
 	$allowed = array(
 		'strong' => array(),
 		'b'      => array(),
@@ -38,14 +38,14 @@ function mpp_get_subpage_title_allowed_html() {
 	 *
 	 * @param array $allowed Allowed tags for wp_kses().
 	 */
-	return (array) apply_filters( 'mpp_subpage_title_allowed_html', $allowed );
+	return (array) pchap_apply_filters( 'pchap_subpage_title_allowed_html', $allowed );
 }
 
 /**
  * Encode the "<" of a raw-text title that do not start an allowed inline tag.
  *
  * Classic [nextpage] titles typed in the text editor are raw text ("a < b", "C++ <T>"),
- * while the allowed inline tags (see mpp_get_subpage_title_allowed_html()) stay markup.
+ * while the allowed inline tags (see pchap_get_subpage_title_allowed_html()) stay markup.
  *
  * @since 1.7.0
  * @access private
@@ -53,13 +53,13 @@ function mpp_get_subpage_title_allowed_html() {
  * @param string $title Raw-text title.
  * @return string
  */
-function _mpp_encode_title_stray_lt( $title ) {
+function _pchap_encode_title_stray_lt( $title ) {
 	if ( false === strpos( $title, '<' ) ) {
 		return $title;
 	}
 
 	$names = array();
-	foreach ( array_keys( mpp_get_subpage_title_allowed_html() ) as $name ) {
+	foreach ( array_keys( pchap_get_subpage_title_allowed_html() ) as $name ) {
 		if ( is_string( $name ) && '' !== $name ) {
 			$names[] = preg_quote( $name, '/' );
 		}
@@ -90,17 +90,17 @@ function _mpp_encode_title_stray_lt( $title ) {
  * @param string $format Optional. 'html' (block titles, default) or 'text' (shortcode titles).
  * @return string Safe HTML.
  */
-function mpp_get_subpage_title_html( $title, $format = 'html' ) {
+function pchap_get_subpage_title_html( $title, $format = 'html' ) {
 	if ( ! is_scalar( $title ) ) {
 		return '';
 	}
 
 	$title = (string) $title;
 	if ( 'text' === $format ) {
-		$title = _mpp_encode_title_stray_lt( $title );
+		$title = _pchap_encode_title_stray_lt( $title );
 	}
 
-	return trim( force_balance_tags( wp_kses( $title, mpp_get_subpage_title_allowed_html() ) ) );
+	return trim( force_balance_tags( wp_kses( $title, pchap_get_subpage_title_allowed_html() ) ) );
 }
 
 /**
@@ -115,14 +115,14 @@ function mpp_get_subpage_title_html( $title, $format = 'html' ) {
  * @param string $format Optional. 'html' (block titles, default) or 'text' (shortcode titles).
  * @return string Plain text.
  */
-function mpp_get_subpage_title_text( $title, $format = 'html' ) {
+function pchap_get_subpage_title_text( $title, $format = 'html' ) {
 	if ( ! is_scalar( $title ) ) {
 		return '';
 	}
 
 	$title = (string) $title;
 	if ( 'text' === $format ) {
-		$title = _mpp_encode_title_stray_lt( $title );
+		$title = _pchap_encode_title_stray_lt( $title );
 	}
 
 	// Strip the tags first, so that an encoded "&lt;b&gt;" stays text.
@@ -143,13 +143,13 @@ function mpp_get_subpage_title_text( $title, $format = 'html' ) {
  * @since 1.7.0
  * @access private
  *
- * @param Multipage|mixed $multipage The Multipage instance.
- * @param int             $index     0-based subpage index.
- * @param int             $count     Number of titles being rendered.
+ * @param PChap|mixed $multipage The Post Chapters instance.
+ * @param int         $index     0-based subpage index.
+ * @param int         $count     Number of titles being rendered.
  * @return string 'html' or 'text'.
  */
-function _mpp_get_title_format( $multipage, $index, $count ) {
-	if ( $multipage instanceof Multipage && is_array( $multipage->pages ) && count( $multipage->pages ) === (int) $count ) {
+function _pchap_get_title_format( $multipage, $index, $count ) {
+	if ( $multipage instanceof PChap && is_array( $multipage->pages ) && count( $multipage->pages ) === (int) $count ) {
 		return $multipage->get_title_format( $index );
 	}
 
@@ -164,13 +164,13 @@ function _mpp_get_title_format( $multipage, $index, $count ) {
  *
  * @global int $page
  *
- * @param Multipage|mixed $multipage The Multipage instance.
+ * @param PChap|mixed $multipage The Post Chapters instance.
  * @return int
  */
-function _mpp_get_current_page( $multipage ) {
+function _pchap_get_current_page( $multipage ) {
 	global $page;
 
-	if ( $multipage instanceof Multipage && ! empty( $multipage->post_id ) ) {
+	if ( $multipage instanceof PChap && ! empty( $multipage->post_id ) ) {
 		return $multipage->get_current_page();
 	}
 
@@ -185,7 +185,7 @@ function _mpp_get_current_page( $multipage ) {
  *
  * @since 1.2.0
  *
- * @param Multipage    $multipage The Multipage instance.
+ * @param PChap        $multipage The Post Chapters instance.
  * @param string|array $args {
  *     Optional. Array or string of default arguments.
  *
@@ -204,7 +204,7 @@ function _mpp_get_current_page( $multipage ) {
  * }
  * @return string Formatted output in HTML.
  */
-function mpp_link_pages( $multipage, $args = '' ) {
+function pchap_link_pages( $multipage, $args = '' ) {
 	$defaults = array(
 		'before'                => '<div>',
 		'after'                 => '</div>',
@@ -212,8 +212,8 @@ function mpp_link_pages( $multipage, $args = '' ) {
 		'link_after'            => '',
 		'continue_or_prev_next' => 'continue',
 		'separator'             => ' ',
-		'nextpagelink'          => esc_html__( 'Next page', 'sgr-nextpage-titles' ),
-		'previouspagelink'      => esc_html__( 'Previous page', 'sgr-nextpage-titles' ),
+		'nextpagelink'          => esc_html__( 'Next page', 'post-chapters' ),
+		'previouspagelink'      => esc_html__( 'Previous page', 'post-chapters' ),
 		'echo'                  => 0,
 	);
 
@@ -226,26 +226,26 @@ function mpp_link_pages( $multipage, $args = '' ) {
 	 *
 	 * @param array $params An array of arguments for page links for paginated posts.
 	 */
-	$r = apply_filters( 'mpp_link_pages_args', $params );
+	$r = pchap_apply_filters( 'pchap_link_pages_args', $params );
 
 	$output = '';
-	$titles = ( $multipage instanceof Multipage && is_array( $multipage->mpp_data ) ) ? array_values( $multipage->mpp_data ) : array();
+	$titles = ( $multipage instanceof PChap && is_array( $multipage->pchap_data ) ) ? array_values( $multipage->pchap_data ) : array();
 
 	if ( ! empty( $titles ) ) {
-		$current  = _mpp_get_current_page( $multipage );
+		$current  = _pchap_get_current_page( $multipage );
 		$numpages = count( $titles );
 
 		if ( 'continue' === $r['continue_or_prev_next'] ) {
 			$output .= $r['before'];
 			$next    = $current + 1;
 			if ( $next <= $numpages ) {
-				$link = _mpp_link_page( $next, 'next' ) . $r['link_before'] . mpp_get_subpage_title_html( $titles[ $next - 1 ], _mpp_get_title_format( $multipage, $next - 1, $numpages ) ) . $r['link_after'] . '</a>';
-				/* translators: %s: link to the next subpage. */
-				$text = sprintf( esc_html__( 'Continue: %s', 'sgr-nextpage-titles' ), $link );
+				$link = _pchap_link_page( $next, 'next' ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[ $next - 1 ], _pchap_get_title_format( $multipage, $next - 1, $numpages ) ) . $r['link_after'] . '</a>';
+				/* translators: %s: link to the next chapter. */
+				$text = sprintf( esc_html__( 'Continue: %s', 'post-chapters' ), $link );
 			} else {
-				$link = _mpp_link_page( 1 ) . $r['link_before'] . mpp_get_subpage_title_html( $titles[0], _mpp_get_title_format( $multipage, 0, $numpages ) ) . $r['link_after'] . '</a>';
-				/* translators: %s: link to the first subpage. */
-				$text = sprintf( esc_html__( 'Back to: %s', 'sgr-nextpage-titles' ), $link );
+				$link = _pchap_link_page( 1 ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[0], _pchap_get_title_format( $multipage, 0, $numpages ) ) . $r['link_after'] . '</a>';
+				/* translators: %s: link to the first chapter. */
+				$text = sprintf( esc_html__( 'Back to: %s', 'post-chapters' ), $link );
 			}
 
 			/**
@@ -256,27 +256,27 @@ function mpp_link_pages( $multipage, $args = '' ) {
 			 * @param string $text The text with the link.
 			 * @param string $link The link HTML.
 			 */
-			$output .= apply_filters( 'mpp_link_pages_link', $text, $link );
+			$output .= pchap_apply_filters( 'pchap_link_pages_link', $text, $link );
 
 			$output .= $r['after'];
 		} elseif ( 'next-previous' === $r['continue_or_prev_next'] ) {
 			$output .= $r['before'];
 			$prev    = $current - 1;
 			if ( $prev > 0 ) {
-				$link = _mpp_link_page( $prev, 'previous' ) . $r['link_before'] . $r['previouspagelink'] . $r['link_after'] . '</a>';
+				$link = _pchap_link_page( $prev, 'previous' ) . $r['link_before'] . $r['previouspagelink'] . $r['link_after'] . '</a>';
 
-				/** This filter is documented in inc/mpp-template.php */
-				$output .= apply_filters( 'mpp_link_pages_link', $link, $prev );
+				/** This filter is documented in inc/pchap-template.php */
+				$output .= pchap_apply_filters( 'pchap_link_pages_link', $link, $prev );
 			}
 			$next = $current + 1;
 			if ( $next <= $numpages ) {
 				if ( $prev > 0 ) {
 					$output .= $r['separator'];
 				}
-				$link = _mpp_link_page( $next, 'next' ) . $r['link_before'] . $r['nextpagelink'] . $r['link_after'] . '</a>';
+				$link = _pchap_link_page( $next, 'next' ) . $r['link_before'] . $r['nextpagelink'] . $r['link_after'] . '</a>';
 
-				/** This filter is documented in inc/mpp-template.php */
-				$output .= apply_filters( 'mpp_link_pages_link', $link, $next );
+				/** This filter is documented in inc/pchap-template.php */
+				$output .= pchap_apply_filters( 'pchap_link_pages_link', $link, $next );
 			}
 			$output .= $r['after'];
 		}
@@ -290,7 +290,7 @@ function mpp_link_pages( $multipage, $args = '' ) {
 	 * @param string $output HTML output of paginated posts' page links.
 	 * @param array  $args   An array of arguments.
 	 */
-	$html = apply_filters( 'mpp_link_pages', $output, $args );
+	$html = pchap_apply_filters( 'pchap_link_pages', $output, $args );
 
 	if ( $r['echo'] ) {
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts.
@@ -309,7 +309,7 @@ function mpp_link_pages( $multipage, $args = '' ) {
  *
  * @global int $more
  *
- * @param Multipage    $multipage The Multipage instance.
+ * @param PChap        $multipage The Post Chapters instance.
  * @param string|array $args {
  *     Optional. Array or string of default arguments.
  *
@@ -330,7 +330,7 @@ function mpp_link_pages( $multipage, $args = '' ) {
  * }
  * @return string Formatted output in HTML.
  */
-function mpp_toc( $multipage, $args = '' ) {
+function pchap_toc( $multipage, $args = '' ) {
 	global $more;
 
 	$defaults = array(
@@ -357,20 +357,20 @@ function mpp_toc( $multipage, $args = '' ) {
 	 *
 	 * @param array $params An array of arguments for page links for paginated posts.
 	 */
-	$r = apply_filters( 'mpp_toc_args', $params );
+	$r = pchap_apply_filters( 'pchap_toc_args', $params );
 
-	$current = _mpp_get_current_page( $multipage );
-	$data    = ( $multipage instanceof Multipage && is_array( $multipage->mpp_data ) ) ? $multipage->mpp_data : array();
+	$current = _pchap_get_current_page( $multipage );
+	$data    = ( $multipage instanceof PChap && is_array( $multipage->pchap_data ) ) ? $multipage->pchap_data : array();
 
 	$i      = 1;
 	$count  = count( $data );
 	$output = $r['before'];
 
 	foreach ( $data as $title ) {
-		$safe_title = mpp_get_subpage_title_html( $title, _mpp_get_title_format( $multipage, $i - 1, $count ) );
+		$safe_title = pchap_get_subpage_title_html( $title, _pchap_get_title_format( $multipage, $i - 1, $count ) );
 		$row        = $r['row_before'] . str_replace( '%', (string) $i, (string) $r['pagelink'] ) . $r['separator'];
 		if ( $i !== $current || ( ! $more && 1 === $current ) ) {
-			$link = _mpp_link_page( $i ) . $safe_title . '</a>';
+			$link = _pchap_link_page( $i ) . $safe_title . '</a>';
 			$row .= $r['link_before'] . $link . $r['link_after'];
 		} else {
 			$row .= '<span class="current" aria-current="page">' . $safe_title . '</span>';
@@ -386,7 +386,7 @@ function mpp_toc( $multipage, $args = '' ) {
 		 * @param string $title The subpage title.
 		 * @param int    $i     Page number (1-based).
 		 */
-		$row = apply_filters( 'mpp_toc_pages_row', $row, $title, $i );
+		$row = pchap_apply_filters( 'pchap_toc_pages_row', $row, $title, $i );
 
 		$output .= $row;
 		++$i;
@@ -394,7 +394,7 @@ function mpp_toc( $multipage, $args = '' ) {
 
 	// Add a link for comments.
 	if ( $r['comments'] ) {
-		$link    = $r['comments'] . esc_html__( 'Comments', 'sgr-nextpage-titles' ) . '</a>';
+		$link    = $r['comments'] . esc_html__( 'Comments', 'post-chapters' ) . '</a>';
 		$row     = $r['row_before'] . $r['link_before'] . $link . $r['link_after'] . $r['row_after'];
 		$output .= $row;
 	}
@@ -416,7 +416,7 @@ function mpp_toc( $multipage, $args = '' ) {
 
 	$output = sprintf(
 		$template,
-		esc_html__( 'Contents', 'sgr-nextpage-titles' ),
+		esc_html__( 'Contents', 'post-chapters' ),
 		$output
 	);
 
@@ -428,7 +428,7 @@ function mpp_toc( $multipage, $args = '' ) {
 	 * @param string $output HTML output of paginated posts' page links.
 	 * @param array  $args   An array of arguments.
 	 */
-	$html = apply_filters( 'mpp_toc', $output, $args );
+	$html = pchap_apply_filters( 'pchap_toc', $output, $args );
 
 	if ( $r['echo'] ) {
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts.
@@ -438,7 +438,7 @@ function mpp_toc( $multipage, $args = '' ) {
 }
 
 /**
- * Helper function for mpp_link_pages().
+ * Helper function for pchap_link_pages().
  *
  * @since 1.4
  * @since 1.7.0 Added the `$post` parameter.
@@ -451,7 +451,7 @@ function mpp_toc( $multipage, $args = '' ) {
  * @param int|WP_Post|null $post Optional. Post. Default: the current post.
  * @return string Link.
  */
-function _mpp_link_page_url( $i, $p = '', $post = null ) {
+function _pchap_link_page_url( $i, $p = '', $post = null ) {
 	global $wp_rewrite;
 
 	$post = get_post( $post );
@@ -507,9 +507,9 @@ function _mpp_link_page_url( $i, $p = '', $post = null ) {
  * @param string $p   Optional. Fragment identifier (e.g. 'comments'). Default empty.
  * @return string Opening `<a>` tag HTML.
  */
-function _mpp_link_page( $i, $rel = '', $p = '' ) {
-	$post_id = multipage()->post_id ? multipage()->post_id : null;
-	$url     = _mpp_link_page_url( $i, $p, $post_id );
+function _pchap_link_page( $i, $rel = '', $p = '' ) {
+	$post_id = pchap()->post_id ? pchap()->post_id : null;
+	$url     = _pchap_link_page_url( $i, $p, $post_id );
 
 	$rel_attr = '';
 	if ( $rel ) {

@@ -1,11 +1,11 @@
 <?php
 /**
- * Multipage Options.
+ * Post Chapters Options.
  *
  * Single source of truth for the plugin settings: definitions (type, default,
  * allowed values, settings group), validation, sanitization and getters.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Options
  * @since 1.4
  */
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 /** Definitions ***************************************************************/
 
 /**
- * Return the definitions of every Multipage setting.
+ * Return the definitions of every Post Chapters setting.
  *
  * Each definition is an array with the following keys:
  * - type:    'boolean', 'string' (value restricted to `choices`) or 'priority'
@@ -26,90 +26,90 @@ defined( 'ABSPATH' ) || exit;
  * - group:   Settings API group the option is registered in.
  *
  * Definitions contain no translated strings, so they can be used at any time.
- * Use mpp_get_option_choice_labels() for the UI labels.
+ * Use pchap_get_option_choice_labels() for the UI labels.
  *
  * @since 1.7.0
  *
  * @return array Option name => definition.
  */
-function mpp_get_option_definitions() {
+function pchap_get_option_definitions() {
 	$definitions = array(
 		'mpp-hide-intro-title'            => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-comments-on-page'            => array(
 			'type'    => 'string',
 			'default' => 'all',
 			'choices' => array( 'all', 'first-page', 'last-page' ),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-continue-or-prev-next'       => array(
 			'type'    => 'string',
 			'default' => 'continue',
 			'choices' => array( 'continue', 'next-previous', 'hidden' ),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-disable-standard-pagination' => array(
 			'type'    => 'boolean',
 			'default' => true,
 			'choices' => array(),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-toc-only-on-the-first-page'  => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-toc-position'                => array(
 			'type'    => 'string',
 			'default' => 'top-right',
 			'choices' => array( 'top-left', 'top-right', 'top', 'bottom', 'hidden' ),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-toc-row-labels'              => array(
 			'type'    => 'string',
 			'default' => 'number',
 			'choices' => array( 'number', 'page', 'hidden' ),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-hide-toc-header'             => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'mpp-comments-toc-link'           => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'mpp-settings',
+			'group'   => 'post-chapters',
 		),
 		'_mpp-rewrite-title-priority'     => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
-			'group'   => 'mpp-advanced-settings',
+			'group'   => 'post-chapters-advanced',
 		),
 		'_mpp-rewrite-content-priority'   => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
-			'group'   => 'mpp-advanced-settings',
+			'group'   => 'post-chapters-advanced',
 		),
 		'mpp-disable-tinymce-buttons'     => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'mpp-advanced-settings',
+			'group'   => 'post-chapters-advanced',
 		),
 	);
 
 	/**
-	 * Filters the Multipage option definitions.
+	 * Filters the Post Chapters option definitions.
 	 *
 	 * Can be used to add allowed values (e.g. a custom table of contents
 	 * position handled by a theme). Removing core options is not supported.
@@ -118,7 +118,7 @@ function mpp_get_option_definitions() {
 	 *
 	 * @param array $definitions Option name => definition.
 	 */
-	$filtered = apply_filters( 'mpp_get_option_definitions', $definitions );
+	$filtered = pchap_apply_filters( 'pchap_get_option_definitions', $definitions );
 
 	if ( ! is_array( $filtered ) ) {
 		return $definitions;
@@ -140,15 +140,15 @@ function mpp_get_option_definitions() {
 }
 
 /**
- * Return the definition of a single Multipage option.
+ * Return the definition of a single Post Chapters option.
  *
  * @since 1.7.0
  *
  * @param string $option_name The option name.
  * @return array|null The definition, or null if the option is unknown.
  */
-function mpp_get_option_definition( $option_name ) {
-	$definitions = mpp_get_option_definitions();
+function pchap_get_option_definition( $option_name ) {
+	$definitions = pchap_get_option_definitions();
 
 	return isset( $definitions[ $option_name ] ) ? $definitions[ $option_name ] : null;
 }
@@ -165,44 +165,44 @@ function mpp_get_option_definition( $option_name ) {
  * @return array Option name => array( value => label ), or value => label when
  *               `$option_name` is given (empty array if unknown).
  */
-function mpp_get_option_choice_labels( $option_name = '' ) {
+function pchap_get_option_choice_labels( $option_name = '' ) {
 	$priority_labels = array(
-		100 => __( 'Highest', 'sgr-nextpage-titles' ),
-		50  => __( 'High', 'sgr-nextpage-titles' ),
-		20  => __( 'Normal', 'sgr-nextpage-titles' ),
-		10  => __( 'Low', 'sgr-nextpage-titles' ),
-		5   => __( 'Lowest', 'sgr-nextpage-titles' ),
+		100 => __( 'Highest', 'post-chapters' ),
+		50  => __( 'High', 'post-chapters' ),
+		20  => __( 'Normal', 'post-chapters' ),
+		10  => __( 'Low', 'post-chapters' ),
+		5   => __( 'Lowest', 'post-chapters' ),
 	);
 
 	$labels = array(
 		'mpp-comments-on-page'          => array(
-			'all'        => __( 'All pages — Display comments on all post pages', 'sgr-nextpage-titles' ),
-			'first-page' => __( 'First page — Display comments only on the first page', 'sgr-nextpage-titles' ),
-			'last-page'  => __( 'Last page — Display comments only on the last page', 'sgr-nextpage-titles' ),
+			'all'        => __( 'All pages — Display comments on all post pages', 'post-chapters' ),
+			'first-page' => __( 'First page — Display comments only on the first page', 'post-chapters' ),
+			'last-page'  => __( 'Last page — Display comments only on the last page', 'post-chapters' ),
 		),
 		'mpp-continue-or-prev-next'     => array(
-			'continue'      => __( 'Continue or back to intro', 'sgr-nextpage-titles' ),
-			'next-previous' => __( 'Next and previous', 'sgr-nextpage-titles' ),
-			'hidden'        => __( 'Hidden', 'sgr-nextpage-titles' ),
+			'continue'      => __( 'Continue or back to intro', 'post-chapters' ),
+			'next-previous' => __( 'Next and previous', 'post-chapters' ),
+			'hidden'        => __( 'Hidden', 'post-chapters' ),
 		),
 		'mpp-toc-position'              => array(
-			'top-left'  => __( 'above the post content, align left', 'sgr-nextpage-titles' ),
-			'top-right' => __( 'above the post content, align right', 'sgr-nextpage-titles' ),
-			'top'       => __( 'above the post content', 'sgr-nextpage-titles' ),
-			'bottom'    => __( 'below the post content', 'sgr-nextpage-titles' ),
-			'hidden'    => __( 'hidden', 'sgr-nextpage-titles' ),
+			'top-left'  => __( 'above the post content, align left', 'post-chapters' ),
+			'top-right' => __( 'above the post content, align right', 'post-chapters' ),
+			'top'       => __( 'above the post content', 'post-chapters' ),
+			'bottom'    => __( 'below the post content', 'post-chapters' ),
+			'hidden'    => __( 'hidden', 'post-chapters' ),
 		),
 		'mpp-toc-row-labels'            => array(
-			'number' => __( 'number — Display numbers before the subpage title', 'sgr-nextpage-titles' ),
-			'page'   => __( 'page # — Display "Page #" before the subpage title', 'sgr-nextpage-titles' ),
-			'hidden' => __( 'hidden — Hide subpage labels, display only the title', 'sgr-nextpage-titles' ),
+			'number' => __( 'number — Display numbers before the chapter title', 'post-chapters' ),
+			'page'   => __( 'chapter # — Display "Chapter #" before the chapter title', 'post-chapters' ),
+			'hidden' => __( 'hidden — Hide the labels, display only the chapter title', 'post-chapters' ),
 		),
 		'_mpp-rewrite-title-priority'   => $priority_labels,
 		'_mpp-rewrite-content-priority' => $priority_labels,
 	);
 
 	// Make sure every allowed value has a label (e.g. values added by a filter).
-	foreach ( mpp_get_option_definitions() as $name => $definition ) {
+	foreach ( pchap_get_option_definitions() as $name => $definition ) {
 		if ( empty( $definition['choices'] ) ) {
 			continue;
 		}
@@ -221,7 +221,7 @@ function mpp_get_option_choice_labels( $option_name = '' ) {
 	 *
 	 * @param array $labels Option name => array( value => label ).
 	 */
-	$labels = (array) apply_filters( 'mpp_get_option_choice_labels', $labels );
+	$labels = (array) pchap_apply_filters( 'pchap_get_option_choice_labels', $labels );
 
 	if ( '' !== $option_name ) {
 		return isset( $labels[ $option_name ] ) ? (array) $labels[ $option_name ] : array();
@@ -244,7 +244,7 @@ function mpp_get_option_choice_labels( $option_name = '' ) {
  * @param mixed $value Scalar value.
  * @return bool
  */
-function mpp_option_to_boolean( $value ) {
+function pchap_option_to_boolean( $value ) {
 	if ( is_string( $value ) && in_array( strtolower( trim( $value ) ), array( '', '0', 'false', 'off', 'no' ), true ) ) {
 		return false;
 	}
@@ -262,12 +262,12 @@ function mpp_option_to_boolean( $value ) {
  * @param mixed $normalized Output. The normalized value when valid.
  * @return bool Whether the value is valid.
  */
-function _mpp_check_option_value( $definition, $value, &$normalized = null ) {
+function _pchap_check_option_value( $definition, $value, &$normalized = null ) {
 	switch ( $definition['type'] ) {
 		case 'boolean':
 			// Values stored by all the plugin versions: 1/0, '1'/'0', '' (unchecked), true/false.
 			if ( is_bool( $value ) || is_int( $value ) || is_float( $value ) || is_string( $value ) ) {
-				$normalized = mpp_option_to_boolean( $value );
+				$normalized = pchap_option_to_boolean( $value );
 				return true;
 			}
 			return false;
@@ -309,28 +309,28 @@ function _mpp_check_option_value( $definition, $value, &$normalized = null ) {
  * @param mixed  $fallback    Optional. Preferred fallback value. Default null.
  * @return mixed The normalized valid value. Unknown options are returned untouched.
  */
-function mpp_validate_option_value( $option_name, $value, $fallback = null ) {
-	$definition = mpp_get_option_definition( $option_name );
+function pchap_validate_option_value( $option_name, $value, $fallback = null ) {
+	$definition = pchap_get_option_definition( $option_name );
 
 	if ( null === $definition ) {
 		return $value;
 	}
 
 	$normalized = null;
-	if ( _mpp_check_option_value( $definition, $value, $normalized ) ) {
+	if ( _pchap_check_option_value( $definition, $value, $normalized ) ) {
 		return $normalized;
 	}
 
-	if ( null !== $fallback && _mpp_check_option_value( $definition, $fallback, $normalized ) ) {
+	if ( null !== $fallback && _pchap_check_option_value( $definition, $fallback, $normalized ) ) {
 		return $normalized;
 	}
 
-	_mpp_check_option_value( $definition, $definition['default'], $normalized );
+	_pchap_check_option_value( $definition, $definition['default'], $normalized );
 	return $normalized;
 }
 
 /**
- * Sanitize a Multipage option before it is saved (Settings API callback).
+ * Sanitize a Post Chapters option before it is saved (Settings API callback).
  *
  * Booleans are stored as 1/0 (an unchecked checkbox is posted as null by
  * options.php and stored as 0). Invalid values keep the current valid value
@@ -342,10 +342,10 @@ function mpp_validate_option_value( $option_name, $value, $fallback = null ) {
  * @param string $option_name The option name.
  * @return mixed The sanitized value.
  */
-function mpp_sanitize_option( $value, $option_name ) {
+function pchap_sanitize_option( $value, $option_name ) {
 	static $reported = array();
 
-	$definition = mpp_get_option_definition( $option_name );
+	$definition = pchap_get_option_definition( $option_name );
 
 	if ( null === $definition ) {
 		return is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
@@ -355,7 +355,7 @@ function mpp_sanitize_option( $value, $option_name ) {
 		if ( null === $value || '' === $value ) {
 			return 0;
 		}
-		return ( is_scalar( $value ) && mpp_option_to_boolean( $value ) ) ? 1 : 0;
+		return ( is_scalar( $value ) && pchap_option_to_boolean( $value ) ) ? 1 : 0;
 	}
 
 	if ( is_string( $value ) ) {
@@ -363,12 +363,12 @@ function mpp_sanitize_option( $value, $option_name ) {
 	}
 
 	$normalized = null;
-	if ( _mpp_check_option_value( $definition, $value, $normalized ) ) {
+	if ( _pchap_check_option_value( $definition, $value, $normalized ) ) {
 		return $normalized;
 	}
 
 	// Invalid or missing value: keep the current valid value, or the default.
-	$fallback = mpp_validate_option_value( $option_name, get_option( $option_name, $definition['default'] ) );
+	$fallback = pchap_validate_option_value( $option_name, get_option( $option_name, $definition['default'] ) );
 
 	if ( null !== $value && ! isset( $reported[ $option_name ] ) && function_exists( 'add_settings_error' ) ) {
 		$reported[ $option_name ] = true;
@@ -377,8 +377,8 @@ function mpp_sanitize_option( $value, $option_name ) {
 			'mpp-invalid-' . $option_name,
 			sprintf(
 				/* translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type"). */
-				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'sgr-nextpage-titles' ),
-				esc_html( _mpp_get_option_field_label( $option_name ) )
+				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'post-chapters' ),
+				esc_html( _pchap_get_option_field_label( $option_name ) )
 			),
 			'error'
 		);
@@ -403,7 +403,7 @@ function mpp_sanitize_option( $value, $option_name ) {
  * @param string $option_name The option name.
  * @return string Plain-text label (not escaped).
  */
-function _mpp_get_option_field_label( $option_name ) {
+function _pchap_get_option_field_label( $option_name ) {
 	global $wp_settings_fields;
 
 	if ( is_array( $wp_settings_fields ) ) {
@@ -438,7 +438,7 @@ function _mpp_get_option_field_label( $option_name ) {
  * @param mixed  $default     Default value if not set.
  * @return mixed The option value.
  */
-function mpp_get_option( $option_name, $default = false ) {
+function pchap_get_option( $option_name, $default = false ) {
 	static $cache   = array();
 	static $missing = null;
 
@@ -464,28 +464,28 @@ function mpp_get_option( $option_name, $default = false ) {
  *
  * @since 1.5.13
  */
-function mpp_clear_options_cache() {
-	mpp_get_option( '__clear_cache__' );
+function pchap_clear_options_cache() {
+	pchap_get_option( '__clear_cache__' );
 }
 
 /**
- * Clear the in-memory options cache when a Multipage option changes.
+ * Clear the in-memory options cache when a Post Chapters option changes.
  *
  * @since 1.7.0
  *
  * @param string $option_name The option name.
  */
-function mpp_maybe_clear_options_cache( $option_name ) {
-	if ( is_string( $option_name ) && null !== mpp_get_option_definition( $option_name ) ) {
-		mpp_clear_options_cache();
+function pchap_maybe_clear_options_cache( $option_name ) {
+	if ( is_string( $option_name ) && null !== pchap_get_option_definition( $option_name ) ) {
+		pchap_clear_options_cache();
 	}
 }
-add_action( 'added_option', 'mpp_maybe_clear_options_cache' );
-add_action( 'updated_option', 'mpp_maybe_clear_options_cache' );
-add_action( 'deleted_option', 'mpp_maybe_clear_options_cache' );
+add_action( 'added_option', 'pchap_maybe_clear_options_cache' );
+add_action( 'updated_option', 'pchap_maybe_clear_options_cache' );
+add_action( 'deleted_option', 'pchap_maybe_clear_options_cache' );
 
 /**
- * Return the validated value of a Multipage option.
+ * Return the validated value of a Post Chapters option.
  *
  * @since 1.7.0
  *
@@ -493,8 +493,8 @@ add_action( 'deleted_option', 'mpp_maybe_clear_options_cache' );
  * @param mixed  $fallback    Fallback value used when the option is missing or invalid.
  * @return mixed The valid value.
  */
-function _mpp_get_valid_option( $option_name, $fallback ) {
-	return mpp_validate_option_value( $option_name, mpp_get_option( $option_name, $fallback ), $fallback );
+function _pchap_get_valid_option( $option_name, $fallback ) {
+	return pchap_validate_option_value( $option_name, pchap_get_option( $option_name, $fallback ), $fallback );
 }
 
 /** Getters *******************************************************************/
@@ -508,7 +508,7 @@ function _mpp_get_valid_option( $option_name, $fallback ) {
  *                      Default: false.
  * @return bool True if the intro title should be hidden, otherwise false.
  */
-function mpp_hide_intro_title( $default = false ) {
+function pchap_hide_intro_title( $default = false ) {
 
 	/**
 	 * Filters whether or not the intro title is hidden.
@@ -517,7 +517,7 @@ function mpp_hide_intro_title( $default = false ) {
 	 *
 	 * @param bool $value Whether the intro title is hidden.
 	 */
-	return (bool) apply_filters( 'mpp_hideintro_title', (bool) _mpp_get_valid_option( 'mpp-hide-intro-title', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hideintro_title', (bool) _pchap_get_valid_option( 'mpp-hide-intro-title', (bool) $default ) );
 }
 
 /**
@@ -527,8 +527,8 @@ function mpp_hide_intro_title( $default = false ) {
  *
  * @param string $default Optional. Default: all.
  */
-function mpp_comments_on_page( $default = 'all' ) {
-	echo esc_html( mpp_get_comments_on_page( $default ) );
+function pchap_comments_on_page( $default = 'all' ) {
+	echo esc_html( pchap_get_comments_on_page( $default ) );
 }
 
 /**
@@ -539,7 +539,7 @@ function mpp_comments_on_page( $default = 'all' ) {
  * @param string $default Optional. Default: all.
  * @return string The pages where to display comments (all, first-page or last-page).
  */
-function mpp_get_comments_on_page( $default = 'all' ) {
+function pchap_get_comments_on_page( $default = 'all' ) {
 
 	/**
 	 * Filters the pages where to display comments.
@@ -548,7 +548,7 @@ function mpp_get_comments_on_page( $default = 'all' ) {
 	 *
 	 * @param string $value The pages where to display comments.
 	 */
-	return apply_filters( 'mpp_get_comments_on_page', _mpp_get_valid_option( 'mpp-comments-on-page', $default ) );
+	return pchap_apply_filters( 'pchap_get_comments_on_page', _pchap_get_valid_option( 'mpp-comments-on-page', $default ) );
 }
 
 /**
@@ -558,8 +558,8 @@ function mpp_get_comments_on_page( $default = 'all' ) {
  *
  * @param string $default Optional. Default: continue.
  */
-function mpp_continue_or_prev_next( $default = 'continue' ) {
-	echo esc_html( mpp_get_continue_or_prev_next( $default ) );
+function pchap_continue_or_prev_next( $default = 'continue' ) {
+	echo esc_html( pchap_get_continue_or_prev_next( $default ) );
 }
 
 /**
@@ -570,7 +570,7 @@ function mpp_continue_or_prev_next( $default = 'continue' ) {
  * @param string $default Optional. Default: continue.
  * @return string The navigation type (continue, next-previous or hidden).
  */
-function mpp_get_continue_or_prev_next( $default = 'continue' ) {
+function pchap_get_continue_or_prev_next( $default = 'continue' ) {
 
 	/**
 	 * Filters the navigation type.
@@ -579,7 +579,7 @@ function mpp_get_continue_or_prev_next( $default = 'continue' ) {
 	 *
 	 * @param string $value The navigation type.
 	 */
-	return apply_filters( 'mpp_get_continue_or_prev_next', _mpp_get_valid_option( 'mpp-continue-or-prev-next', $default ) );
+	return pchap_apply_filters( 'pchap_get_continue_or_prev_next', _pchap_get_valid_option( 'mpp-continue-or-prev-next', $default ) );
 }
 
 /**
@@ -591,7 +591,7 @@ function mpp_get_continue_or_prev_next( $default = 'continue' ) {
  *                      Default: true.
  * @return bool true if the standard WordPress pagination should be hidden otherwise false.
  */
-function mpp_disable_standard_pagination( $default = true ) {
+function pchap_disable_standard_pagination( $default = true ) {
 
 	/**
 	 * Filters whether or not the standard WordPress pagination is disabled.
@@ -600,7 +600,7 @@ function mpp_disable_standard_pagination( $default = true ) {
 	 *
 	 * @param bool $value Whether the standard pagination is disabled.
 	 */
-	return (bool) apply_filters( 'mpp_disable_standard_pagination', (bool) _mpp_get_valid_option( 'mpp-disable-standard-pagination', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_standard_pagination', (bool) _pchap_get_valid_option( 'mpp-disable-standard-pagination', (bool) $default ) );
 }
 
 /**
@@ -612,7 +612,7 @@ function mpp_disable_standard_pagination( $default = true ) {
  *                      Default: false.
  * @return bool true if the table of contents should be only on the first page of the post otherwise false.
  */
-function mpp_toc_only_on_the_first_page( $default = false ) {
+function pchap_toc_only_on_the_first_page( $default = false ) {
 
 	/**
 	 * Filters whether or not the table of contents is displayed only on the first page.
@@ -621,7 +621,7 @@ function mpp_toc_only_on_the_first_page( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is only on the first page.
 	 */
-	return (bool) apply_filters( 'mpp_toc_only_on_the_first_page', (bool) _mpp_get_valid_option( 'mpp-toc-only-on-the-first-page', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_toc_only_on_the_first_page', (bool) _pchap_get_valid_option( 'mpp-toc-only-on-the-first-page', (bool) $default ) );
 }
 
 /**
@@ -631,8 +631,8 @@ function mpp_toc_only_on_the_first_page( $default = false ) {
  *
  * @param string $default Optional. Default: top-right.
  */
-function mpp_toc_position( $default = 'top-right' ) {
-	echo esc_html( mpp_get_toc_position( $default ) );
+function pchap_toc_position( $default = 'top-right' ) {
+	echo esc_html( pchap_get_toc_position( $default ) );
 }
 
 /**
@@ -643,7 +643,7 @@ function mpp_toc_position( $default = 'top-right' ) {
  * @param string $default Optional. Default: top-right.
  * @return string The table of contents position (top-left, top-right, top, bottom or hidden).
  */
-function mpp_get_toc_position( $default = 'top-right' ) {
+function pchap_get_toc_position( $default = 'top-right' ) {
 
 	/**
 	 * Filters the table of contents position.
@@ -652,7 +652,7 @@ function mpp_get_toc_position( $default = 'top-right' ) {
 	 *
 	 * @param string $value The table of contents position.
 	 */
-	return apply_filters( 'mpp_get_toc_position', _mpp_get_valid_option( 'mpp-toc-position', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_position', _pchap_get_valid_option( 'mpp-toc-position', $default ) );
 }
 
 /**
@@ -662,8 +662,8 @@ function mpp_get_toc_position( $default = 'top-right' ) {
  *
  * @param string $default Optional. Default: number.
  */
-function mpp_toc_row_labels( $default = 'number' ) {
-	echo esc_html( mpp_get_toc_row_labels( $default ) );
+function pchap_toc_row_labels( $default = 'number' ) {
+	echo esc_html( pchap_get_toc_row_labels( $default ) );
 }
 
 /**
@@ -674,7 +674,7 @@ function mpp_toc_row_labels( $default = 'number' ) {
  * @param string $default Optional. Default: number.
  * @return string The table of contents row labels type (number, page or hidden).
  */
-function mpp_get_toc_row_labels( $default = 'number' ) {
+function pchap_get_toc_row_labels( $default = 'number' ) {
 
 	/**
 	 * Filters the table of contents row labels type.
@@ -683,7 +683,7 @@ function mpp_get_toc_row_labels( $default = 'number' ) {
 	 *
 	 * @param string $value The table of contents row labels type.
 	 */
-	return apply_filters( 'mpp_get_toc_row_labels', _mpp_get_valid_option( 'mpp-toc-row-labels', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_row_labels', _pchap_get_valid_option( 'mpp-toc-row-labels', $default ) );
 }
 
 /**
@@ -695,7 +695,7 @@ function mpp_get_toc_row_labels( $default = 'number' ) {
  *                      Default: false.
  * @return bool true if the table of contents header should be hidden otherwise false.
  */
-function mpp_hide_toc_header( $default = false ) {
+function pchap_hide_toc_header( $default = false ) {
 
 	/**
 	 * Filters whether or not the table of contents header is hidden.
@@ -704,7 +704,7 @@ function mpp_hide_toc_header( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents header is hidden.
 	 */
-	return (bool) apply_filters( 'mpp_hide_toc_header', (bool) _mpp_get_valid_option( 'mpp-hide-toc-header', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hide_toc_header', (bool) _pchap_get_valid_option( 'mpp-hide-toc-header', (bool) $default ) );
 }
 
 /**
@@ -716,7 +716,7 @@ function mpp_hide_toc_header( $default = false ) {
  *                      Default: false.
  * @return bool true if the table of contents is including a link for comments.
  */
-function mpp_comments_toc_link( $default = false ) {
+function pchap_comments_toc_link( $default = false ) {
 
 	/**
 	 * Filters whether or not the table of contents is including a link for comments.
@@ -725,7 +725,7 @@ function mpp_comments_toc_link( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is including a link for comments.
 	 */
-	return (bool) apply_filters( 'mpp_comments_toc_link', (bool) _mpp_get_valid_option( 'mpp-comments-toc-link', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_comments_toc_link', (bool) _pchap_get_valid_option( 'mpp-comments-toc-link', (bool) $default ) );
 }
 
 /**
@@ -735,8 +735,8 @@ function mpp_comments_toc_link( $default = false ) {
  *
  * @param int $default Optional. Default: 20 (normal).
  */
-function mpp_rewrite_title_priority( $default = 20 ) {
-	echo (int) mpp_get_rewrite_title_priority( $default );
+function pchap_rewrite_title_priority( $default = 20 ) {
+	echo (int) pchap_get_rewrite_title_priority( $default );
 }
 
 /**
@@ -747,7 +747,7 @@ function mpp_rewrite_title_priority( $default = 20 ) {
  * @param int $default Optional. Default: 20 (normal).
  * @return int The rewrite titles priority.
  */
-function mpp_get_rewrite_title_priority( $default = 20 ) {
+function pchap_get_rewrite_title_priority( $default = 20 ) {
 
 	/**
 	 * Filters the rewrite titles priority.
@@ -756,7 +756,7 @@ function mpp_get_rewrite_title_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite titles priority.
 	 */
-	return (int) apply_filters( 'mpp_get_rewrite_title_priority', (int) _mpp_get_valid_option( '_mpp-rewrite-title-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_title_priority', (int) _pchap_get_valid_option( '_mpp-rewrite-title-priority', $default ) );
 }
 
 /**
@@ -766,8 +766,8 @@ function mpp_get_rewrite_title_priority( $default = 20 ) {
  *
  * @param int $default Optional. Default: 20 (normal).
  */
-function mpp_rewrite_content_priority( $default = 20 ) {
-	echo (int) mpp_get_rewrite_content_priority( $default );
+function pchap_rewrite_content_priority( $default = 20 ) {
+	echo (int) pchap_get_rewrite_content_priority( $default );
 }
 
 /**
@@ -778,7 +778,7 @@ function mpp_rewrite_content_priority( $default = 20 ) {
  * @param int $default Optional. Default: 20 (normal).
  * @return int The rewrite content priority.
  */
-function mpp_get_rewrite_content_priority( $default = 20 ) {
+function pchap_get_rewrite_content_priority( $default = 20 ) {
 
 	/**
 	 * Filters the rewrite content priority.
@@ -787,7 +787,7 @@ function mpp_get_rewrite_content_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite content priority.
 	 */
-	return (int) apply_filters( 'mpp_get_rewrite_content_priority', (int) _mpp_get_valid_option( '_mpp-rewrite-content-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_content_priority', (int) _pchap_get_valid_option( '_mpp-rewrite-content-priority', $default ) );
 }
 
 /**
@@ -799,7 +799,7 @@ function mpp_get_rewrite_content_priority( $default = 20 ) {
  *                      Default: false.
  * @return bool true if the TinyMCE Buttons should be hidden otherwise false.
  */
-function mpp_disable_tinymce_buttons( $default = false ) {
+function pchap_disable_tinymce_buttons( $default = false ) {
 
 	/**
 	 * Filters whether or not TinyMCE Buttons are disabled.
@@ -808,5 +808,5 @@ function mpp_disable_tinymce_buttons( $default = false ) {
 	 *
 	 * @param bool $value Whether TinyMCE Buttons are disabled.
 	 */
-	return (bool) apply_filters( 'mpp_disable_tinymce_buttons', (bool) _mpp_get_valid_option( 'mpp-disable-tinymce-buttons', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_tinymce_buttons', (bool) _pchap_get_valid_option( 'mpp-disable-tinymce-buttons', (bool) $default ) );
 }

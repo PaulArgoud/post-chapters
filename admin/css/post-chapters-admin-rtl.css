@@ -1,6 +1,6 @@
 /*
-Plugin Name: Multipage
-Plugin URI: https://wordpress.org/plugins/sgr-nextpage-titles/
+Plugin Name: Post Chapters
+Plugin URI: https://wordpress.org/plugins/post-chapters/
 Author: Sergio De Falco, Paul ARGOUD
 License: GPL v3
 */
@@ -22,16 +22,16 @@ i.mce-i-subpage {
 }
 
 /* Settings screens. */
-.settings_page_mpp-settings label a,
-.settings_page_mpp-advanced-settings label a {
+.settings_page_post-chapters label a,
+.settings_page_post-chapters-advanced label a {
 	text-decoration: none;
 	color: #444;
 }
 
-.settings_page_mpp-advanced-settings .mpp-rebuild-form {
+.settings_page_post-chapters-advanced .mpp-rebuild-form {
 	margin: 1em 0 2em;
 }
 
-.settings_page_mpp-advanced-settings .mpp-rebuild-pending {
+.settings_page_post-chapters-advanced .mpp-rebuild-pending {
 	font-style: italic;
 }

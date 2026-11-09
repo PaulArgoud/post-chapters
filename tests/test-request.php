@@ -2,10 +2,10 @@
 /**
  * Request handling tests: document title, rel links, 404 and canonical redirects.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * Request lifecycle: pre_handle_404, redirect_canonical, wp, wp_head.
@@ -13,7 +13,7 @@
  * @group multipage
  * @group request
  */
-class Test_Mpp_Request extends Mpp_UnitTestCase {
+class Test_PChap_Request extends PChap_UnitTestCase {
 
 	/**
 	 * Three-page classic post: Intro, Deux, Trois.
@@ -32,7 +32,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 		$title = wp_get_document_title();
 		$this->assertStringContainsString( 'Mon article', $title );
 		$this->assertStringNotContainsString( 'Intro', $title );
-		$this->assertFalse( has_filter( 'document_title_parts', array( multipage(), 'mpp_document_title_parts' ) ) );
+		$this->assertFalse( has_filter( 'document_title_parts', array( pchap(), 'pchap_document_title_parts' ) ) );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$title = wp_get_document_title();
@@ -45,14 +45,14 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 	}
 
 	/**
-	 * Document title of an untitled subpage keeps a "Page N" part.
+	 * Document title of an untitled subpage keeps a "Chapter N" part.
 	 */
 	public function test_document_title_of_untitled_subpage() {
 		$post_id = $this->create_post( "Intro\n\n[nextpage]\n\nTwo" );
 
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertStringContainsString( 'Page 2', wp_get_document_title() );
+		$this->assertStringContainsString( 'Chapter 2', wp_get_document_title() );
 	}
 
 	/**
@@ -64,7 +64,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertSame( 50, has_filter( 'document_title_parts', array( multipage(), 'mpp_document_title_parts' ) ) );
+		$this->assertSame( 50, has_filter( 'document_title_parts', array( pchap(), 'pchap_document_title_parts' ) ) );
 	}
 
 	/**
@@ -76,7 +76,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertSame( 5, has_filter( 'the_content', array( multipage(), 'mpp_the_content' ) ) );
+		$this->assertSame( 5, has_filter( 'the_content', array( pchap(), 'pchap_the_content' ) ) );
 	}
 
 	/**
@@ -86,18 +86,18 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 1 );
-		$head = (string) get_echo( array( multipage(), 'mpp_rel_links' ) );
+		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
 		$this->assertStringNotContainsString( 'rel="prev"', $head );
-		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _mpp_link_page_url( 2, '', $post_id ) ) . '" />', $head );
-		$this->assertSame( 10, has_action( 'wp_head', array( multipage(), 'mpp_rel_links' ) ) );
+		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _pchap_link_page_url( 2, '', $post_id ) ) . '" />', $head );
+		$this->assertSame( 10, has_action( 'wp_head', array( pchap(), 'pchap_rel_links' ) ) );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$head = (string) get_echo( 'do_action', array( 'wp_head' ) );
-		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( _mpp_link_page_url( 1, '', $post_id ) ) . '" />', $head );
-		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _mpp_link_page_url( 3, '', $post_id ) ) . '" />', $head );
+		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( _pchap_link_page_url( 1, '', $post_id ) ) . '" />', $head );
+		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _pchap_link_page_url( 3, '', $post_id ) ) . '" />', $head );
 
 		$this->go_to_subpage( $post_id, 3 );
-		$head = (string) get_echo( array( multipage(), 'mpp_rel_links' ) );
+		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
 		$this->assertStringContainsString( 'rel="prev"', $head );
 		$this->assertStringNotContainsString( 'rel="next"', $head );
 	}
@@ -110,7 +110,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC, array( 'post_name' => 'mon-article' ) );
 
 		$this->go_to_subpage( $post_id, 2 );
-		$head = (string) get_echo( array( multipage(), 'mpp_rel_links' ) );
+		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
 
 		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( home_url( '/mon-article/' ) ) . '" />', $head );
 		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( home_url( '/mon-article/3/' ) ) . '" />', $head );
@@ -124,7 +124,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 
 		$this->go_to_subpage( $post_id, 1 );
 
-		$this->assertSame( '', (string) get_echo( array( multipage(), 'mpp_rel_links' ) ) );
+		$this->assertSame( '', (string) get_echo( array( pchap(), 'pchap_rel_links' ) ) );
 	}
 
 	/**
@@ -137,14 +137,14 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 			$this->go_to_subpage( $post_id, $page );
 			$this->assertFalse( is_404(), "Subpage {$page}." );
 			$this->assertTrue( is_single() );
-			$this->assertTrue( multipage()->is_multipage_view() );
+			$this->assertTrue( pchap()->is_multipage_view() );
 		}
 
 		foreach ( array( 4, 99 ) as $page ) {
 			$this->go_to_subpage( $post_id, $page );
 			$this->assertTrue( is_404(), "Subpage {$page}." );
-			$this->assertFalse( multipage()->is_multipage_view() );
-			$this->assertFalse( has_filter( 'the_content', array( multipage(), 'mpp_the_content' ) ) );
+			$this->assertFalse( pchap()->is_multipage_view() );
+			$this->assertFalse( has_filter( 'the_content', array( pchap(), 'pchap_the_content' ) ) );
 		}
 	}
 
@@ -153,11 +153,11 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 	 */
 	public function test_404_handling_with_pretty_permalinks() {
 		$this->set_permalink_structure( '/%postname%/' );
-		$post_id = $this->create_post( Mpp_Test_Corpus::items()['blocks 1.7']['content'] );
+		$post_id = $this->create_post( PChap_Test_Corpus::items()['blocks 1.7']['content'] );
 
 		$this->go_to( trailingslashit( get_permalink( $post_id ) ) . '3/' );
 		$this->assertFalse( is_404() );
-		$this->assertSame( 3, multipage()->get_current_page() );
+		$this->assertSame( 3, pchap()->get_current_page() );
 
 		$this->reset_multipage();
 		$this->go_to( trailingslashit( get_permalink( $post_id ) ) . '4/' );
@@ -171,7 +171,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 2 );
-		$requested = _mpp_link_page_url( 2, '', $post_id );
+		$requested = _pchap_link_page_url( 2, '', $post_id );
 
 		// A redirect elsewhere (e.g. to the base URL) is cancelled.
 		$this->assertFalse( apply_filters( 'redirect_canonical', get_permalink( $post_id ), $requested ) );
@@ -213,28 +213,28 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 
 		$this->reset_multipage();
 		$this->go_to( home_url( '/' ) );
-		$this->assertFalse( multipage()->is_multipage_view() );
+		$this->assertFalse( pchap()->is_multipage_view() );
 
 		$this->reset_multipage();
 		$this->go_to( home_url( '/?feed=rss2' ) );
 		$this->assertTrue( is_feed() );
-		$this->assertFalse( multipage()->is_multipage_view() );
+		$this->assertFalse( pchap()->is_multipage_view() );
 	}
 
 	/**
-	 * Multipage::setup() is idempotent and only for the main query.
+	 * PChap::setup() is idempotent and only for the main query.
 	 */
 	public function test_setup_is_idempotent_and_main_query_only() {
 		$post_id = $this->create_post( self::CLASSIC );
 		$this->go_to_subpage( $post_id, 2 );
 
-		$mpp = multipage();
+		$mpp = pchap();
 		$this->assertTrue( $mpp->setup() );
 		$this->assertTrue( $mpp->setup( $GLOBALS['wp_the_query'] ) );
 		$this->assertSame( 2, $mpp->get_current_page() );
 		$this->assertSame( 3, $mpp->max_num_pages );
-		$this->assertSame( 'deux', $mpp->mpp_pagename );
-		$this->assertSame( 1, $mpp->mpp_index );
+		$this->assertSame( 'deux', $mpp->pchap_pagename );
+		$this->assertSame( 1, $mpp->pchap_index );
 		$this->assertSame( 'Deux', $mpp->page_title );
 		$this->assertSame( $post_id, $mpp->post_id );
 
@@ -248,7 +248,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 	 */
 	public function test_seo_replacement_filters() {
 		$post_id = $this->create_post( self::CLASSIC );
-		$mpp     = multipage();
+		$mpp     = pchap();
 
 		$this->go_to_subpage( $post_id, 1 );
 		$this->assertSame(
@@ -305,7 +305,7 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 	public function test_wpseo_canonical_filter() {
 		$this->set_permalink_structure( '/%postname%/' );
 		$post_id   = $this->create_post( self::CLASSIC, array( 'post_name' => 'mon-article' ) );
-		$mpp       = multipage();
+		$mpp       = pchap();
 		$permalink = get_permalink( $post_id );
 
 		$this->go_to_subpage( $post_id, 1 );
@@ -338,13 +338,13 @@ class Test_Mpp_Request extends Mpp_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 
 		if ( ! defined( 'WPSEO_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'wpseo_replacements', array( multipage(), 'filter_wpseo_replacements' ) ) );
+			$this->assertFalse( has_filter( 'wpseo_replacements', array( pchap(), 'filter_wpseo_replacements' ) ) );
 		}
 		if ( ! defined( 'RANK_MATH_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'rank_math/replacements', array( multipage(), 'filter_rank_math_replacements' ) ) );
+			$this->assertFalse( has_filter( 'rank_math/replacements', array( pchap(), 'filter_rank_math_replacements' ) ) );
 		}
 		if ( ! defined( 'SEOPRESS_VERSION' ) ) {
-			$this->assertFalse( has_filter( 'seopress_context_paged', array( multipage(), 'filter_seopress_context_paged' ) ) );
+			$this->assertFalse( has_filter( 'seopress_context_paged', array( pchap(), 'filter_seopress_context_paged' ) ) );
 		}
 	}
 }

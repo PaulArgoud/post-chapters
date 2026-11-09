@@ -1,7 +1,7 @@
 # Multipage for WordPress
 
-[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.1-blue.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/tag/1.7.1)
-[![CI](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/sgr-nextpage-titles/actions/workflows/ci.yml)
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.7.1-blue.svg)](https://github.com/PaulArgoud/post-chapters/releases/tag/1.7.1)
+[![CI](https://github.com/PaulArgoud/post-chapters/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/post-chapters/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
 [![PHP](https://img.shields.io/badge/PHP-7.4%E2%80%938.4-777BB4.svg)](https://www.php.net/)
@@ -35,16 +35,16 @@ Split your WordPress posts into multiple subpages, each with its own title and a
 
 ### From GitHub
 
-1. Download `sgr-nextpage-titles.zip` from the [latest release](https://github.com/PaulArgoud/sgr-nextpage-titles/releases/latest) (use this archive, not GitHub's "Source code" archives, which contain the development files and a differently named folder)
-2. In WordPress, go to **Plugins > Add New > Upload Plugin** and upload the zip, or unzip it so that the plugin sits in `/wp-content/plugins/sgr-nextpage-titles/`
+1. Download `post-chapters.zip` from the [latest release](https://github.com/PaulArgoud/post-chapters/releases/latest) (use this archive, not GitHub's "Source code" archives, which contain the development files and a differently named folder)
+2. In WordPress, go to **Plugins > Add New > Upload Plugin** and upload the zip, or unzip it so that the plugin sits in `/wp-content/plugins/post-chapters/`
 3. Activate **Multipage** through the **Plugins** menu in WordPress
 4. Configure the plugin under **Settings > Multipage**
 
 ### WordPress.org
 
-The [WordPress.org listing](https://wordpress.org/plugins/sgr-nextpage-titles/) is still the original author's version 1.5.12 (2021), so searching for **Multipage** in **Plugins > Add New** installs that older version, not 1.7.1. Install from the GitHub release above.
+The [WordPress.org listing](https://wordpress.org/plugins/post-chapters/) is still the original author's version 1.5.12 (2021), so searching for **Multipage** in **Plugins > Add New** installs that older version, not 1.7.1. Install from the GitHub release above.
 
-The GitHub version declares `Update URI: https://github.com/PaulArgoud/sgr-nextpage-titles` in its header, so WordPress never replaces it with the WordPress.org version of the same slug. Updates come from new GitHub releases: download the new zip and upload it again (WordPress offers to replace the installed version).
+The GitHub version declares `Update URI: https://github.com/PaulArgoud/post-chapters` in its header, so WordPress never replaces it with the WordPress.org version of the same slug. Updates come from new GitHub releases: download the new zip and upload it again (WordPress offers to replace the installed version).
 
 ### Updating to 1.7.0
 
@@ -96,14 +96,14 @@ The plugin checks the child theme first, then the parent theme, then falls back 
 
 | Filter | Description |
 |--------|-------------|
-| `mpp_the_content` | Modify the multipage content output (title + table of contents + content) |
-| `mpp_page_title_template` | Change the subpage title HTML template (default: `<h2>%s</h2>`) |
-| `mpp_link_pages` / `mpp_link_pages_args` / `mpp_link_pages_link` | Navigation HTML, arguments and individual links |
-| `mpp_toc` / `mpp_toc_args` / `mpp_toc_pages_row` | Table of contents HTML, arguments and individual rows |
-| `mpp_untitled_subpage_title` | Fallback title of untitled subpages (default: "Page N") |
-| `mpp_subpage_title_allowed_html` | Inline HTML allowed in subpage titles |
-| `mpp_comment_block_names` | Comment blocks hidden on subpages without comments (block themes) |
-| `mpp_get_admin_tabs` | Add or remove admin settings tabs |
+| `pchap_the_content` | Modify the multipage content output (title + table of contents + content) |
+| `pchap_page_title_template` | Change the subpage title HTML template (default: `<h2>%s</h2>`) |
+| `pchap_link_pages` / `pchap_link_pages_args` / `pchap_link_pages_link` | Navigation HTML, arguments and individual links |
+| `pchap_toc` / `pchap_toc_args` / `pchap_toc_pages_row` | Table of contents HTML, arguments and individual rows |
+| `pchap_untitled_subpage_title` | Fallback title of untitled subpages (default: "Page N") |
+| `pchap_subpage_title_allowed_html` | Inline HTML allowed in subpage titles |
+| `pchap_comment_block_names` | Comment blocks hidden on subpages without comments (block themes) |
+| `pchap_get_admin_tabs` | Add or remove admin settings tabs |
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the complete hooks reference.
 
@@ -125,11 +125,11 @@ Translation files are located in `/languages/`. Available languages:
 - Italian (it_IT)
 - Spanish (es_ES)
 
-For these four languages the bundled files are always used, even when a language pack is installed: the packs that [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/sgr-nextpage-titles/) delivers for the `sgr-nextpage-titles` slug translate the original plugin and lack the strings of this version. Other languages use the installed language pack, if any. The `mpp_prefer_bundled_translations` filter (`add_filter( 'mpp_prefer_bundled_translations', '__return_false' );`) gives the language packs precedence back. To contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
+For these four languages the bundled files are always used, even when a language pack is installed: the packs that [translate.wordpress.org](https://translate.wordpress.org/projects/wp-plugins/post-chapters/) delivers for the `post-chapters` slug translate the original plugin and lack the strings of this version. Other languages use the installed language pack, if any. The `pchap_prefer_bundled_translations` filter (`add_filter( 'pchap_prefer_bundled_translations', '__return_false' );`) gives the language packs precedence back. To contribute a translation, see [CONTRIBUTING.md](CONTRIBUTING.md#translations).
 
 ## Development
 
-The plugin itself needs no build step. The development tools are installed with Composer and the tests run in [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (Docker and Node.js 22.13+ required). Clone the repository into a folder named `sgr-nextpage-titles`.
+The plugin itself needs no build step. The development tools are installed with Composer and the tests run in [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (Docker and Node.js 22.13+ required). Clone the repository into a folder named `post-chapters`.
 
 ```bash
 composer install          # PHPCS, WPCS, PHPCompatibilityWP, PHPUnit (dev only)
@@ -138,14 +138,14 @@ composer phpcs            # WordPress Coding Standards (composer phpcbf to fix)
 npx wp-env start          # WordPress 7.1.4 / PHP 8.4 at http://localhost:8888
 composer test:wp-env      # PHPUnit suite inside wp-env
 bin/check-i18n.sh         # Translation files in sync with the code (WP-CLI + gettext)
-bin/build-zip.sh          # Release archive: build/sgr-nextpage-titles.zip
+bin/build-zip.sh          # Release archive: build/post-chapters.zip
 ```
 
 `composer test` runs PHPUnit directly when the WordPress test library is available (`WP_TESTS_DIR`). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and [ARCHITECTURE.md](ARCHITECTURE.md) for the internals.
 
 ## History
 
-This plugin was originally created by Sergio De Falco (SGr33n). The [original codebase up to version 1.3.1](https://github.com/wp-plugins/sgr-nextpage-titles) served as the foundation for this fork. From there, the plugin was maintained and extended through [version 1.5.9 on the WordPress.org SVN repository](https://plugins.svn.wordpress.org/sgr-nextpage-titles/tags/). Starting from [version 1.5.12 published on WordPress.org](https://wordpress.org/plugins/sgr-nextpage-titles/), Paul Argoud took over active development, bringing the plugin up to modern WordPress and PHP standards with continued improvements.
+This plugin was originally created by Sergio De Falco (SGr33n). The [original codebase up to version 1.3.1](https://github.com/wp-plugins/post-chapters) served as the foundation for this fork. From there, the plugin was maintained and extended through [version 1.5.9 on the WordPress.org SVN repository](https://plugins.svn.wordpress.org/post-chapters/tags/). Starting from [version 1.5.12 published on WordPress.org](https://wordpress.org/plugins/post-chapters/), Paul Argoud took over active development, bringing the plugin up to modern WordPress and PHP standards with continued improvements.
 
 ## Changelog
 

@@ -2,5 +2,5 @@
 /**
  * Silence is golden.
  *
- * @package Multipage
+ * @package Post Chapters
  */

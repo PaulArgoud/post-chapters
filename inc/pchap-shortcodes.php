@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Multipage Shortcodes Class.
+ * Main Post Chapters Shortcodes Class.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Shortcodes
  * @since 1.4
  */
@@ -11,8 +11,8 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Initialize Multipage Shortcodes.
+ * Initialize Post Chapters Shortcodes.
  *
  * @since 1.4
  */
-Multipage_Plugin_Shortcodes::init();
+PChap_Shortcodes::init();

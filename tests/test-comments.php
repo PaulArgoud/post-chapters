@@ -2,10 +2,10 @@
 /**
  * Comments visibility tests.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
-// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_Mpp_ prefix and tests apply core and third-party hooks.
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
  * The "Display comments on" setting, for classic themes (comments_template)
@@ -14,7 +14,7 @@
  * @group multipage
  * @group comments
  */
-class Test_Mpp_Comments extends Mpp_UnitTestCase {
+class Test_PChap_Comments extends PChap_UnitTestCase {
 
 	/**
 	 * Three-page classic post.
@@ -67,12 +67,12 @@ class Test_Mpp_Comments extends Mpp_UnitTestCase {
 			if ( $is_visible ) {
 				$this->assertSame( $template, $filtered, "Comments must be visible on page {$page}." );
 			} else {
-				$this->assertSame( MPP_PLUGIN_DIR . 'index.php', $filtered, "Comments must be hidden on page {$page}." );
+				$this->assertSame( PCHAP_PLUGIN_DIR . 'index.php', $filtered, "Comments must be hidden on page {$page}." );
 				$this->assertFileExists( $filtered );
 				$this->assertSame( '', trim( (string) get_echo( 'comments_template' ) ), 'The replacement template outputs nothing.' );
 			}
 
-			$this->assertSame( $is_visible, multipage()->comments_allowed_on_current_page() );
+			$this->assertSame( $is_visible, pchap()->comments_allowed_on_current_page() );
 		}
 	}
 

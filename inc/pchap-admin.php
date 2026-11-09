@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Multipage Admin Class.
+ * Main Post Chapters Admin Class.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage CoreAdministration
  * @since 1.4
  */
@@ -11,10 +11,10 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Setup Multipage Admin.
+ * Setup Post Chapters Admin.
  *
  * @since 1.4
  */
-function mpp_admin() {
-	multipage()->admin = new MPP_Admin();
+function pchap_admin() {
+	pchap()->admin = new PChap_Admin();
 }

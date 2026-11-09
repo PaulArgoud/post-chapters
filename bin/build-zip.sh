@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Build the distributable plugin archive: build/sgr-nextpage-titles.zip
+# Build the distributable plugin archive: build/post-chapters.zip
 #
-# The archive contains a single top-level "sgr-nextpage-titles/" folder, as
+# The archive contains a single top-level "post-chapters/" folder, as
 # expected by the WordPress plugin uploader. Only files known to git are
 # packaged, and every path listed in .distignore is left out (development
 # tooling, tests, contributor docs, .po sources...).
@@ -11,7 +11,7 @@
 #
 set -euo pipefail
 
-SLUG="sgr-nextpage-titles"
+SLUG="post-chapters"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT}/build"
 ZIP_FILE="${BUILD_DIR}/${SLUG}.zip"

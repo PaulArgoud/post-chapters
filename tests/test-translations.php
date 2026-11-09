@@ -2,11 +2,11 @@
 /**
  * Translations: the bundled files win over the language packs of the original plugin.
  *
- * The sgr-nextpage-titles slug is shared with the original plugin, whose language packs
+ * The post-chapters slug is shared with the original plugin, whose language packs
  * from translate.wordpress.org (installed in WP_LANG_DIR/plugins) lack the strings of
  * this version.
  *
- * @package Multipage
+ * @package Post Chapters
  */
 
 /**
@@ -14,7 +14,7 @@
  *
  * @group i18n
  */
-class MPP_Test_Translations extends WP_UnitTestCase {
+class PChap_Test_Translations extends WP_UnitTestCase {
 
 	/**
 	 * Locale forced by force_locale().
@@ -61,7 +61,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		remove_filter( 'determine_locale', array( $this, 'force_locale' ) );
-		remove_filter( 'mpp_prefer_bundled_translations', '__return_false' );
+		remove_filter( 'pchap_prefer_bundled_translations', '__return_false' );
 
 		foreach ( $this->created as $file ) {
 			if ( file_exists( $file ) ) {
@@ -91,8 +91,8 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 		$this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
 
 		$this->assert_registry_resolves_pack();
-		$this->assertSame( 'Commentaires', __( 'Comments', 'sgr-nextpage-titles' ) );
-		$this->assertSame( 'Navigation des sous-pages', __( 'Subpage navigation', 'sgr-nextpage-titles' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
+		$this->assertSame( 'Navigation des sous-pages', __( 'Subpage navigation', 'post-chapters' ) );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 		}
 		self::unload_all_locales();
 
-		$this->assertSame( 'Commentaires', __( 'Comments', 'sgr-nextpage-titles' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
 	}
 
 	/**
@@ -119,33 +119,33 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 		$this->locale = 'nl_NL';
 		$this->install_pack( 'nl_NL', 'Reacties' );
 
-		$this->assertFileDoesNotExist( MPP_PLUGIN_DIR . 'languages/sgr-nextpage-titles-nl_NL.mo' );
-		$this->assertSame( 'Reacties', __( 'Comments', 'sgr-nextpage-titles' ) );
+		$this->assertFileDoesNotExist( PCHAP_PLUGIN_DIR . 'languages/post-chapters-nl_NL.mo' );
+		$this->assertSame( 'Reacties', __( 'Comments', 'post-chapters' ) );
 	}
 
 	/**
-	 * The mpp_prefer_bundled_translations filter gives the language packs precedence back.
+	 * The pchap_prefer_bundled_translations filter gives the language packs precedence back.
 	 */
 	public function test_filter_restores_language_pack_precedence() {
-		add_filter( 'mpp_prefer_bundled_translations', '__return_false' );
+		add_filter( 'pchap_prefer_bundled_translations', '__return_false' );
 		$this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
-		$this->assertSame( 'Commentaires (ancien pack)', __( 'Comments', 'sgr-nextpage-titles' ) );
+		$this->assertSame( 'Commentaires (ancien pack)', __( 'Comments', 'post-chapters' ) );
 	}
 
 	/**
 	 * Other text domains and files outside WP_LANG_DIR/plugins are never redirected.
 	 */
 	public function test_mofile_filter_scope() {
-		$pack = WP_LANG_DIR . '/plugins/sgr-nextpage-titles-fr_FR.mo';
+		$pack = WP_LANG_DIR . '/plugins/post-chapters-fr_FR.mo';
 
-		$this->assertSame( MPP_PLUGIN_DIR . 'languages/sgr-nextpage-titles-fr_FR.mo', wp_normalize_path( mpp_load_bundled_textdomain_mofile( $pack, 'sgr-nextpage-titles' ) ) );
-		$this->assertSame( $pack, mpp_load_bundled_textdomain_mofile( $pack, 'other-domain' ) );
+		$this->assertSame( PCHAP_PLUGIN_DIR . 'languages/post-chapters-fr_FR.mo', wp_normalize_path( pchap_load_bundled_textdomain_mofile( $pack, 'post-chapters' ) ) );
+		$this->assertSame( $pack, pchap_load_bundled_textdomain_mofile( $pack, 'other-domain' ) );
 
-		$custom = WP_LANG_DIR . '/loco/plugins/sgr-nextpage-titles-fr_FR.mo';
-		$this->assertSame( $custom, mpp_load_bundled_textdomain_mofile( $custom, 'sgr-nextpage-titles' ) );
+		$custom = WP_LANG_DIR . '/loco/plugins/post-chapters-fr_FR.mo';
+		$this->assertSame( $custom, pchap_load_bundled_textdomain_mofile( $custom, 'post-chapters' ) );
 
-		$elsewhere = WP_CONTENT_DIR . '/custom/sgr-nextpage-titles-fr_FR.mo';
-		$this->assertSame( $elsewhere, mpp_load_bundled_textdomain_mofile( $elsewhere, 'sgr-nextpage-titles' ) );
+		$elsewhere = WP_CONTENT_DIR . '/custom/post-chapters-fr_FR.mo';
+		$this->assertSame( $elsewhere, pchap_load_bundled_textdomain_mofile( $elsewhere, 'post-chapters' ) );
 	}
 
 	/**
@@ -156,17 +156,17 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Block_Type', $block_type );
 
 		$handle   = $block_type->editor_script_handles[0];
-		$basename = 'sgr-nextpage-titles-fr_FR-' . md5( 'blocks/subpage/index.js' ) . '.json';
-		$bundled  = MPP_PLUGIN_DIR . 'languages/' . $basename;
+		$basename = 'post-chapters-fr_FR-' . md5( 'blocks/subpage/index.js' ) . '.json';
+		$bundled  = PCHAP_PLUGIN_DIR . 'languages/' . $basename;
 		$this->assertFileExists( $bundled );
 
 		$this->ensure_packs_dir();
-		foreach ( array( $basename, 'sgr-nextpage-titles-fr_FR-' . $handle . '.json' ) as $name ) {
+		foreach ( array( $basename, 'post-chapters-fr_FR-' . $handle . '.json' ) as $name ) {
 			$this->write_file( WP_LANG_DIR . '/plugins/' . $name, '{"locale_data":{"messages":{"":{"domain":"messages"},"Subpage title":["Ancien pack"]}}}' );
 		}
 		wp_cache_delete( md5( WP_LANG_DIR . '/plugins/' ), 'translation_files' );
 
-		$this->assertSame( file_get_contents( $bundled ), load_script_textdomain( $handle, 'sgr-nextpage-titles' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+		$this->assertSame( file_get_contents( $bundled ), load_script_textdomain( $handle, 'post-chapters' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
 	}
 
 	/**
@@ -181,7 +181,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 			return;
 		}
 
-		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'sgr-nextpage-titles', 'fr_FR' ), 'The registry should resolve the language pack first.' );
+		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'post-chapters', 'fr_FR' ), 'The registry should resolve the language pack first.' );
 	}
 
 	/**
@@ -194,7 +194,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	private function install_pack( $locale, $translation ) {
 		$this->ensure_packs_dir();
 
-		$base = WP_LANG_DIR . '/plugins/sgr-nextpage-titles-' . $locale;
+		$base = WP_LANG_DIR . '/plugins/post-chapters-' . $locale;
 
 		$mo = new MO();
 		$mo->set_header( 'Language', $locale );
@@ -239,7 +239,7 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 		$GLOBALS['wp_textdomain_registry'] = $registry; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Restored in tear_down().
 
 		self::unload_all_locales();
-		mpp_load_multipage_textdomain();
+		pchap_load_textdomain();
 	}
 
 	/**
@@ -249,11 +249,11 @@ class MPP_Test_Translations extends WP_UnitTestCase {
 	 * another locale would stay loaded for the next tests.
 	 */
 	private static function unload_all_locales() {
-		unload_textdomain( 'sgr-nextpage-titles', true );
+		unload_textdomain( 'post-chapters', true );
 
 		if ( class_exists( 'WP_Translation_Controller' ) ) {
 			foreach ( array( 'fr_FR', 'nl_NL' ) as $locale ) {
-				WP_Translation_Controller::get_instance()->unload_textdomain( 'sgr-nextpage-titles', $locale );
+				WP_Translation_Controller::get_instance()->unload_textdomain( 'post-chapters', $locale );
 			}
 		}
 	}

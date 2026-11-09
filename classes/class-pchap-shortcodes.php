@@ -1,8 +1,8 @@
 <?php
 /**
- * Multipage Component Shortcodes.
+ * Post Chapters Component Shortcodes.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Shortcodes
  * @since 1.5
  */
@@ -11,11 +11,11 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Multipage shortcodes.
+ * Post Chapters shortcodes.
  *
  * @since 1.1
  */
-class Multipage_Plugin_Shortcodes {
+class PChap_Shortcodes {
 
 	/**
 	 * Register shortcode handlers
@@ -23,7 +23,7 @@ class Multipage_Plugin_Shortcodes {
 	 * @since 1.1
 	 */
 	public static function init() {
-		add_shortcode( 'nextpage', array( 'Multipage_Plugin_Shortcodes', 'nextpage' ) );
+		add_shortcode( 'nextpage', array( 'PChap_Shortcodes', 'nextpage' ) );
 	}
 
 	/**

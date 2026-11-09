@@ -1,12 +1,12 @@
 <?php
 /**
- * Multipage Updater.
+ * Post Chapters Updater.
  *
  * Install/update routines, activation/deactivation hooks and the subpage
  * index (post meta `_mpp_data`) rebuild, run in batches either synchronously
  * (admin action, WP-CLI) or in the background through WP-Cron.
  *
- * @package Multipage
+ * @package Post Chapters
  * @subpackage Updater
  * @since 1.4
  */
@@ -17,22 +17,22 @@ defined( 'ABSPATH' ) || exit;
 /** Versions ******************************************************************/
 
 /**
- * Return the Multipage database version installed on this site.
+ * Return the Post Chapters database version installed on this site.
  *
- * Combines the raw version detected by Multipage::versions() (999 for a
+ * Combines the raw version detected by PChap::versions() (999 for a
  * legacy 1.3 install still holding the `multipage` option) with the version
- * stored in `_mpp_db_version` by mpp_version_bump() (1000 for 1.4 to 1.6).
+ * stored in `_mpp_db_version` by pchap_version_bump() (1000 for 1.4 to 1.6).
  *
  * @since 1.7.0
  *
  * @return int The installed database version, 0 on a fresh install.
  */
-function mpp_get_installed_db_version() {
-	return max( (int) mpp_get_db_version_raw(), (int) get_option( '_mpp_db_version', 0 ) );
+function pchap_get_installed_db_version() {
+	return max( (int) pchap_get_db_version_raw(), (int) get_option( '_mpp_db_version', 0 ) );
 }
 
 /**
- * Is this a fresh installation of Multipage?
+ * Is this a fresh installation of Post Chapters?
  *
  * If no database version is found (neither the legacy settings nor the
  * stored `_mpp_db_version`), we infer that this is the first installation.
@@ -43,14 +43,14 @@ function mpp_get_installed_db_version() {
  *
  * @return bool True if this is a fresh install, otherwise false.
  */
-function mpp_is_install() {
-	return 0 === mpp_get_installed_db_version();
+function pchap_is_install() {
+	return 0 === pchap_get_installed_db_version();
 }
 
 /**
- * Is this a Multipage update?
+ * Is this a Post Chapters update?
  *
- * Determined by comparing the registered Multipage version to the version
+ * Determined by comparing the registered Post Chapters version to the version
  * number stored in the database. If the registered version is greater, it's
  * an update.
  *
@@ -58,25 +58,25 @@ function mpp_is_install() {
  *
  * @return bool True if update, otherwise false.
  */
-function mpp_is_update() {
+function pchap_is_update() {
 
 	// Current DB version of this site (per site in a multisite network).
 	$current_db   = (int) get_option( '_mpp_db_version', 0 );
-	$current_live = (int) mpp_get_db_version();
+	$current_live = (int) pchap_get_db_version();
 
 	return $current_db < $current_live;
 }
 
 /**
- * Determine whether Multipage is in the process of being deactivated.
+ * Determine whether Post Chapters is in the process of being deactivated.
  *
  * @since 1.4
  *
- * @param string $basename Multipage basename.
- * @return bool True if deactivating Multipage, false if not.
+ * @param string $basename Post Chapters basename.
+ * @return bool True if deactivating Post Chapters, false if not.
  */
-function mpp_is_deactivation( $basename = '' ) {
-	$mpp    = multipage();
+function pchap_is_deactivation( $basename = '' ) {
+	$mpp    = pchap();
 	$action = '';
 
 	// Check GET for single deactivation, POST for bulk deactivation.
@@ -113,86 +113,91 @@ function mpp_is_deactivation( $basename = '' ) {
 		return false;
 	}
 
-	// Is Multipage being deactivated?
+	// Is Post Chapters being deactivated?
 	return in_array( $basename, $plugins, true );
 }
 
 /**
- * Update the Multipage version stored in the database to the current version.
+ * Update the Post Chapters version stored in the database to the current version.
  *
  * @since 1.4
  */
-function mpp_version_bump() {
-	update_option( '_mpp_db_version', mpp_get_db_version() );
+function pchap_version_bump() {
+	update_option( '_mpp_db_version', pchap_get_db_version() );
 }
 
 /**
- * Set up the Multipage updater.
+ * Set up the Post Chapters updater.
  *
  * @since 1.4
  */
-function mpp_setup_updater() {
+function pchap_setup_updater() {
 
-	// Are we running an outdated version of Multipage?
-	if ( ! mpp_is_update() ) {
+	// Are we running an outdated version of Post Chapters?
+	if ( ! pchap_is_update() ) {
 		return;
 	}
 
-	mpp_version_updater();
+	pchap_version_updater();
 }
 
 /**
- * Initialize an update or installation of Multipage.
+ * Initialize an update or installation of Post Chapters.
  *
- * Multipage's version updater looks at what the current database version is,
+ * Post Chapters's version updater looks at what the current database version is,
  * and runs whatever other code is needed - either the "update" or "install"
  * code.
  *
  * @since 1.4
  */
-function mpp_version_updater() {
+function pchap_version_updater() {
 
 	// Get the installed database version.
-	$raw_db_version = mpp_get_installed_db_version();
+	$raw_db_version = pchap_get_installed_db_version();
 
 	if ( 0 === $raw_db_version ) {
 		/*
 		 * Fresh install. Index the posts that may already contain subpages
 		 * (e.g. the plugin was deleted then installed again).
 		 */
-		mpp_schedule_postmeta_rebuild();
+		pchap_schedule_postmeta_rebuild();
 
 		/**
-		 * Fires when Multipage is installed.
+		 * Fires when Post Chapters is installed.
 		 *
 		 * @since 1.4
 		 */
-		do_action( 'mpp_on_install' );
+		pchap_do_action( 'pchap_on_install' );
 
 	} else {
 
 		// Version 1.4.
 		if ( $raw_db_version < 1000 ) {
-			mpp_update_to_1_4();
+			pchap_update_to_1_4();
 		}
 
 		// Version 1.7.
 		if ( $raw_db_version < 1700 ) {
-			mpp_update_to_1_7();
+			pchap_update_to_1_7();
+		}
+
+		// Version 2.0 (Multipage becomes Post Chapters).
+		if ( $raw_db_version < 2000 ) {
+			pchap_update_to_2_0();
 		}
 
 		/**
-		 * Fires when Multipage is updated.
+		 * Fires when Post Chapters is updated.
 		 *
 		 * @since 1.4
 		 */
-		do_action( 'mpp_on_update' );
+		pchap_do_action( 'pchap_on_update' );
 	}
 
 	/* All done! *************************************************************/
 
 	// Bump the version.
-	mpp_version_bump();
+	pchap_version_bump();
 }
 
 /**
@@ -210,12 +215,12 @@ function mpp_version_updater() {
  * @since 1.7.0 The subpage index is rebuilt in the background (WP-Cron)
  *              instead of synchronously, after the settings conversion.
  */
-function mpp_update_to_1_4() {
+function pchap_update_to_1_4() {
 	// Convert old settings schema.
 	$old_settings = get_option( 'multipage', false );
 
 	if ( is_array( $old_settings ) ) {
-		_mpp_convert_legacy_settings( $old_settings );
+		_pchap_convert_legacy_settings( $old_settings );
 	}
 
 	// Remove the old options.
@@ -224,9 +229,9 @@ function mpp_update_to_1_4() {
 	/*
 	 * Add multipage postmeta value to old multipage posts, in the background:
 	 * a synchronous full rebuild could exceed max_execution_time on admin_init.
-	 * Keeps a rebuild already pending (mpp_update_to_1_7() restarts it anyway).
+	 * Keeps a rebuild already pending (pchap_update_to_1_7() restarts it anyway).
 	 */
-	mpp_schedule_postmeta_rebuild( false );
+	pchap_schedule_postmeta_rebuild( false );
 }
 
 /**
@@ -239,7 +244,7 @@ function mpp_update_to_1_4() {
  *
  * @param array $old_settings The legacy `multipage` option value.
  */
-function _mpp_convert_legacy_settings( $old_settings ) {
+function _pchap_convert_legacy_settings( $old_settings ) {
 
 	$priorities  = array(
 		'highest' => '100',
@@ -300,8 +305,23 @@ function _mpp_convert_legacy_settings( $old_settings ) {
  *
  * @since 1.7.0
  */
-function mpp_update_to_1_7() {
-	mpp_schedule_postmeta_rebuild();
+function pchap_update_to_1_7() {
+	pchap_schedule_postmeta_rebuild();
+}
+
+/**
+ * 2.0 update routine.
+ *
+ * Multipage became Post Chapters: the options and the `_mpp_data` meta keep
+ * their names, but the WP-Cron event of the background rebuild was renamed
+ * from mpp_rebuild_postmeta_batch to pchap_rebuild_postmeta_batch. Drop the
+ * old event and schedule the new one when a rebuild is still pending.
+ *
+ * @since 2.0.0
+ */
+function pchap_update_to_2_0() {
+	wp_clear_scheduled_hook( 'mpp_rebuild_postmeta_batch' );
+	pchap_ensure_postmeta_rebuild_event();
 }
 
 /** Subpage index (post meta) rebuild ****************************************/
@@ -313,8 +333,8 @@ function mpp_update_to_1_7() {
  *
  * @return string
  */
-function mpp_get_rebuild_cron_hook() {
-	return 'mpp_rebuild_postmeta_batch';
+function pchap_get_rebuild_cron_hook() {
+	return 'pchap_rebuild_postmeta_batch';
 }
 
 /**
@@ -324,7 +344,7 @@ function mpp_get_rebuild_cron_hook() {
  *
  * @return int
  */
-function mpp_get_rebuild_batch_size() {
+function pchap_get_rebuild_batch_size() {
 
 	/**
 	 * Filters the number of posts processed per subpage index rebuild batch.
@@ -333,14 +353,14 @@ function mpp_get_rebuild_batch_size() {
 	 *
 	 * @param int $batch_size Number of posts per batch. Default 200.
 	 */
-	$batch_size = (int) apply_filters( 'mpp_rebuild_postmeta_batch_size', 200 );
+	$batch_size = (int) pchap_apply_filters( 'pchap_rebuild_postmeta_batch_size', 200 );
 
 	return max( 1, $batch_size );
 }
 
 /**
  * Return the SQL condition (with placeholders) and its arguments matching the
- * posts whose subpage index must be (re)built: posts containing a Multipage
+ * posts whose subpage index must be (re)built: posts containing a Post Chapters
  * marker and posts already holding a `_mpp_data` meta (stale meta is deleted).
  *
  * Revisions and auto-drafts are excluded. Drafts, pending, private, future
@@ -350,7 +370,7 @@ function mpp_get_rebuild_batch_size() {
  *
  * @return array { 0: string SQL condition on alias `p`, 1: array arguments }
  */
-function _mpp_rebuild_candidates_where() {
+function _pchap_rebuild_candidates_where() {
 	global $wpdb;
 
 	$where = "p.post_type <> %s AND p.post_status <> %s AND ( p.post_content LIKE %s OR p.post_content LIKE %s OR EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s ) )";
@@ -373,10 +393,10 @@ function _mpp_rebuild_candidates_where() {
  * @param int $after_id Optional. Only count posts with an ID greater than this one.
  * @return int
  */
-function mpp_count_postmeta_rebuild_candidates( $after_id = 0 ) {
+function pchap_count_postmeta_rebuild_candidates( $after_id = 0 ) {
 	global $wpdb;
 
-	list( $where, $args ) = _mpp_rebuild_candidates_where();
+	list( $where, $args ) = _pchap_rebuild_candidates_where();
 	array_unshift( $args, (int) $after_id );
 
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery -- $where only holds placeholders and table names.
@@ -403,7 +423,7 @@ function mpp_count_postmeta_rebuild_candidates( $after_id = 0 ) {
  *     @type bool $done      Whether there are no more posts to process.
  * }
  */
-function mpp_process_postmeta_batch( $after_id, $batch_size, $dry_run = false ) {
+function pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run = false ) {
 	global $wpdb;
 
 	$after_id   = max( 0, (int) $after_id );
@@ -417,7 +437,7 @@ function mpp_process_postmeta_batch( $after_id, $batch_size, $dry_run = false ) 
 		'done'      => false,
 	);
 
-	list( $where, $args ) = _mpp_rebuild_candidates_where();
+	list( $where, $args ) = _pchap_rebuild_candidates_where();
 	array_unshift( $args, $after_id );
 	$args[] = $batch_size;
 
@@ -445,7 +465,7 @@ function mpp_process_postmeta_batch( $after_id, $batch_size, $dry_run = false ) 
 
 	foreach ( $posts as $post ) {
 		$post_id  = (int) $post->ID;
-		$new_data = Multipage_Parser::multipage_return_array( (string) $post->post_content );
+		$new_data = PChap_Parser::multipage_return_array( (string) $post->post_content );
 		$old_rows = isset( $existing[ $post_id ] ) ? $existing[ $post_id ] : array();
 
 		++$stats['processed'];
@@ -488,7 +508,7 @@ function mpp_process_postmeta_batch( $after_id, $batch_size, $dry_run = false ) 
  *
  * @since 1.7.0
  */
-function mpp_rebuild_release_memory() {
+function pchap_rebuild_release_memory() {
 	global $wpdb;
 
 	// Drop the in-memory (runtime) object cache when the cache implementation supports it.
@@ -511,26 +531,26 @@ function mpp_rebuild_release_memory() {
  *     Optional. Arguments.
  *
  *     @type int           $after_id   Start after this post ID. Default 0.
- *     @type int           $batch_size Posts per batch. Default mpp_get_rebuild_batch_size().
+ *     @type int           $batch_size Posts per batch. Default pchap_get_rebuild_batch_size().
  *     @type int|float     $time_limit Stop after the batch exceeding this number of
  *                                     seconds. 0 for no limit. Default 0.
  *     @type bool          $dry_run    Only count the changes. Default false.
  *     @type array         $stats      Totals to start from (resumed rebuild).
  *     @type callable|null $callback   Called after each batch with ( $batch, $totals ).
  * }
- * When the current process holds the rebuild lock (mpp_rebuild_acquire_lock()),
+ * When the current process holds the rebuild lock (pchap_rebuild_acquire_lock()),
  * the lock is refreshed after every batch, and the run stops with `lock_lost`
  * set to true if another process took it over.
  *
  * @return array Totals: processed, updated, deleted, unchanged, batches, cursor (last ID),
  *               done and lock_lost.
  */
-function mpp_run_postmeta_rebuild( $args = array() ) {
+function pchap_run_postmeta_rebuild( $args = array() ) {
 	$args = wp_parse_args(
 		$args,
 		array(
 			'after_id'   => 0,
-			'batch_size' => mpp_get_rebuild_batch_size(),
+			'batch_size' => pchap_get_rebuild_batch_size(),
 			'time_limit' => 0,
 			'dry_run'    => false,
 			'stats'      => array(),
@@ -556,10 +576,10 @@ function mpp_run_postmeta_rebuild( $args = array() ) {
 
 	$time_limit = (float) $args['time_limit'];
 	$started    = microtime( true );
-	$has_lock   = false !== _mpp_rebuild_held_lock();
+	$has_lock   = false !== _pchap_rebuild_held_lock();
 
 	do {
-		$batch = mpp_process_postmeta_batch( $totals['cursor'], (int) $args['batch_size'], (bool) $args['dry_run'] );
+		$batch = pchap_process_postmeta_batch( $totals['cursor'], (int) $args['batch_size'], (bool) $args['dry_run'] );
 
 		++$totals['batches'];
 		foreach ( array( 'processed', 'updated', 'deleted', 'unchanged' ) as $key ) {
@@ -572,14 +592,14 @@ function mpp_run_postmeta_rebuild( $args = array() ) {
 			call_user_func( $args['callback'], $batch, $totals );
 		}
 
-		mpp_rebuild_release_memory();
+		pchap_rebuild_release_memory();
 
 		if ( $totals['done'] ) {
 			break;
 		}
 
 		// Keep the lock alive between batches; stop if another process took it over.
-		if ( $has_lock && ! mpp_rebuild_refresh_lock() ) {
+		if ( $has_lock && ! pchap_rebuild_refresh_lock() ) {
 			$totals['lock_lost'] = true;
 			break;
 		}
@@ -599,8 +619,8 @@ function mpp_run_postmeta_rebuild( $args = array() ) {
  * @param bool $update_option Whether to update the '_mpp-postmeta-built' option. Default true.
  * @return array Totals: processed, updated, deleted, unchanged, batches, cursor and done.
  */
-function mpp_add_post_multipage_meta( $update_option = true ) {
-	$stats = mpp_run_postmeta_rebuild();
+function pchap_add_post_multipage_meta( $update_option = true ) {
+	$stats = pchap_run_postmeta_rebuild();
 
 	if ( true === $update_option ) {
 		update_option( '_mpp-postmeta-built', time() );
@@ -617,7 +637,7 @@ function mpp_add_post_multipage_meta( $update_option = true ) {
  * @return array|false The state (cursor, processed, updated, deleted, unchanged,
  *                     batches, started), or false when no rebuild is pending.
  */
-function mpp_get_postmeta_rebuild_state() {
+function pchap_get_postmeta_rebuild_state() {
 	$state = get_option( '_mpp-rebuild-state', false );
 
 	if ( ! is_array( $state ) ) {
@@ -643,10 +663,10 @@ function mpp_get_postmeta_rebuild_state() {
  *
  * @since 1.7.0
  *
- * @param array $stats Totals returned by mpp_run_postmeta_rebuild().
+ * @param array $stats Totals returned by pchap_run_postmeta_rebuild().
  */
-function mpp_save_postmeta_rebuild_state( $stats ) {
-	$previous = mpp_get_postmeta_rebuild_state();
+function pchap_save_postmeta_rebuild_state( $stats ) {
+	$previous = pchap_get_postmeta_rebuild_state();
 	$state    = array(
 		'cursor'    => isset( $stats['cursor'] ) ? (int) $stats['cursor'] : 0,
 		'processed' => isset( $stats['processed'] ) ? (int) $stats['processed'] : 0,
@@ -669,8 +689,8 @@ function mpp_save_postmeta_rebuild_state( $stats ) {
  *                      is already pending. Default true.
  * @return bool Whether a background run is scheduled.
  */
-function mpp_schedule_postmeta_rebuild( $restart = true ) {
-	if ( $restart || false === mpp_get_postmeta_rebuild_state() ) {
+function pchap_schedule_postmeta_rebuild( $restart = true ) {
+	if ( $restart || false === pchap_get_postmeta_rebuild_state() ) {
 		update_option(
 			'_mpp-rebuild-state',
 			array(
@@ -686,7 +706,7 @@ function mpp_schedule_postmeta_rebuild( $restart = true ) {
 		);
 	}
 
-	return mpp_ensure_postmeta_rebuild_event();
+	return pchap_ensure_postmeta_rebuild_event();
 }
 
 /**
@@ -697,10 +717,10 @@ function mpp_schedule_postmeta_rebuild( $restart = true ) {
  * @param int $delay Optional. Seconds before the next run. Default 0.
  * @return bool Whether a background run is scheduled.
  */
-function mpp_ensure_postmeta_rebuild_event( $delay = 0 ) {
-	$hook = mpp_get_rebuild_cron_hook();
+function pchap_ensure_postmeta_rebuild_event( $delay = 0 ) {
+	$hook = pchap_get_rebuild_cron_hook();
 
-	if ( false === mpp_get_postmeta_rebuild_state() ) {
+	if ( false === pchap_get_postmeta_rebuild_state() ) {
 		return false;
 	}
 
@@ -716,9 +736,9 @@ function mpp_ensure_postmeta_rebuild_event( $delay = 0 ) {
  *
  * @since 1.7.0
  *
- * @param array $stats Totals returned by mpp_run_postmeta_rebuild().
+ * @param array $stats Totals returned by pchap_run_postmeta_rebuild().
  */
-function mpp_complete_postmeta_rebuild( $stats ) {
+function pchap_complete_postmeta_rebuild( $stats ) {
 	update_option( '_mpp-postmeta-built', time() );
 	update_option(
 		'_mpp-rebuild-last',
@@ -731,7 +751,7 @@ function mpp_complete_postmeta_rebuild( $stats ) {
 		false
 	);
 	delete_option( '_mpp-rebuild-state' );
-	wp_clear_scheduled_hook( mpp_get_rebuild_cron_hook() );
+	wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 }
 
 /**
@@ -744,7 +764,7 @@ function mpp_complete_postmeta_rebuild( $stats ) {
  *
  * @return int
  */
-function mpp_get_rebuild_lock_ttl() {
+function pchap_get_rebuild_lock_ttl() {
 	return 5 * MINUTE_IN_SECONDS;
 }
 
@@ -760,7 +780,7 @@ function mpp_get_rebuild_lock_ttl() {
  *                                 Null (default) to only read it.
  * @return string|false The value held by this process, false if none.
  */
-function _mpp_rebuild_held_lock( $value = null ) {
+function _pchap_rebuild_held_lock( $value = null ) {
 	static $held = false;
 
 	if ( null !== $value ) {
@@ -780,7 +800,7 @@ function _mpp_rebuild_held_lock( $value = null ) {
  *                           timestamp), null when there is no lock.
  * @return int The timestamp, 0 when there is no lock.
  */
-function _mpp_rebuild_lock_time( $value ) {
+function _pchap_rebuild_lock_time( $value ) {
 	if ( ! is_string( $value ) || '' === $value ) {
 		return 0;
 	}
@@ -799,7 +819,7 @@ function _mpp_rebuild_lock_time( $value ) {
  * @param string $token Optional. Owner token to keep. Default a new token.
  * @return string
  */
-function _mpp_rebuild_new_lock_value( $token = '' ) {
+function _pchap_rebuild_new_lock_value( $token = '' ) {
 	if ( '' === $token ) {
 		$token = wp_generate_uuid4();
 	}
@@ -812,31 +832,31 @@ function _mpp_rebuild_new_lock_value( $token = '' ) {
  *
  * Uses an atomic INSERT IGNORE on the options table (same approach as
  * WP_Upgrader::create_lock()), bypassing the options cache. A stale lock
- * (not refreshed for mpp_get_rebuild_lock_ttl() seconds) is taken over with
+ * (not refreshed for pchap_get_rebuild_lock_ttl() seconds) is taken over with
  * a compare-and-set UPDATE.
  *
  * @since 1.7.0
  *
  * @return bool Whether the lock was acquired.
  */
-function mpp_rebuild_acquire_lock() {
+function pchap_rebuild_acquire_lock() {
 	global $wpdb;
 
 	$lock  = '_mpp-rebuild-lock';
-	$value = _mpp_rebuild_new_lock_value();
+	$value = _pchap_rebuild_new_lock_value();
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$inserted = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'off' )", $lock, $value ) );
 
 	if ( $inserted ) {
-		_mpp_rebuild_held_lock( $value );
+		_pchap_rebuild_held_lock( $value );
 		return true;
 	}
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
 
-	if ( null === $current || _mpp_rebuild_lock_time( $current ) > time() - mpp_get_rebuild_lock_ttl() ) {
+	if ( null === $current || _pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl() ) {
 		return false;
 	}
 
@@ -848,7 +868,7 @@ function mpp_rebuild_acquire_lock() {
 		return false;
 	}
 
-	_mpp_rebuild_held_lock( $value );
+	_pchap_rebuild_held_lock( $value );
 	return true;
 }
 
@@ -863,10 +883,10 @@ function mpp_rebuild_acquire_lock() {
  * @return bool True if this process still owns the lock, false if it does not
  *              hold it or lost it (taken over by another process).
  */
-function mpp_rebuild_refresh_lock() {
+function pchap_rebuild_refresh_lock() {
 	global $wpdb;
 
-	$held = _mpp_rebuild_held_lock();
+	$held = _pchap_rebuild_held_lock();
 
 	if ( false === $held ) {
 		return false;
@@ -875,7 +895,7 @@ function mpp_rebuild_refresh_lock() {
 	$lock  = '_mpp-rebuild-lock';
 	$parts = explode( '|', $held, 2 );
 	$token = isset( $parts[1] ) ? $parts[1] : '';
-	$value = _mpp_rebuild_new_lock_value( $token );
+	$value = _pchap_rebuild_new_lock_value( $token );
 
 	if ( $value === $held ) {
 		// Same second: only check the ownership (an identical UPDATE affects no row).
@@ -883,7 +903,7 @@ function mpp_rebuild_refresh_lock() {
 		$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
 
 		if ( $current !== $held ) {
-			_mpp_rebuild_held_lock( false );
+			_pchap_rebuild_held_lock( false );
 			return false;
 		}
 
@@ -894,11 +914,11 @@ function mpp_rebuild_refresh_lock() {
 	$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s", $value, $lock, $held ) );
 
 	if ( 1 !== (int) $updated ) {
-		_mpp_rebuild_held_lock( false );
+		_pchap_rebuild_held_lock( false );
 		return false;
 	}
 
-	_mpp_rebuild_held_lock( $value );
+	_pchap_rebuild_held_lock( $value );
 	return true;
 }
 
@@ -910,10 +930,10 @@ function mpp_rebuild_refresh_lock() {
  *
  * @since 1.7.0
  */
-function mpp_rebuild_release_lock() {
+function pchap_rebuild_release_lock() {
 	global $wpdb;
 
-	$held = _mpp_rebuild_held_lock();
+	$held = _pchap_rebuild_held_lock();
 
 	if ( false === $held ) {
 		return;
@@ -922,7 +942,7 @@ function mpp_rebuild_release_lock() {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", '_mpp-rebuild-lock', $held ) );
 
-	_mpp_rebuild_held_lock( false );
+	_pchap_rebuild_held_lock( false );
 }
 
 /**
@@ -932,13 +952,13 @@ function mpp_rebuild_release_lock() {
  *
  * @return bool
  */
-function mpp_is_rebuild_locked() {
+function pchap_is_rebuild_locked() {
 	global $wpdb;
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", '_mpp-rebuild-lock' ) );
 
-	return null !== $current && _mpp_rebuild_lock_time( $current ) > time() - mpp_get_rebuild_lock_ttl();
+	return null !== $current && _pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl();
 }
 
 /**
@@ -950,22 +970,22 @@ function mpp_is_rebuild_locked() {
  *
  * @since 1.7.0
  */
-function mpp_cron_rebuild_postmeta() {
-	$state = mpp_get_postmeta_rebuild_state();
-	$hook  = mpp_get_rebuild_cron_hook();
+function pchap_cron_rebuild_postmeta() {
+	$state = pchap_get_postmeta_rebuild_state();
+	$hook  = pchap_get_rebuild_cron_hook();
 
 	if ( false === $state ) {
 		return;
 	}
 
-	if ( ! mpp_rebuild_acquire_lock() ) {
+	if ( ! pchap_rebuild_acquire_lock() ) {
 		// Another process is working: check again later.
-		mpp_ensure_postmeta_rebuild_event( MINUTE_IN_SECONDS );
+		pchap_ensure_postmeta_rebuild_event( MINUTE_IN_SECONDS );
 		return;
 	}
 
 	// Watchdog: resume after the lock expires if this run dies.
-	wp_schedule_single_event( time() + mpp_get_rebuild_lock_ttl() + MINUTE_IN_SECONDS, $hook );
+	wp_schedule_single_event( time() + pchap_get_rebuild_lock_ttl() + MINUTE_IN_SECONDS, $hook );
 
 	/**
 	 * Filters the time budget of one background rebuild run, in seconds.
@@ -976,10 +996,10 @@ function mpp_cron_rebuild_postmeta() {
 	 *
 	 * @param int $time_limit Seconds. Default 15.
 	 */
-	$time_limit = (int) apply_filters( 'mpp_rebuild_cron_time_limit', 15 );
+	$time_limit = (int) pchap_apply_filters( 'pchap_rebuild_cron_time_limit', 15 );
 
 	try {
-		$stats = mpp_run_postmeta_rebuild(
+		$stats = pchap_run_postmeta_rebuild(
 			array(
 				'after_id'   => $state['cursor'],
 				'time_limit' => max( 1, $time_limit ),
@@ -996,16 +1016,16 @@ function mpp_cron_rebuild_postmeta() {
 		wp_clear_scheduled_hook( $hook );
 
 		if ( $stats['done'] ) {
-			mpp_complete_postmeta_rebuild( $stats );
+			pchap_complete_postmeta_rebuild( $stats );
 		} else {
-			mpp_save_postmeta_rebuild_state( $stats );
+			pchap_save_postmeta_rebuild_state( $stats );
 			wp_schedule_single_event( time(), $hook );
 		}
 	} finally {
-		mpp_rebuild_release_lock();
+		pchap_rebuild_release_lock();
 	}
 }
-add_action( 'mpp_rebuild_postmeta_batch', 'mpp_cron_rebuild_postmeta' );
+add_action( 'pchap_rebuild_postmeta_batch', 'pchap_cron_rebuild_postmeta' );
 
 /**
  * Return statistics about the subpage index.
@@ -1015,13 +1035,13 @@ add_action( 'mpp_rebuild_postmeta_batch', 'mpp_cron_rebuild_postmeta' );
  * @since 1.7.0
  *
  * @return array {
- *     @type int $multipage_posts Posts containing a Multipage marker.
+ *     @type int $multipage_posts Posts containing a Post Chapters marker.
  *     @type int $indexed_posts   Posts holding a `_mpp_data` meta.
  *     @type int $missing_index   Posts containing a marker but no `_mpp_data` meta.
  *     @type int $stale_index     Posts holding a `_mpp_data` meta but no marker.
  * }
  */
-function mpp_get_postmeta_index_stats() {
+function pchap_get_postmeta_index_stats() {
 	global $wpdb;
 
 	$markers = $wpdb->prepare(
@@ -1049,39 +1069,39 @@ function mpp_get_postmeta_index_stats() {
 /**
  * Fire activation hooks and events.
  *
- * Runs on Multipage activation. Posts edited while the plugin was inactive
+ * Runs on Post Chapters activation. Posts edited while the plugin was inactive
  * have an outdated subpage index, so a background rebuild is scheduled.
  *
  * @since 1.5
  */
-function mpp_activation() {
+function pchap_activation() {
 
-	mpp_schedule_postmeta_rebuild();
+	pchap_schedule_postmeta_rebuild();
 
 	/**
-	 * Fires during the activation of Multipage.
+	 * Fires during the activation of Post Chapters.
 	 *
 	 * @since 1.5
 	 */
-	do_action( 'mpp_activation' );
+	pchap_do_action( 'pchap_activation' );
 }
 
 /**
  * Fire deactivation hooks and events.
  *
- * Runs on Multipage deactivation.
+ * Runs on Post Chapters deactivation.
  *
  * @since 1.5
  */
-function mpp_deactivation() {
+function pchap_deactivation() {
 
 	// Stop the background rebuild, it is scheduled again on activation.
-	wp_clear_scheduled_hook( mpp_get_rebuild_cron_hook() );
+	wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 
 	/**
-	 * Fires during the deactivation of Multipage.
+	 * Fires during the deactivation of Post Chapters.
 	 *
 	 * @since 1.5
 	 */
-	do_action( 'mpp_deactivation' );
+	pchap_do_action( 'pchap_deactivation' );
 }

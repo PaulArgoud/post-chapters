@@ -1,14 +1,17 @@
 <?php
 /**
- * Multipage Uninstall.
+ * Post Chapters Uninstall.
  *
  * Removes all plugin data when the plugin is deleted via the WordPress admin:
  * options, the `_mpp_data` post meta and the scheduled background rebuild.
+ * The option and meta names are the ones of Multipage, which Post Chapters
+ * reuses: deleting Multipage (1.7 and earlier) from the admin removes the
+ * Post Chapters data too, and the other way round.
  * On multisite, the data of every site of the network is removed.
  *
  * The plugin is not loaded when this file runs: it must stay self-contained.
  *
- * @package Multipage
+ * @package Post Chapters
  * @since 1.5.15
  */
 
@@ -18,11 +21,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 /**
- * Remove the Multipage data of the current site.
+ * Remove the Post Chapters data of the current site.
  *
  * @since 1.7.0
  */
-$mpp_uninstall_site = static function () {
+$pchap_uninstall_site = static function () {
 	global $wpdb;
 
 	$option_names = array(
@@ -53,7 +56,8 @@ $mpp_uninstall_site = static function () {
 		delete_option( $option );
 	}
 
-	// Background rebuild.
+	// Background rebuild (and its Multipage 1.x name).
+	wp_clear_scheduled_hook( 'pchap_rebuild_postmeta_batch' );
 	wp_clear_scheduled_hook( 'mpp_rebuild_postmeta_batch' );
 
 	// Delete all _mpp_data post meta entries in one query.
@@ -62,30 +66,30 @@ $mpp_uninstall_site = static function () {
 };
 
 if ( is_multisite() ) {
-	$mpp_offset = 0;
-	$mpp_number = 100;
+	$pchap_offset = 0;
+	$pchap_number = 100;
 
 	do {
-		$mpp_site_ids = get_sites(
+		$pchap_site_ids = get_sites(
 			array(
 				'fields'                 => 'ids',
-				'number'                 => $mpp_number,
-				'offset'                 => $mpp_offset,
+				'number'                 => $pchap_number,
+				'offset'                 => $pchap_offset,
 				'orderby'                => 'id',
 				'order'                  => 'ASC',
 				'update_site_meta_cache' => false,
 			)
 		);
 
-		foreach ( $mpp_site_ids as $mpp_site_id ) {
-			switch_to_blog( (int) $mpp_site_id );
-			$mpp_uninstall_site();
+		foreach ( $pchap_site_ids as $pchap_site_id ) {
+			switch_to_blog( (int) $pchap_site_id );
+			$pchap_uninstall_site();
 			restore_current_blog();
 		}
 
-		$mpp_offset    += $mpp_number;
-		$mpp_site_count = count( $mpp_site_ids );
-	} while ( $mpp_site_count === $mpp_number );
+		$pchap_offset    += $pchap_number;
+		$pchap_site_count = count( $pchap_site_ids );
+	} while ( $pchap_site_count === $pchap_number );
 } else {
-	$mpp_uninstall_site();
+	$pchap_uninstall_site();
 }
