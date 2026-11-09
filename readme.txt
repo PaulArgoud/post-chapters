@@ -23,6 +23,7 @@ Post Chapters splits a long post into chapters. Each chapter is a page of its ow
 * **Navigation** between chapters: "Continue / Back to" or "Previous / Next" links.
 * **Comments** on all chapters, on the first one only or on the last one only, in classic and block themes.
 * **SEO-friendly**: the chapter title appears in the browser title, `rel=prev` / `rel=next` links are added, and Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework show the chapter title, canonical URL and robots of each chapter instead of "Page X of Y".
+* **Tested with** Yoast SEO, Rank Math, SEOPress, All in One SEO, The SEO Framework, Redis Object Cache, the WordPress core sitemap and custom post types (see the FAQ for versions).
 * **Block and classic themes**: the table of contents and the navigation are added once, only to the post being read, never to excerpts, related posts or Query Loop blocks.
 * **Your own styles**: the plugin loads a minimal stylesheet that your theme can replace.
 * **RTL support** and translations in French, German, Italian and Spanish.
@@ -70,6 +71,18 @@ Yes. The elements open around the shortcode are closed at the end of the chapter
 = Does it work with SEO plugins? =
 
 Yes: Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework. On chapters 2 and up, the title carries the chapter title (even when your title template has no page variable), the canonical URL and the Open Graph URL are the chapter's, and a chapter is not set to noindex as a "paginated page" (All in One SEO does that by default). The plugin also works with the WordPress core sitemap, which lists the post URLs.
+
+= Which plugins is it tested with? =
+
+On WordPress 7.1.4 with Twenty Twenty-Five, in November 2026: Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0 and Redis Object Cache 3.0.0 (with Redis 7). With each SEO plugin, a chapter has its own title, canonical URL and Open Graph URL, one pair of `rel=prev` / `rel=next` links, and is not set to `noindex` as a "paginated page". The WordPress core sitemap works as before. Custom post types, flat or hierarchical, work like posts. Page builders and e-commerce templates that render the post content themselves are not tested. If a plugin misbehaves with a chapter, please open an issue on [GitHub](https://github.com/PaulArgoud/post-chapters/issues).
+
+= Does it work with custom post types? =
+
+Yes, with any public post type that supports the editor: chapters work as they do for posts, with the URL base of the post type. The Chapter block needs the block editor (`show_in_rest`); in the classic editor, use the **Chapter** button or the shortcode.
+
+= Is it fast? =
+
+On a post without chapters, the plugin only looks for a chapter marker. A split post is parsed once and the result is kept in the object cache (tested with Redis), and the stylesheet is only loaded on split posts.
 
 = What happens with a chapter number that does not exist? =
 

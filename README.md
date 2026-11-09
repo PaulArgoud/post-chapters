@@ -21,6 +21,7 @@ Post Chapters is the continuation of **Multipage** (`sgr-nextpage-titles`), orig
 - **Comments** on all chapters, the first one or the last one, in classic and block themes
 - **SEO-friendly**: chapter titles in `<title>`, `rel=prev` / `rel=next` links, integrations with Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework (chapter title in every title, canonical and Open Graph URL of each chapter, indexable chapters)
 - **Block and classic themes**: the table of contents and the navigation are added once, only to the post being viewed (never to excerpts, related posts or Query Loop blocks)
+- **Fast**: on posts without chapters the plugin only looks for a chapter marker, and it parses split posts once, keeping the result in the object cache (tested with Redis)
 - **Custom CSS**: override the plugin styles from your theme
 - **RTL support** (frontend and admin)
 - **Internationalized**: French, German, Italian and Spanish included
@@ -32,6 +33,23 @@ Post Chapters is the continuation of **Multipage** (`sgr-nextpage-titles`), orig
 |-------------|---------|--------------|
 | WordPress   | 6.3     | 7.1.4        |
 | PHP         | 7.4     | 8.4          |
+
+## Compatibility
+
+Tested on WordPress 7.1.4 with Twenty Twenty-Five, with the plugins below on 2026-11-09. Each SEO plugin is installed from WordPress.org and checked by [`bin/check-seo.sh`](bin/check-seo.sh), which runs before a release.
+
+| Plugin | Tested version | What Post Chapters does with it |
+|--------|----------------|---------------------------------|
+| [Yoast SEO](https://wordpress.org/plugins/wordpress-seo/) | 28.8 | Chapter title in the title and the social titles, canonical, `og:url` and schema `url` of each chapter |
+| [Rank Math SEO](https://wordpress.org/plugins/seo-by-rank-math/) | 1.0.281 | Chapter title in the title (even with the default title template) and the social titles |
+| [SEOPress](https://wordpress.org/plugins/wp-seopress/) | 10.4 | Chapter title in the titles, canonical of each chapter |
+| [All in One SEO](https://wordpress.org/plugins/all-in-one-seo-pack/) | 5.0.5 | Chapter title instead of "Page N"; chapters keep the robots of their post instead of AIOSEO's default `noindex` for paginated pages |
+| [The SEO Framework](https://wordpress.org/plugins/autodescription/) | 5.2.0 | Chapter title instead of "Page N" in the title and the social titles |
+| [Redis Object Cache](https://wordpress.org/plugins/redis-cache/) | 3.0.0, Redis 7 | Parsed chapters are cached in the object cache; settings and edited content are seen on the next request. The test suite also runs on it in CI |
+| WordPress core sitemap | 7.1.4 | `wp-sitemap.xml` works as before; it lists the post, not its chapters |
+| Custom post types | | Flat and hierarchical types, with their own URL base or plain permalinks (covered by the test suite) |
+
+With every SEO plugin, a chapter gets its own title, canonical URL and Open Graph URL, a single pair of `rel=prev` / `rel=next` links, and is not set to `noindex` because it is "paginated". Not tested: page builders (Elementor, Divi...) and e-commerce templates that render the post content themselves. Plugins change: if one of the tested versions misbehaves, [open an issue](https://github.com/PaulArgoud/post-chapters/issues).
 
 ## Installation
 
