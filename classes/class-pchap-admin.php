@@ -286,7 +286,7 @@ class PChap_Admin {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
-		$handle = 'multipage-admin';
+		$handle = 'post-chapters-admin';
 
 		// LTR or RTL.
 		$file = is_rtl() ? 'admin/css/' . $handle . '-rtl' : 'admin/css/' . $handle;

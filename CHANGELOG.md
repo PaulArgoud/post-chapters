@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The admin stylesheet loads again: 2.0.0 enqueued `admin/css/multipage-admin[.min].css`, a file renamed to `post-chapters-admin[.min].css`, so every admin page requested a missing file (404) and the settings screens lost their styles. The style handle is now `post-chapters-admin`
+
 ### Development
+
+- WordPress.org listing assets in `.wordpress-org/`: new screenshots (settings, block editor, a post split into chapters, on WordPress 7.1 with Twenty Twenty-Five), banners (772×250, 1544×500) and icons (128×128, 256×256, SVG)
 
 - wp-env runs a single environment (`.wp-env.json`, `"testsEnvironment": false`, `WP_DEBUG` and `SCRIPT_DEBUG` off): `composer test:wp-env` and CI run PHPUnit in its `cli` container instead of the deprecated `tests-cli` container, and the development site at http://localhost:8888 is the same environment (the test run reinstalls its database)
 - The documentation uses `npx @wordpress/env@12` instead of `npx wp-env` (the npm package `wp-env` is unrelated)

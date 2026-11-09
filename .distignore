@@ -45,7 +45,7 @@
 /CLAUDE.md
 /ARCHITECTURE.md
 /CONTRIBUTING.md
-/screenshot-*.png
+/.wordpress-org
 
 # Translation sources (the compiled .mo files and the .pot template are shipped).
 /languages/*.po

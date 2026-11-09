@@ -29,7 +29,7 @@
 /phpcs.xml.dist         export-ignore
 /phpstan.neon.dist      export-ignore
 /phpunit.xml.dist       export-ignore
-/screenshot-*.png       export-ignore
+/.wordpress-org         export-ignore
 /tests                  export-ignore
 /vendor                 export-ignore
 /*.code-workspace       export-ignore

@@ -15,7 +15,7 @@ post-chapters/
 ├── index.php                        # "Silence is golden" (one in every shipped folder)
 ├── readme.txt                       # WordPress.org directory readme (Stable tag, FAQ, changelog)
 ├── README.md / CHANGELOG.md / LICENSE  # GitHub readme, full history, GPL v3 (shipped)
-├── screenshot-[1-3].png             # WordPress.org screenshots (not shipped)
+├── .wordpress-org/                 # WordPress.org assets for SVN /assets: screenshots, banners, icons (not shipped)
 │
 ├── blocks/
 │   └── subpage/                     # "Subpage" block (multipage/subpage), no build step
