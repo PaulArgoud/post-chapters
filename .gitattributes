@@ -16,6 +16,7 @@
 /.github                export-ignore
 /.gitignore             export-ignore
 /.wp-env.json           export-ignore
+/.wp-env.test.json      export-ignore
 /ARCHITECTURE.md        export-ignore
 /CLAUDE.md              export-ignore
 /CONTRIBUTING.md        export-ignore

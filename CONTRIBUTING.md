@@ -29,9 +29,9 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
    ```
 4. Start WordPress (7.1.4, PHP 8.4, `WP_DEBUG` and `SCRIPT_DEBUG` on, see `.wp-env.json`):
    ```bash
-   npx wp-env start
+   npx @wordpress/env@12 start
    ```
-   The site runs at http://localhost:8888 (user `admin`, password `password`), with Post Chapters active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored.
+   The site runs at http://localhost:8888 (user `admin`, password `password`), with Post Chapters active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored. Use `npx @wordpress/env@12`, not `npx wp-env`: the npm package `wp-env` is unrelated to WordPress.
 
 You can also use another local environment (Local, DDEV...): symlink or copy the folder into `wp-content/plugins/` and activate **Post Chapters**.
 
@@ -70,7 +70,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 | `composer lint` | `php -l` on every PHP file with the current PHP binary (`bin/php-lint.php`) |
 | `composer phpcs` | WordPress Coding Standards + PHPCompatibilityWP (`phpcs.xml.dist`) |
 | `composer phpcbf` | Fix the violations that can be fixed automatically |
-| `composer test:wp-env` | PHPUnit suite inside the running wp-env `tests-cli` container |
+| `composer test:wp-env` | PHPUnit suite inside the `cli` container of the running wp-env test environment (`.wp-env.test.json`) |
 | `composer test` | PHPUnit with the local PHP, when the WordPress test library is available (`WP_TESTS_DIR`) |
 | `bin/check-i18n.sh` | Translation files in sync with the code (see [Translations](#translations)) |
 | `bin/build-zip.sh` | Release archive `build/post-chapters.zip` |
@@ -93,21 +93,23 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 
 ### Tests
 
-The suite uses PHPUnit 9.6 and the WordPress test library. It runs inside wp-env:
+The suite uses PHPUnit 9.6 and the WordPress test library. It runs in a separate wp-env environment, `.wp-env.test.json` (port 8889, `WP_DEBUG` and `SCRIPT_DEBUG` off, its own containers and database), next to the development site:
 
 ```bash
-npx wp-env start
+npx @wordpress/env@12 start --config=.wp-env.test.json
 composer test:wp-env
 # A subset:
-npx wp-env run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --filter Test_PChap_Split_Html
-npx wp-env run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --group parser
+npx @wordpress/env@12 run cli --config=.wp-env.test.json --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --filter Test_PChap_Split_Html
+npx @wordpress/env@12 run cli --config=.wp-env.test.json --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --group parser
 ```
+
+Every `run`, `stop` or `destroy` of the test environment needs `--config=.wp-env.test.json`. Its local overrides (e.g. `"port": 8899` when 8889 is taken) go in `.wp-env.test.override.json`, which is git-ignored.
 
 - The configuration is strict: PHP notices, warnings and deprecations, risky tests and unexpected output fail the run
 - Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `PChap` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
 - Content cases shared by several tests live in `PChap_Test_Corpus` (`tests/includes/class-pchap-test-corpus.php`); add a case there when you fix a parsing bug
 - Splitting changes must keep every page balanced (tags and block delimiters) and must not leave empty elements: see `tests/test-split-html.php` and `tests/test-request-invariant.php`
-- CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx wp-env start`
+- CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx @wordpress/env@12 start --config=.wp-env.test.json`
 
 Also check your change by hand in the browser: the block editor, the classic editor (Classic Editor plugin), a block theme (Twenty Twenty-Five) and a classic theme (Twenty Twenty-One).
 

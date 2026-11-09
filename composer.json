@@ -47,14 +47,14 @@
 			"@php ./vendor/bin/phpunit"
 		],
 		"test:wp-env": [
-			"npx -y @wordpress/env@12 run tests-cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit"
+			"npx -y @wordpress/env@12 run cli --config=.wp-env.test.json --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit"
 		]
 	},
 	"scripts-descriptions": {
 		"lint": "Run php -l on every PHP file of the plugin with the current PHP binary.",
 		"phpcs": "Check the code against the WordPress Coding Standards and PHPCompatibilityWP.",
 		"phpcbf": "Automatically fix the coding standard violations that can be fixed.",
-		"test": "Run the PHPUnit test suite (needs the WordPress test library, e.g. inside wp-env tests-cli).",
-		"test:wp-env": "Run the PHPUnit test suite inside a started wp-env (plugin folder must be named post-chapters)."
+		"test": "Run the PHPUnit test suite (needs the WordPress test library, e.g. inside the cli container of the wp-env test environment).",
+		"test:wp-env": "Run the PHPUnit test suite inside the wp-env test environment (.wp-env.test.json), once started; the plugin folder must be named post-chapters."
 	}
 }

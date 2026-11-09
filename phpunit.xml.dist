@@ -3,8 +3,9 @@
 	PHPUnit configuration for the Post Chapters plugin.
 
 	The tests need the WordPress PHPUnit test library: run them inside the
-	wp-env "tests-cli" container, e.g. "composer test:wp-env" once
-	"npx wp-env start" is running (see .wp-env.json).
+	cli container of the wp-env test environment described by .wp-env.test.json,
+	e.g. "composer test:wp-env" once that environment is started (see
+	CONTRIBUTING.md).
 	See tests/bootstrap.php for the environment variables that are read.
 -->
 <phpunit

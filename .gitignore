@@ -37,8 +37,9 @@ phpunit.xml
 # PHPStan
 /tmp/phpstan/
 
-# wp-env
+# wp-env (local overrides of .wp-env.json and .wp-env.test.json)
 .wp-env.override.json
+.wp-env.test.override.json
 
 # Gettext artifacts
 messages.mo
