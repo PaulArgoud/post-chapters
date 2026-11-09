@@ -73,11 +73,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 | `composer test:wp-env` | PHPUnit suite inside the running wp-env `cli` container (reinstalls its database) |
 | `composer test` | PHPUnit with the local PHP, when the WordPress test library is available (`WP_TESTS_DIR`) |
 | `bin/check-i18n.sh` | Translation files in sync with the code (see [Translations](#translations)) |
-| `bin/build-zip.sh` | Release archive `build/post-chapters.zip` |
+| `bin/build-zip.sh` | Release archive `build/post-chapters.zip` (`--wporg`: `build/post-chapters-wporg.zip`, without `Update URI`) |
 
 ### Coding standards
 
-`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `post-chapters` text domain and the global prefixes `pchap_`, `_pchap_` (internal helpers) and `multipage`.
+`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `post-chapters` text domain and the global prefixes `pchap_` (internal helpers included: no leading underscore, Plugin Check rejects it) and `multipage`.
 
 - Follow the [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/)
 - Strict comparisons (`===` / `!==`) and Yoda conditions
@@ -164,12 +164,13 @@ French translations follow the French typography rules (non-breaking space befor
 ## Building a Release
 
 ```bash
-bin/build-zip.sh
+bin/build-zip.sh           # GitHub release: build/post-chapters.zip
+bin/build-zip.sh --wporg   # WordPress.org: build/post-chapters-wporg.zip
 ```
 
 The archive `build/post-chapters.zip` holds one top-level `post-chapters/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `PCHAP_VERSION` in `post-chapters.php` and `version` in `blocks/subpage/block.json`, and the database version in `PChap::setup_globals()` when an upgrade routine is added.
 
-The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with a WordPress.org plugin of the same slug. Remove that line from any build published to WordPress.org SVN, otherwise WordPress.org updates would not reach the sites.
+The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with a WordPress.org plugin of the same slug. `--wporg` builds the same archive without that line (Plugin Check rejects it, and WordPress.org updates would not reach the sites): use it for anything sent to WordPress.org, and run Plugin Check on it first.
 
 ## Submitting a Pull Request
 

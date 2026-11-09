@@ -81,10 +81,10 @@ function pchap_get_db_version_raw() {
  * Since WordPress 6.7 load_plugin_textdomain() only registers a custom
  * lookup path; the files are loaded just in time on the first translation
  * call. WP_Textdomain_Registry looks into WP_LANG_DIR/plugins first and only
- * falls back to the path registered here. The language packs found there for
- * this slug belong to the original plugin on translate.wordpress.org and lack
- * the strings of this version, so pchap_load_bundled_textdomain_mofile() swaps
- * them for the bundled file of the same locale, when there is one.
+ * falls back to the path registered here. A language pack found there can lag
+ * behind the strings of this release, so pchap_load_bundled_textdomain_mofile()
+ * swaps it for the bundled file of the same locale, when there is one. Without
+ * this call the bundled translations of /languages would never load.
  *
  * @since 1.4
  * @since 1.7.0 Registers the bundled /languages directory as the fallback path.
@@ -94,6 +94,7 @@ function pchap_get_db_version_raw() {
  * @return bool True on success, false on failure.
  */
 function pchap_load_textdomain() {
+	// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Registers the bundled translations of /languages.
 	return load_plugin_textdomain(
 		'post-chapters',
 		false,
@@ -203,7 +204,7 @@ add_filter( 'load_textdomain_mofile', 'pchap_load_bundled_textdomain_mofile', 10
  * @param string $hook_name A Post Chapters hook name (pchap_*).
  * @return string The matching mpp_* hook name, or '' for any other hook.
  */
-function _pchap_get_legacy_hook_name( $hook_name ) {
+function pchap_get_legacy_hook_name( $hook_name ) {
 	return 0 === strpos( $hook_name, 'pchap_' ) ? 'mpp_' . substr( $hook_name, strlen( 'pchap_' ) ) : '';
 }
 
@@ -223,7 +224,7 @@ function _pchap_get_legacy_hook_name( $hook_name ) {
 function pchap_apply_filters( $hook_name, $value, ...$args ) {
 	$value = apply_filters( $hook_name, $value, ...$args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Always a pchap_* hook.
 
-	$legacy = _pchap_get_legacy_hook_name( $hook_name );
+	$legacy = pchap_get_legacy_hook_name( $hook_name );
 	if ( '' !== $legacy && has_filter( $legacy ) ) {
 		$value = apply_filters_deprecated( $legacy, array_merge( array( $value ), $args ), '2.0.0', $hook_name ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Deprecated mpp_* name of a pchap_* hook.
 	}
@@ -242,7 +243,7 @@ function pchap_apply_filters( $hook_name, $value, ...$args ) {
 function pchap_do_action( $hook_name, ...$args ) {
 	do_action( $hook_name, ...$args ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Always a pchap_* hook.
 
-	$legacy = _pchap_get_legacy_hook_name( $hook_name );
+	$legacy = pchap_get_legacy_hook_name( $hook_name );
 	if ( '' !== $legacy && has_action( $legacy ) ) {
 		do_action_deprecated( $legacy, $args, '2.0.0', $hook_name ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Deprecated mpp_* name of a pchap_* hook.
 	}

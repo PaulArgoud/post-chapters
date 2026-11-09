@@ -7,7 +7,11 @@
 # packaged, and every path listed in .distignore is left out (development
 # tooling, tests, contributor docs, .po sources...).
 #
-# Usage: bin/build-zip.sh
+# Usage: bin/build-zip.sh [--wporg]
+#
+#   --wporg  Build build/post-chapters-wporg.zip for WordPress.org instead: same
+#            files, without the "Update URI" header of post-chapters.php (Plugin
+#            Check rejects it on WordPress.org-hosted plugins).
 #
 set -euo pipefail
 
@@ -15,6 +19,17 @@ SLUG="post-chapters"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT}/build"
 ZIP_FILE="${BUILD_DIR}/${SLUG}.zip"
+
+WPORG=0
+for arg in "$@"; do
+	case "${arg}" in
+		--wporg) WPORG=1 ;;
+		*) echo "Usage: bin/build-zip.sh [--wporg]" >&2; exit 1 ;;
+	esac
+done
+if [[ "${WPORG}" == 1 ]]; then
+	ZIP_FILE="${BUILD_DIR}/${SLUG}-wporg.zip"
+fi
 DISTIGNORE="${ROOT}/.distignore"
 
 for tool in rsync zip unzip; do
@@ -72,6 +87,17 @@ fi
 # Step 2: drop everything listed in .distignore (development tooling, tests,
 # contributor docs, .po sources, build/ itself...).
 rsync -a --exclude-from="${DISTIGNORE}" "${SOURCE_DIR}/" "${STAGE_DIR}/"
+
+# WordPress.org build: drop the "Update URI" header line.
+if [[ "${WPORG}" == 1 ]]; then
+	MAIN_FILE="${STAGE_DIR}/${SLUG}.php"
+	grep -v -E '^[[:space:]]*\*[[:space:]]*Update URI:' "${MAIN_FILE}" > "${MAIN_FILE}.tmp"
+	mv "${MAIN_FILE}.tmp" "${MAIN_FILE}"
+	if grep -q 'Update URI:' "${MAIN_FILE}"; then
+		echo "Error: could not remove the Update URI header." >&2
+		exit 1
+	fi
+fi
 
 # Zip it with a single top-level folder, without extra file attributes.
 (

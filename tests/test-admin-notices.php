@@ -123,10 +123,10 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 			),
 		);
 
-		$this->assertSame( 'Intro & "more"', _pchap_get_option_field_label( 'mpp-hide-intro-title' ) );
+		$this->assertSame( 'Intro & "more"', pchap_get_option_field_label( 'mpp-hide-intro-title' ) );
 
 		$GLOBALS['wp_settings_fields']['post-chapters']['pchap_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
-		$this->assertSame( 'mpp-hide-intro-title', _pchap_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
+		$this->assertSame( 'mpp-hide-intro-title', pchap_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
 	}
 
 	/**

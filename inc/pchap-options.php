@@ -256,13 +256,14 @@ function pchap_option_to_boolean( $value ) {
  * Check a value against an option definition.
  *
  * @since 1.7.0
+ * @access private
  *
  * @param array $definition The option definition.
  * @param mixed $value      The value to check.
  * @param mixed $normalized Output. The normalized value when valid.
  * @return bool Whether the value is valid.
  */
-function _pchap_check_option_value( $definition, $value, &$normalized = null ) {
+function pchap_check_option_value( $definition, $value, &$normalized = null ) {
 	switch ( $definition['type'] ) {
 		case 'boolean':
 			// Values stored by all the plugin versions: 1/0, '1'/'0', '' (unchecked), true/false.
@@ -317,15 +318,15 @@ function pchap_validate_option_value( $option_name, $value, $fallback = null ) {
 	}
 
 	$normalized = null;
-	if ( _pchap_check_option_value( $definition, $value, $normalized ) ) {
+	if ( pchap_check_option_value( $definition, $value, $normalized ) ) {
 		return $normalized;
 	}
 
-	if ( null !== $fallback && _pchap_check_option_value( $definition, $fallback, $normalized ) ) {
+	if ( null !== $fallback && pchap_check_option_value( $definition, $fallback, $normalized ) ) {
 		return $normalized;
 	}
 
-	_pchap_check_option_value( $definition, $definition['default'], $normalized );
+	pchap_check_option_value( $definition, $definition['default'], $normalized );
 	return $normalized;
 }
 
@@ -363,7 +364,7 @@ function pchap_sanitize_option( $value, $option_name ) {
 	}
 
 	$normalized = null;
-	if ( _pchap_check_option_value( $definition, $value, $normalized ) ) {
+	if ( pchap_check_option_value( $definition, $value, $normalized ) ) {
 		return $normalized;
 	}
 
@@ -378,7 +379,7 @@ function pchap_sanitize_option( $value, $option_name ) {
 			sprintf(
 				/* translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type"). */
 				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'post-chapters' ),
-				esc_html( _pchap_get_option_field_label( $option_name ) )
+				esc_html( pchap_get_option_field_label( $option_name ) )
 			),
 			'error'
 		);
@@ -403,7 +404,7 @@ function pchap_sanitize_option( $value, $option_name ) {
  * @param string $option_name The option name.
  * @return string Plain-text label (not escaped).
  */
-function _pchap_get_option_field_label( $option_name ) {
+function pchap_get_option_field_label( $option_name ) {
 	global $wp_settings_fields;
 
 	if ( is_array( $wp_settings_fields ) ) {
@@ -488,12 +489,13 @@ add_action( 'deleted_option', 'pchap_maybe_clear_options_cache' );
  * Return the validated value of a Post Chapters option.
  *
  * @since 1.7.0
+ * @access private
  *
  * @param string $option_name The option name.
  * @param mixed  $fallback    Fallback value used when the option is missing or invalid.
  * @return mixed The valid value.
  */
-function _pchap_get_valid_option( $option_name, $fallback ) {
+function pchap_get_valid_option( $option_name, $fallback ) {
 	return pchap_validate_option_value( $option_name, pchap_get_option( $option_name, $fallback ), $fallback );
 }
 
@@ -517,7 +519,7 @@ function pchap_hide_intro_title( $default = false ) {
 	 *
 	 * @param bool $value Whether the intro title is hidden.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_hideintro_title', (bool) _pchap_get_valid_option( 'mpp-hide-intro-title', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hideintro_title', (bool) pchap_get_valid_option( 'mpp-hide-intro-title', (bool) $default ) );
 }
 
 /**
@@ -548,7 +550,7 @@ function pchap_get_comments_on_page( $default = 'all' ) {
 	 *
 	 * @param string $value The pages where to display comments.
 	 */
-	return pchap_apply_filters( 'pchap_get_comments_on_page', _pchap_get_valid_option( 'mpp-comments-on-page', $default ) );
+	return pchap_apply_filters( 'pchap_get_comments_on_page', pchap_get_valid_option( 'mpp-comments-on-page', $default ) );
 }
 
 /**
@@ -579,7 +581,7 @@ function pchap_get_continue_or_prev_next( $default = 'continue' ) {
 	 *
 	 * @param string $value The navigation type.
 	 */
-	return pchap_apply_filters( 'pchap_get_continue_or_prev_next', _pchap_get_valid_option( 'mpp-continue-or-prev-next', $default ) );
+	return pchap_apply_filters( 'pchap_get_continue_or_prev_next', pchap_get_valid_option( 'mpp-continue-or-prev-next', $default ) );
 }
 
 /**
@@ -600,7 +602,7 @@ function pchap_disable_standard_pagination( $default = true ) {
 	 *
 	 * @param bool $value Whether the standard pagination is disabled.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_disable_standard_pagination', (bool) _pchap_get_valid_option( 'mpp-disable-standard-pagination', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_standard_pagination', (bool) pchap_get_valid_option( 'mpp-disable-standard-pagination', (bool) $default ) );
 }
 
 /**
@@ -621,7 +623,7 @@ function pchap_toc_only_on_the_first_page( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is only on the first page.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_toc_only_on_the_first_page', (bool) _pchap_get_valid_option( 'mpp-toc-only-on-the-first-page', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_toc_only_on_the_first_page', (bool) pchap_get_valid_option( 'mpp-toc-only-on-the-first-page', (bool) $default ) );
 }
 
 /**
@@ -652,7 +654,7 @@ function pchap_get_toc_position( $default = 'top-right' ) {
 	 *
 	 * @param string $value The table of contents position.
 	 */
-	return pchap_apply_filters( 'pchap_get_toc_position', _pchap_get_valid_option( 'mpp-toc-position', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_position', pchap_get_valid_option( 'mpp-toc-position', $default ) );
 }
 
 /**
@@ -683,7 +685,7 @@ function pchap_get_toc_row_labels( $default = 'number' ) {
 	 *
 	 * @param string $value The table of contents row labels type.
 	 */
-	return pchap_apply_filters( 'pchap_get_toc_row_labels', _pchap_get_valid_option( 'mpp-toc-row-labels', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_row_labels', pchap_get_valid_option( 'mpp-toc-row-labels', $default ) );
 }
 
 /**
@@ -704,7 +706,7 @@ function pchap_hide_toc_header( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents header is hidden.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_hide_toc_header', (bool) _pchap_get_valid_option( 'mpp-hide-toc-header', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hide_toc_header', (bool) pchap_get_valid_option( 'mpp-hide-toc-header', (bool) $default ) );
 }
 
 /**
@@ -725,7 +727,7 @@ function pchap_comments_toc_link( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is including a link for comments.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_comments_toc_link', (bool) _pchap_get_valid_option( 'mpp-comments-toc-link', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_comments_toc_link', (bool) pchap_get_valid_option( 'mpp-comments-toc-link', (bool) $default ) );
 }
 
 /**
@@ -756,7 +758,7 @@ function pchap_get_rewrite_title_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite titles priority.
 	 */
-	return (int) pchap_apply_filters( 'pchap_get_rewrite_title_priority', (int) _pchap_get_valid_option( '_mpp-rewrite-title-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_title_priority', (int) pchap_get_valid_option( '_mpp-rewrite-title-priority', $default ) );
 }
 
 /**
@@ -787,7 +789,7 @@ function pchap_get_rewrite_content_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite content priority.
 	 */
-	return (int) pchap_apply_filters( 'pchap_get_rewrite_content_priority', (int) _pchap_get_valid_option( '_mpp-rewrite-content-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_content_priority', (int) pchap_get_valid_option( '_mpp-rewrite-content-priority', $default ) );
 }
 
 /**
@@ -808,5 +810,5 @@ function pchap_disable_tinymce_buttons( $default = false ) {
 	 *
 	 * @param bool $value Whether TinyMCE Buttons are disabled.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_disable_tinymce_buttons', (bool) _pchap_get_valid_option( 'mpp-disable-tinymce-buttons', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_tinymce_buttons', (bool) pchap_get_valid_option( 'mpp-disable-tinymce-buttons', (bool) $default ) );
 }

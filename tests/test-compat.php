@@ -51,10 +51,10 @@ class Test_PChap_Compat extends PChap_UnitTestCase {
 	 * Every pchap_* hook maps to its mpp_* name, other hooks to nothing.
 	 */
 	public function test_legacy_hook_name() {
-		$this->assertSame( 'mpp_toc', _pchap_get_legacy_hook_name( 'pchap_toc' ) );
-		$this->assertSame( 'mpp_get_toc_position', _pchap_get_legacy_hook_name( 'pchap_get_toc_position' ) );
-		$this->assertSame( '', _pchap_get_legacy_hook_name( 'the_content' ) );
-		$this->assertSame( '', _pchap_get_legacy_hook_name( 'my_pchap_toc' ) );
+		$this->assertSame( 'mpp_toc', pchap_get_legacy_hook_name( 'pchap_toc' ) );
+		$this->assertSame( 'mpp_get_toc_position', pchap_get_legacy_hook_name( 'pchap_get_toc_position' ) );
+		$this->assertSame( '', pchap_get_legacy_hook_name( 'the_content' ) );
+		$this->assertSame( '', pchap_get_legacy_hook_name( 'my_pchap_toc' ) );
 	}
 
 	/**

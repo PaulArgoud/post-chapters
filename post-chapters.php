@@ -66,7 +66,8 @@ function pchap_multipage_active_notice() {
 		return;
 	}
 
-	// The plugin is idle: its text domain is not loaded yet.
+	// The plugin is idle: its text domain (bundled translations) is not loaded yet.
+	// phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Registers the bundled translations of /languages.
 	load_plugin_textdomain( 'post-chapters', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 	printf(

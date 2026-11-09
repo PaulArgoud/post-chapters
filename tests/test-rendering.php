@@ -31,7 +31,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * @return string
 	 */
 	private function href( $post_id, $page, $fragment = '' ) {
-		return 'href="' . esc_url( _pchap_link_page_url( $page, $fragment, $post_id ) ) . '"';
+		return 'href="' . esc_url( pchap_link_page_url( $page, $fragment, $post_id ) ) . '"';
 	}
 
 	/**

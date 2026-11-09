@@ -85,8 +85,8 @@
 	Every global (function, class, constant, hook, variable) must be prefixed.
 	Prefixes are compared case-insensitively, so "pchap" covers the PChap* classes,
 	the PCHAP_* constants and pchap(), and "pchap_" the functions and hooks.
-	"_pchap_" is the plugin prefix of its internal (@access private) helpers, a
-	WordPress core convention. The deprecated mpp_* hook names of Multipage are
+	Internal (@access private) helpers use "pchap_" too: Plugin Check does not
+	accept a leading underscore. The deprecated mpp_* hook names of Multipage are
 	only fired through pchap_apply_filters() / pchap_do_action().
 	-->
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
@@ -94,7 +94,6 @@
 			<property name="prefixes" type="array">
 				<element value="pchap"/>
 				<element value="pchap_"/>
-				<element value="_pchap_"/>
 			</property>
 		</properties>
 	</rule>

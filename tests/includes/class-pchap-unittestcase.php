@@ -32,7 +32,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 		parent::set_up();
 		$this->reset_multipage();
 		pchap_clear_options_cache();
-		_pchap_rebuild_held_lock( false );
+		pchap_rebuild_held_lock( false );
 	}
 
 	/**
@@ -44,7 +44,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 	public function tear_down() {
 		$this->reset_multipage();
 		pchap_clear_options_cache();
-		_pchap_rebuild_held_lock( false );
+		pchap_rebuild_held_lock( false );
 		parent::tear_down();
 		pchap_clear_options_cache();
 	}

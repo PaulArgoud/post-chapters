@@ -88,13 +88,13 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 1 );
 		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
 		$this->assertStringNotContainsString( 'rel="prev"', $head );
-		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _pchap_link_page_url( 2, '', $post_id ) ) . '" />', $head );
+		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( pchap_link_page_url( 2, '', $post_id ) ) . '" />', $head );
 		$this->assertSame( 10, has_action( 'wp_head', array( pchap(), 'pchap_rel_links' ) ) );
 
 		$this->go_to_subpage( $post_id, 2 );
 		$head = (string) get_echo( 'do_action', array( 'wp_head' ) );
-		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( _pchap_link_page_url( 1, '', $post_id ) ) . '" />', $head );
-		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( _pchap_link_page_url( 3, '', $post_id ) ) . '" />', $head );
+		$this->assertStringContainsString( '<link rel="prev" href="' . esc_url( pchap_link_page_url( 1, '', $post_id ) ) . '" />', $head );
+		$this->assertStringContainsString( '<link rel="next" href="' . esc_url( pchap_link_page_url( 3, '', $post_id ) ) . '" />', $head );
 
 		$this->go_to_subpage( $post_id, 3 );
 		$head = (string) get_echo( array( pchap(), 'pchap_rel_links' ) );
@@ -171,7 +171,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 2 );
-		$requested = _pchap_link_page_url( 2, '', $post_id );
+		$requested = pchap_link_page_url( 2, '', $post_id );
 
 		// A redirect elsewhere (e.g. to the base URL) is cancelled.
 		$this->assertFalse( apply_filters( 'redirect_canonical', get_permalink( $post_id ), $requested ) );

@@ -714,11 +714,11 @@ class PChap {
 		$num_pages    = $this->max_num_pages;
 
 		if ( $current_page > 1 ) {
-			echo '<link rel="prev" href="' . esc_url( _pchap_link_page_url( $current_page - 1, '', $this->post_id ) ) . '" />' . "\n";
+			echo '<link rel="prev" href="' . esc_url( pchap_link_page_url( $current_page - 1, '', $this->post_id ) ) . '" />' . "\n";
 		}
 
 		if ( $current_page < $num_pages ) {
-			echo '<link rel="next" href="' . esc_url( _pchap_link_page_url( $current_page + 1, '', $this->post_id ) ) . '" />' . "\n";
+			echo '<link rel="next" href="' . esc_url( pchap_link_page_url( $current_page + 1, '', $this->post_id ) ) . '" />' . "\n";
 		}
 	}
 
@@ -1062,7 +1062,7 @@ class PChap {
 			return $canonical;
 		}
 
-		$url = _pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
+		$url = pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
 
 		return '' !== $url ? $url : $canonical;
 	}
@@ -1407,10 +1407,10 @@ class PChap {
 					$comments_link = '<a href="#comments">';
 					break;
 				case 'first-page':
-					$comments_link = _pchap_link_page( 1, '', 'comments' );
+					$comments_link = pchap_link_page( 1, '', 'comments' );
 					break;
 				case 'last-page':
-					$comments_link = _pchap_link_page( $this->max_num_pages, '', 'comments' );
+					$comments_link = pchap_link_page( $this->max_num_pages, '', 'comments' );
 					break;
 				default:
 					$comments_link = '';
@@ -1610,7 +1610,7 @@ class PChap {
 			return $redirect_url;
 		}
 
-		$expected = _pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
+		$expected = pchap_link_page_url( $this->get_current_page(), '', $this->post_id );
 
 		if ( '' !== $expected && self::is_same_page_url( $redirect_url, $expected ) ) {
 			return $redirect_url;

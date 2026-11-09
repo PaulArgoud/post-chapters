@@ -220,7 +220,7 @@ function pchap_update_to_1_4() {
 	$old_settings = get_option( 'multipage', false );
 
 	if ( is_array( $old_settings ) ) {
-		_pchap_convert_legacy_settings( $old_settings );
+		pchap_convert_legacy_settings( $old_settings );
 	}
 
 	// Remove the old options.
@@ -244,7 +244,7 @@ function pchap_update_to_1_4() {
  *
  * @param array $old_settings The legacy `multipage` option value.
  */
-function _pchap_convert_legacy_settings( $old_settings ) {
+function pchap_convert_legacy_settings( $old_settings ) {
 
 	$priorities  = array(
 		'highest' => '100',
@@ -359,30 +359,30 @@ function pchap_get_rebuild_batch_size() {
 }
 
 /**
- * Return the SQL condition (with placeholders) and its arguments matching the
- * posts whose subpage index must be (re)built: posts containing a Post Chapters
- * marker and posts already holding a `_mpp_data` meta (stale meta is deleted).
+ * Return the values of the SQL condition matching the posts whose subpage index
+ * must be (re)built: posts containing a Post Chapters marker and posts already
+ * holding a `_mpp_data` meta (stale meta is deleted).
  *
- * Revisions and auto-drafts are excluded. Drafts, pending, private, future
- * and trashed posts are included, as save_post also indexes them.
+ * The condition itself is written out in pchap_count_postmeta_rebuild_candidates()
+ * and pchap_process_postmeta_batch(), so that every query is a literal string
+ * (keep both in sync). Revisions and auto-drafts are excluded. Drafts, pending,
+ * private, future and trashed posts are included, as save_post also indexes them.
  *
  * @since 1.7.0
+ * @access private
  *
- * @return array { 0: string SQL condition on alias `p`, 1: array arguments }
+ * @return string[] Values of the five placeholders of the condition, in order.
  */
-function _pchap_rebuild_candidates_where() {
+function pchap_rebuild_candidates_args() {
 	global $wpdb;
 
-	$where = "p.post_type <> %s AND p.post_status <> %s AND ( p.post_content LIKE %s OR p.post_content LIKE %s OR EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s ) )";
-	$args  = array(
+	return array(
 		'revision',
 		'auto-draft',
 		'%' . $wpdb->esc_like( '[nextpage' ) . '%',
 		'%' . $wpdb->esc_like( 'wp:multipage/subpage' ) . '%',
 		'_mpp_data',
 	);
-
-	return array( $where, $args );
 }
 
 /**
@@ -396,11 +396,8 @@ function _pchap_rebuild_candidates_where() {
 function pchap_count_postmeta_rebuild_candidates( $after_id = 0 ) {
 	global $wpdb;
 
-	list( $where, $args ) = _pchap_rebuild_candidates_where();
-	array_unshift( $args, (int) $after_id );
-
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery -- $where only holds placeholders and table names.
-	return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->posts} p WHERE p.ID > %d AND {$where}", $args ) );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- One-off count for the rebuild, nothing to cache; the spread array holds the other five values.
+	return (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->posts} p WHERE p.ID > %d AND p.post_type <> %s AND p.post_status <> %s AND ( p.post_content LIKE %s OR p.post_content LIKE %s OR EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s ) )", (int) $after_id, ...pchap_rebuild_candidates_args() ) );
 }
 
 /**
@@ -437,12 +434,11 @@ function pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run = false 
 		'done'      => false,
 	);
 
-	list( $where, $args ) = _pchap_rebuild_candidates_where();
-	array_unshift( $args, $after_id );
+	$args   = pchap_rebuild_candidates_args();
 	$args[] = $batch_size;
 
-	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $where only holds placeholders and table names; $args holds the values of all the placeholders, $where's included.
-	$posts = $wpdb->get_results( $wpdb->prepare( "SELECT p.ID, p.post_content FROM {$wpdb->posts} p WHERE p.ID > %d AND {$where} ORDER BY p.ID ASC LIMIT %d", $args ) );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery,WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- Batch of the rebuild, read once, nothing to cache; the spread array holds the other six values.
+	$posts = $wpdb->get_results( $wpdb->prepare( "SELECT p.ID, p.post_content FROM {$wpdb->posts} p WHERE p.ID > %d AND p.post_type <> %s AND p.post_status <> %s AND ( p.post_content LIKE %s OR p.post_content LIKE %s OR EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s ) ) ORDER BY p.ID ASC LIMIT %d", $after_id, ...$args ) );
 
 	if ( empty( $posts ) ) {
 		$stats['done'] = true;
@@ -576,7 +572,7 @@ function pchap_run_postmeta_rebuild( $args = array() ) {
 
 	$time_limit = (float) $args['time_limit'];
 	$started    = microtime( true );
-	$has_lock   = false !== _pchap_rebuild_held_lock();
+	$has_lock   = false !== pchap_rebuild_held_lock();
 
 	do {
 		$batch = pchap_process_postmeta_batch( $totals['cursor'], (int) $args['batch_size'], (bool) $args['dry_run'] );
@@ -780,7 +776,7 @@ function pchap_get_rebuild_lock_ttl() {
  *                                 Null (default) to only read it.
  * @return string|false The value held by this process, false if none.
  */
-function _pchap_rebuild_held_lock( $value = null ) {
+function pchap_rebuild_held_lock( $value = null ) {
 	static $held = false;
 
 	if ( null !== $value ) {
@@ -800,7 +796,7 @@ function _pchap_rebuild_held_lock( $value = null ) {
  *                           timestamp), null when there is no lock.
  * @return int The timestamp, 0 when there is no lock.
  */
-function _pchap_rebuild_lock_time( $value ) {
+function pchap_rebuild_lock_time( $value ) {
 	if ( ! is_string( $value ) || '' === $value ) {
 		return 0;
 	}
@@ -819,7 +815,7 @@ function _pchap_rebuild_lock_time( $value ) {
  * @param string $token Optional. Owner token to keep. Default a new token.
  * @return string
  */
-function _pchap_rebuild_new_lock_value( $token = '' ) {
+function pchap_rebuild_new_lock_value( $token = '' ) {
 	if ( '' === $token ) {
 		$token = wp_generate_uuid4();
 	}
@@ -843,20 +839,20 @@ function pchap_rebuild_acquire_lock() {
 	global $wpdb;
 
 	$lock  = '_mpp-rebuild-lock';
-	$value = _pchap_rebuild_new_lock_value();
+	$value = pchap_rebuild_new_lock_value();
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$inserted = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO {$wpdb->options} ( option_name, option_value, autoload ) VALUES ( %s, %s, 'off' )", $lock, $value ) );
 
 	if ( $inserted ) {
-		_pchap_rebuild_held_lock( $value );
+		pchap_rebuild_held_lock( $value );
 		return true;
 	}
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
 
-	if ( null === $current || _pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl() ) {
+	if ( null === $current || pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl() ) {
 		return false;
 	}
 
@@ -868,7 +864,7 @@ function pchap_rebuild_acquire_lock() {
 		return false;
 	}
 
-	_pchap_rebuild_held_lock( $value );
+	pchap_rebuild_held_lock( $value );
 	return true;
 }
 
@@ -886,7 +882,7 @@ function pchap_rebuild_acquire_lock() {
 function pchap_rebuild_refresh_lock() {
 	global $wpdb;
 
-	$held = _pchap_rebuild_held_lock();
+	$held = pchap_rebuild_held_lock();
 
 	if ( false === $held ) {
 		return false;
@@ -895,7 +891,7 @@ function pchap_rebuild_refresh_lock() {
 	$lock  = '_mpp-rebuild-lock';
 	$parts = explode( '|', $held, 2 );
 	$token = isset( $parts[1] ) ? $parts[1] : '';
-	$value = _pchap_rebuild_new_lock_value( $token );
+	$value = pchap_rebuild_new_lock_value( $token );
 
 	if ( $value === $held ) {
 		// Same second: only check the ownership (an identical UPDATE affects no row).
@@ -903,7 +899,7 @@ function pchap_rebuild_refresh_lock() {
 		$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", $lock ) );
 
 		if ( $current !== $held ) {
-			_pchap_rebuild_held_lock( false );
+			pchap_rebuild_held_lock( false );
 			return false;
 		}
 
@@ -914,11 +910,11 @@ function pchap_rebuild_refresh_lock() {
 	$updated = $wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s", $value, $lock, $held ) );
 
 	if ( 1 !== (int) $updated ) {
-		_pchap_rebuild_held_lock( false );
+		pchap_rebuild_held_lock( false );
 		return false;
 	}
 
-	_pchap_rebuild_held_lock( $value );
+	pchap_rebuild_held_lock( $value );
 	return true;
 }
 
@@ -933,7 +929,7 @@ function pchap_rebuild_refresh_lock() {
 function pchap_rebuild_release_lock() {
 	global $wpdb;
 
-	$held = _pchap_rebuild_held_lock();
+	$held = pchap_rebuild_held_lock();
 
 	if ( false === $held ) {
 		return;
@@ -942,7 +938,7 @@ function pchap_rebuild_release_lock() {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", '_mpp-rebuild-lock', $held ) );
 
-	_pchap_rebuild_held_lock( false );
+	pchap_rebuild_held_lock( false );
 }
 
 /**
@@ -958,7 +954,7 @@ function pchap_is_rebuild_locked() {
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
 	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", '_mpp-rebuild-lock' ) );
 
-	return null !== $current && _pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl();
+	return null !== $current && pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl();
 }
 
 /**

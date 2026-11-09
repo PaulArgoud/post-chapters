@@ -210,7 +210,7 @@ class Test_PChap_Upgrade extends PChap_UnitTestCase {
 		update_option( 'mpp-toc-position', 'bottom' );
 		update_option( 'mpp-toc-row-labels', 'hidden' );
 
-		_pchap_convert_legacy_settings(
+		pchap_convert_legacy_settings(
 			array(
 				'toc-position'           => 'top-left',
 				'toc-page-labels'        => 'numbers',

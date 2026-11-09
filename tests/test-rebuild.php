@@ -286,7 +286,7 @@ class Test_PChap_Rebuild extends PChap_UnitTestCase {
 		$this->assertFalse( pchap_get_postmeta_rebuild_state(), 'State deleted.' );
 		$this->assertSame( 0, $this->count_cron_events( $hook ), 'No event left (watchdog removed).' );
 		$this->assertFalse( pchap_is_rebuild_locked(), 'Lock released.' );
-		$this->assertFalse( _pchap_rebuild_held_lock() );
+		$this->assertFalse( pchap_rebuild_held_lock() );
 
 		$last = get_option( '_mpp-rebuild-last' );
 		$this->assertSame( 4, $last['processed'] );
@@ -436,19 +436,19 @@ class Test_PChap_Rebuild extends PChap_UnitTestCase {
 
 		$this->assertTrue( pchap_rebuild_acquire_lock() );
 		$this->assertTrue( pchap_is_rebuild_locked() );
-		$held = _pchap_rebuild_held_lock();
+		$held = pchap_rebuild_held_lock();
 		$this->assertIsString( $held );
 
 		// A second acquisition fails while the lock is fresh.
 		$this->assertFalse( pchap_rebuild_acquire_lock() );
-		$this->assertSame( $held, _pchap_rebuild_held_lock() );
+		$this->assertSame( $held, pchap_rebuild_held_lock() );
 
 		$this->assertTrue( pchap_rebuild_refresh_lock() );
 
 		// Taken over by another process: refresh fails and release leaves it alone.
 		$wpdb->update( $wpdb->options, array( 'option_value' => time() . '|thief' ), array( 'option_name' => '_mpp-rebuild-lock' ) );
 		$this->assertFalse( pchap_rebuild_refresh_lock() );
-		$this->assertFalse( _pchap_rebuild_held_lock() );
+		$this->assertFalse( pchap_rebuild_held_lock() );
 		pchap_rebuild_release_lock();
 		$this->assertTrue( pchap_is_rebuild_locked() );
 
@@ -458,7 +458,7 @@ class Test_PChap_Rebuild extends PChap_UnitTestCase {
 		$this->assertTrue( pchap_rebuild_acquire_lock() );
 		pchap_rebuild_release_lock();
 		$this->assertFalse( pchap_is_rebuild_locked() );
-		$this->assertFalse( _pchap_rebuild_held_lock() );
+		$this->assertFalse( pchap_rebuild_held_lock() );
 	}
 
 	/**

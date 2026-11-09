@@ -79,7 +79,7 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 
 1. The settings page.
 2. The block editor with a Chapter block.
-3. How the post will look like.
+3. A post split into chapters, with its table of contents.
 
 == Changelog ==
 

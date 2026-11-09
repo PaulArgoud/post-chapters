@@ -75,7 +75,7 @@ post-chapters/
 │                                    #   rebuild, upgrade, blocks, shortcode, uninstall
 │
 ├── bin/
-│   ├── build-zip.sh                 # Builds build/post-chapters.zip (git-known files minus .distignore)
+│   ├── build-zip.sh                 # Builds build/post-chapters.zip (git-known files minus .distignore; --wporg: without Update URI)
 │   ├── check-i18n.sh                # Fails when the translation files are out of sync with the code
 │   └── php-lint.php                 # php -l on every PHP file (composer lint)
 │
@@ -116,7 +116,7 @@ Hooks registered at file load: `init` → `pchap_load_textdomain()` and `pchap_r
 
 **Hooks.** Every hook of the plugin is fired through `pchap_apply_filters()` / `pchap_do_action()` (`inc/pchap-functions.php`): they run the `pchap_*` hook, then, when callbacks are attached to it, the matching `mpp_*` name of Multipage through `apply_filters_deprecated()` / `do_action_deprecated()` (deprecated since 2.0.0, same arguments, after the `pchap_*` callbacks).
 
-The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error).
+The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error): `bin/build-zip.sh --wporg` does it.
 
 ## Request Lifecycle (Frontend)
 
@@ -454,7 +454,7 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 ## Tests and Tooling
 
 - PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `PChap_UnitTestCase` resets the `PChap` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `PChap_Test_Corpus` holds real-world contents with their expected pages
-- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap`, `pchap_` and `_pchap_`
+- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap` and `pchap_`
 - CI (`.github/workflows/ci.yml`): PHP lint 7.4–8.4, PHPCS, i18n check, PHPUnit on WordPress 6.3 / PHP 7.4, 7.1.4 / PHP 7.4 and 7.1.4 / PHP 8.4, release zip
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the commands.

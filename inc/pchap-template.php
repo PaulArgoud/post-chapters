@@ -53,7 +53,7 @@ function pchap_get_subpage_title_allowed_html() {
  * @param string $title Raw-text title.
  * @return string
  */
-function _pchap_encode_title_stray_lt( $title ) {
+function pchap_encode_title_stray_lt( $title ) {
 	if ( false === strpos( $title, '<' ) ) {
 		return $title;
 	}
@@ -97,7 +97,7 @@ function pchap_get_subpage_title_html( $title, $format = 'html' ) {
 
 	$title = (string) $title;
 	if ( 'text' === $format ) {
-		$title = _pchap_encode_title_stray_lt( $title );
+		$title = pchap_encode_title_stray_lt( $title );
 	}
 
 	return trim( force_balance_tags( wp_kses( $title, pchap_get_subpage_title_allowed_html() ) ) );
@@ -122,7 +122,7 @@ function pchap_get_subpage_title_text( $title, $format = 'html' ) {
 
 	$title = (string) $title;
 	if ( 'text' === $format ) {
-		$title = _pchap_encode_title_stray_lt( $title );
+		$title = pchap_encode_title_stray_lt( $title );
 	}
 
 	// Strip the tags first, so that an encoded "&lt;b&gt;" stays text.
@@ -148,7 +148,7 @@ function pchap_get_subpage_title_text( $title, $format = 'html' ) {
  * @param int         $count     Number of titles being rendered.
  * @return string 'html' or 'text'.
  */
-function _pchap_get_title_format( $multipage, $index, $count ) {
+function pchap_get_title_format( $multipage, $index, $count ) {
 	if ( $multipage instanceof PChap && is_array( $multipage->pages ) && count( $multipage->pages ) === (int) $count ) {
 		return $multipage->get_title_format( $index );
 	}
@@ -167,7 +167,7 @@ function _pchap_get_title_format( $multipage, $index, $count ) {
  * @param PChap|mixed $multipage The Post Chapters instance.
  * @return int
  */
-function _pchap_get_current_page( $multipage ) {
+function pchap_get_current_page( $multipage ) {
 	global $page;
 
 	if ( $multipage instanceof PChap && ! empty( $multipage->post_id ) ) {
@@ -232,18 +232,18 @@ function pchap_link_pages( $multipage, $args = '' ) {
 	$titles = ( $multipage instanceof PChap && is_array( $multipage->pchap_data ) ) ? array_values( $multipage->pchap_data ) : array();
 
 	if ( ! empty( $titles ) ) {
-		$current  = _pchap_get_current_page( $multipage );
+		$current  = pchap_get_current_page( $multipage );
 		$numpages = count( $titles );
 
 		if ( 'continue' === $r['continue_or_prev_next'] ) {
 			$output .= $r['before'];
 			$next    = $current + 1;
 			if ( $next <= $numpages ) {
-				$link = _pchap_link_page( $next, 'next' ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[ $next - 1 ], _pchap_get_title_format( $multipage, $next - 1, $numpages ) ) . $r['link_after'] . '</a>';
+				$link = pchap_link_page( $next, 'next' ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[ $next - 1 ], pchap_get_title_format( $multipage, $next - 1, $numpages ) ) . $r['link_after'] . '</a>';
 				/* translators: %s: link to the next chapter. */
 				$text = sprintf( esc_html__( 'Continue: %s', 'post-chapters' ), $link );
 			} else {
-				$link = _pchap_link_page( 1 ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[0], _pchap_get_title_format( $multipage, 0, $numpages ) ) . $r['link_after'] . '</a>';
+				$link = pchap_link_page( 1 ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[0], pchap_get_title_format( $multipage, 0, $numpages ) ) . $r['link_after'] . '</a>';
 				/* translators: %s: link to the first chapter. */
 				$text = sprintf( esc_html__( 'Back to: %s', 'post-chapters' ), $link );
 			}
@@ -263,7 +263,7 @@ function pchap_link_pages( $multipage, $args = '' ) {
 			$output .= $r['before'];
 			$prev    = $current - 1;
 			if ( $prev > 0 ) {
-				$link = _pchap_link_page( $prev, 'previous' ) . $r['link_before'] . $r['previouspagelink'] . $r['link_after'] . '</a>';
+				$link = pchap_link_page( $prev, 'previous' ) . $r['link_before'] . $r['previouspagelink'] . $r['link_after'] . '</a>';
 
 				/** This filter is documented in inc/pchap-template.php */
 				$output .= pchap_apply_filters( 'pchap_link_pages_link', $link, $prev );
@@ -273,7 +273,7 @@ function pchap_link_pages( $multipage, $args = '' ) {
 				if ( $prev > 0 ) {
 					$output .= $r['separator'];
 				}
-				$link = _pchap_link_page( $next, 'next' ) . $r['link_before'] . $r['nextpagelink'] . $r['link_after'] . '</a>';
+				$link = pchap_link_page( $next, 'next' ) . $r['link_before'] . $r['nextpagelink'] . $r['link_after'] . '</a>';
 
 				/** This filter is documented in inc/pchap-template.php */
 				$output .= pchap_apply_filters( 'pchap_link_pages_link', $link, $next );
@@ -359,7 +359,7 @@ function pchap_toc( $multipage, $args = '' ) {
 	 */
 	$r = pchap_apply_filters( 'pchap_toc_args', $params );
 
-	$current = _pchap_get_current_page( $multipage );
+	$current = pchap_get_current_page( $multipage );
 	$data    = ( $multipage instanceof PChap && is_array( $multipage->pchap_data ) ) ? $multipage->pchap_data : array();
 
 	$i      = 1;
@@ -367,10 +367,10 @@ function pchap_toc( $multipage, $args = '' ) {
 	$output = $r['before'];
 
 	foreach ( $data as $title ) {
-		$safe_title = pchap_get_subpage_title_html( $title, _pchap_get_title_format( $multipage, $i - 1, $count ) );
+		$safe_title = pchap_get_subpage_title_html( $title, pchap_get_title_format( $multipage, $i - 1, $count ) );
 		$row        = $r['row_before'] . str_replace( '%', (string) $i, (string) $r['pagelink'] ) . $r['separator'];
 		if ( $i !== $current || ( ! $more && 1 === $current ) ) {
-			$link = _pchap_link_page( $i ) . $safe_title . '</a>';
+			$link = pchap_link_page( $i ) . $safe_title . '</a>';
 			$row .= $r['link_before'] . $link . $r['link_after'];
 		} else {
 			$row .= '<span class="current" aria-current="page">' . $safe_title . '</span>';
@@ -451,7 +451,7 @@ function pchap_toc( $multipage, $args = '' ) {
  * @param int|WP_Post|null $post Optional. Post. Default: the current post.
  * @return string Link.
  */
-function _pchap_link_page_url( $i, $p = '', $post = null ) {
+function pchap_link_page_url( $i, $p = '', $post = null ) {
 	global $wp_rewrite;
 
 	$post = get_post( $post );
@@ -507,9 +507,9 @@ function _pchap_link_page_url( $i, $p = '', $post = null ) {
  * @param string $p   Optional. Fragment identifier (e.g. 'comments'). Default empty.
  * @return string Opening `<a>` tag HTML.
  */
-function _pchap_link_page( $i, $rel = '', $p = '' ) {
+function pchap_link_page( $i, $rel = '', $p = '' ) {
 	$post_id = pchap()->post_id ? pchap()->post_id : null;
-	$url     = _pchap_link_page_url( $i, $p, $post_id );
+	$url     = pchap_link_page_url( $i, $p, $post_id );
 
 	$rel_attr = '';
 	if ( $rel ) {

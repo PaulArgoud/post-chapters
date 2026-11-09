@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - wp-env runs a single environment (`.wp-env.json`, `"testsEnvironment": false`, `WP_DEBUG` and `SCRIPT_DEBUG` off): `composer test:wp-env` and CI run PHPUnit in its `cli` container instead of the deprecated `tests-cli` container, and the development site at http://localhost:8888 is the same environment (the test run reinstalls its database)
 - The documentation uses `npx @wordpress/env@12` instead of `npx wp-env` (the npm package `wp-env` is unrelated)
+- `bin/build-zip.sh --wporg` builds `build/post-chapters-wporg.zip` for WordPress.org: the same files, without the `Update URI` header. It passes Plugin Check (mode "new") with no error or warning
+
+### Changed
+
+- The internal helpers are prefixed `pchap_` instead of `_pchap_`, which Plugin Check does not accept (e.g. `_pchap_link_page_url()` is now `pchap_link_page_url()`, `_pchap_get_valid_option()` is now `pchap_get_valid_option()`). They are private (`@access private`) and get no deprecated alias
+- The subpage index rebuild queries are written out as literal prepared statements; `_pchap_rebuild_candidates_where()` is replaced by `pchap_rebuild_candidates_args()`
+- readme.txt: caption of the third screenshot
 
 ## [2.0.0] - 2026-11-09
 

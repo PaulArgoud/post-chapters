@@ -151,7 +151,7 @@ composer phpcs            # WordPress Coding Standards (composer phpcbf to fix)
 npx @wordpress/env@12 start   # WordPress 7.1.4 / PHP 8.4 at http://localhost:8888
 composer test:wp-env          # PHPUnit suite inside wp-env (reinstalls its database)
 bin/check-i18n.sh         # Translation files in sync with the code (WP-CLI + gettext)
-bin/build-zip.sh          # Release archive: build/post-chapters.zip
+bin/build-zip.sh          # Release archive: build/post-chapters.zip (--wporg: WordPress.org build)
 ```
 
 `composer test` runs PHPUnit directly when the WordPress test library is available (`WP_TESTS_DIR`). See [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and [ARCHITECTURE.md](ARCHITECTURE.md) for the internals.
