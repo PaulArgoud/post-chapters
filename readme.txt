@@ -1,5 +1,5 @@
 === Post Chapters ===
-Contributors: paulargoud
+Contributors: nightangel
 Tags: chapters, table of contents, pagination, nextpage, long posts
 Requires at least: 6.3
 Tested up to: 7.1
@@ -84,7 +84,7 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 == Changelog ==
 
 = 2.0.0 =
-Release Date: November 2026
+Release Date: November 9th, 2026
 
 Multipage becomes Post Chapters. Existing content and settings need no change.
 
