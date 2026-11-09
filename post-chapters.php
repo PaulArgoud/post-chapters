@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/PaulArgoud/post-chapters
  * Description:       Split your long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation.
  * Author:            Paul ARGOUD, based on Multipage by SGr33n (aka Sergio De Falco, Envire Web Solutions).
- * Version:           2.0.0
+ * Version:           2.1.0
  * Author URI:        https://paul.argoud.net
  * Text Domain:       post-chapters
  * Domain Path:       /languages/
@@ -20,7 +20,7 @@
 // Exit if accessed directly.
 defined( 'ABSPATH' ) || exit;
 
-define( 'PCHAP_VERSION', '2.0.0' );
+define( 'PCHAP_VERSION', '2.1.0' );
 define( 'PCHAP__PLUGIN_FILE', __FILE__ );
 
 /**

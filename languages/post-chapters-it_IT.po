@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the Multipage package (GPL v3).
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Chapters 2.0.0\n"
+"Project-Id-Version: Post Chapters 2.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/PaulArgoud/post-chapters/issues\n"
-"POT-Creation-Date: 2026-11-09T17:13:39+00:00\n"
+"POT-Creation-Date: 2026-11-09T17:24:42+00:00\n"
 "PO-Revision-Date: 2026-11-07 20:54+0000\n"
 "Last-Translator: Multipage contributors\n"
 "Language-Team: Italian\n"
@@ -42,26 +42,26 @@ msgstr "Paul ARGOUD, basato su Multipage di SGr33n (alias Sergio De Falco, Envir
 msgid "https://paul.argoud.net"
 msgstr "https://paul.argoud.net"
 
-#: class-pchap.php:574 inc/admin/admin-settings.php:152
+#: class-pchap.php:615 inc/admin/admin-settings.php:152
 msgid "Intro"
 msgstr "Introduzione"
 
 #. translators: %d: chapter number.
-#: class-pchap.php:582
+#: class-pchap.php:623
 #, php-format
 msgid "Chapter %d"
 msgstr "Capitolo %d"
 
 #. translators: %: chapter number (literal percent sign, replaced by the number).
-#: class-pchap.php:1273
+#: class-pchap.php:1314
 msgid "Chapter %"
 msgstr "Capitolo %"
 
-#: class-pchap.php:1290
+#: class-pchap.php:1331
 msgid "Chapter navigation"
 msgstr "Navigazione tra i capitoli"
 
-#: class-pchap.php:1324 inc/admin/admin-settings.php:123
+#: class-pchap.php:1365 inc/admin/admin-settings.php:123
 msgid "Table of contents"
 msgstr "Indice"
 

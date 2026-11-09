@@ -4,7 +4,7 @@ Tags: chapters, table of contents, pagination, nextpage, long posts
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.1.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -102,6 +102,17 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 
 == Changelog ==
 
+= 2.1.0 =
+Release Date: November 9th, 2026
+
+* SEO: chapters are now handled correctly by Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework, checked on the real plugins. All in One SEO no longer sets chapters to noindex, SEOPress and Yoast give each chapter its own canonical and Open Graph URL, and every chapter has its own title in every plugin.
+* New: with WordPress 6.8 or later, the next chapter is prefetched when a visitor hovers a link, so turning the page is almost instant.
+* New: a Chapters panel in the editor sidebar lists the chapters and turns the headings of a post into chapters in one undoable step; headings and page breaks can be switched to Chapter blocks.
+* Fixed: deleting the plugin now leaves nothing behind, including entries of a persistent object cache (Redis, Memcached).
+* Fixed: posts built with Elementor, Divi, Beaver Builder or Bricks are no longer split (they showed the whole post on every chapter).
+* Tested with Redis Object Cache, Elementor, the WordPress core sitemap and custom post types.
+* For developers: new filters `pchap_seo_integrations`, `pchap_speculation_rule`, `pchap_speculation_mode` and `pchap_is_builder_post`; the SEO and comments code moved to `pchap()->seo` and `pchap()->comments` (the old `PChap` methods still work, deprecated).
+
 = 2.0.0 =
 Release Date: November 9th, 2026
 
@@ -134,6 +145,9 @@ Multipage by Sergio De Falco, on WordPress.org.
 The full history is in [CHANGELOG.md](https://github.com/PaulArgoud/post-chapters/blob/main/CHANGELOG.md).
 
 == Upgrade Notice ==
+
+= 2.1.0 =
+Fixes for All in One SEO (chapters were noindex), SEOPress and Yoast (wrong canonical and URLs), a clean uninstall with a persistent object cache, and posts built with Elementor. New Chapters panel in the editor.
 
 = 2.0.0 =
 Multipage is now Post Chapters. Content and settings are kept. Deactivate Multipage after activating Post Chapters, and delete its folder rather than using Delete on the Plugins screen.

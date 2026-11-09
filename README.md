@@ -1,6 +1,6 @@
 # Post Chapters for WordPress
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/PaulArgoud/post-chapters/releases/tag/2.0.0)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/PaulArgoud/post-chapters/releases/tag/2.1.0)
 [![CI](https://github.com/PaulArgoud/post-chapters/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/post-chapters/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
