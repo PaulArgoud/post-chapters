@@ -407,10 +407,9 @@ class Test_PChap_Split_Html extends WP_UnitTestCase {
 			}
 
 			// The navigation links to the next subpage (plain permalinks: ?page=N, like core).
-			// wp_kses_post() writes the &#038; of esc_url() as &amp;.
 			if ( $number < count( $expected ) ) {
 				$next_url = add_query_arg( 'page', $number + 1, get_permalink( $post_id ) );
-				$this->assertStringContainsString( '<a href="' . str_replace( '&#038;', '&amp;', esc_url( $next_url ) ) . '" rel="next">', $output, $label . ': link to the next subpage.' );
+				$this->assertStringContainsString( '<a href="' . PChap_UnitTestCase::kses_url( $next_url ) . '" rel="next">', $output, $label . ': link to the next subpage.' );
 			}
 
 			// The TOC and the navigation are never nested in a heading, a paragraph or a link.

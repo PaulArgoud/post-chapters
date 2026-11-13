@@ -219,6 +219,22 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A URL as the table of contents and the navigation write it in an href.
+	 *
+	 * Both go through esc_url(), then wp_kses_post(). kses writes the &#038; of
+	 * esc_url() as &amp; in recent WordPress versions and keeps it in older ones
+	 * (6.3), so the expected value comes from the running version.
+	 *
+	 * @param string $url URL.
+	 * @return string The href attribute value.
+	 */
+	public static function kses_url( $url ) {
+		$html = wp_kses_post( '<a href="' . esc_url( $url ) . '">x</a>' );
+
+		return preg_match( '/href="([^"]*)"/', $html, $matches ) ? $matches[1] : esc_url( $url );
+	}
+
+	/**
 	 * Update several Paginova options.
 	 *
 	 * @param array $options Option name => value.

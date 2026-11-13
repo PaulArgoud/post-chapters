@@ -25,8 +25,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	/**
 	 * Expected href attribute of a subpage link.
 	 *
-	 * The table of contents and the navigation go through wp_kses_post(), which
-	 * writes the &#038; of esc_url() as &amp;.
+	 * The table of contents and the navigation go through wp_kses_post() (see kses_url()).
 	 *
 	 * @param int    $post_id  Post ID.
 	 * @param int    $page     Subpage.
@@ -34,7 +33,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * @return string
 	 */
 	private function href( $post_id, $page, $fragment = '' ) {
-		return 'href="' . str_replace( '&#038;', '&amp;', esc_url( pchap_link_page_url( $page, $fragment, $post_id ) ) ) . '"';
+		return 'href="' . self::kses_url( pchap_link_page_url( $page, $fragment, $post_id ) ) . '"';
 	}
 
 	/**
