@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters Component Shortcodes.
+ * Paginova Component Shortcodes.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Shortcodes
  * @since 1.5
  */
@@ -11,7 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Post Chapters shortcodes.
+ * Paginova shortcodes.
  *
  * @since 1.1
  */

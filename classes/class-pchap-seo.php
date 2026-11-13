@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters SEO: document title, rel prev/next links and SEO plugin integrations.
+ * Paginova SEO: document title, rel prev/next links and SEO plugin integrations.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 2.1.0
  */
 

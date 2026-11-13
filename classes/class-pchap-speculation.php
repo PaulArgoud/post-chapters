@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters speculative loading: the next chapter is fetched before the click.
+ * Paginova speculative loading: the next chapter is fetched before the click.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 2.1.0
  */
 
@@ -102,6 +102,6 @@ class PChap_Speculation {
 			$mode = 'prefetch';
 		}
 
-		$rules->add_rule( $mode, 'post-chapters', $rule );
+		$rules->add_rule( $mode, 'paginova', $rule );
 	}
 }

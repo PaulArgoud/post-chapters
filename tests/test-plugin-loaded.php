@@ -2,7 +2,7 @@
 /**
  * Smoke tests: the plugin boots inside WordPress.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 /**
@@ -15,7 +15,7 @@ class PChap_Test_Plugin_Loaded extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		remove_filter( 'determine_locale', array( $this, 'force_fr_fr_locale' ) );
-		unload_textdomain( 'post-chapters', true );
+		unload_textdomain( 'paginova', true );
 		parent::tear_down();
 	}
 
@@ -51,9 +51,9 @@ class PChap_Test_Plugin_Loaded extends WP_UnitTestCase {
 		$this->assertSame( 10, has_action( 'init', 'pchap_load_textdomain' ) );
 
 		add_filter( 'determine_locale', array( $this, 'force_fr_fr_locale' ) );
-		unload_textdomain( 'post-chapters', true );
+		unload_textdomain( 'paginova', true );
 
-		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'paginova' ) );
 	}
 
 	/**

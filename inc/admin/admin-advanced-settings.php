@@ -1,12 +1,12 @@
 <?php
 /**
- * Post Chapters Admin Advanced Settings.
+ * Paginova Admin Advanced Settings.
  *
  * Fields of the advanced settings screen and the "Rebuild subpage index"
  * action. The settings are saved by the WordPress Settings API (options.php),
  * see PChap_Admin::register_admin_settings().
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.4
  */
 
@@ -57,7 +57,7 @@ function pchap_admin_advanced_callback_disable_tinymce_buttons() {
 }
 
 /**
- * Former "Build Post Chapters postmetas" settings field.
+ * Former "Build Paginova postmetas" settings field.
  *
  * @since 1.4
  * @deprecated 1.7.0 Replaced by the "Rebuild subpage index" action, see pchap_admin_rebuild_postmeta_section().
@@ -87,18 +87,18 @@ function pchap_admin_rebuild_postmeta_section() {
 	if ( $built > DAY_IN_SECONDS ) {
 		$built_text = sprintf(
 			/* translators: %s: date and time of the last rebuild. */
-			__( 'Last rebuilt: %s.', 'post-chapters' ),
+			__( 'Last rebuilt: %s.', 'paginova' ),
 			wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $built )
 		);
 	} elseif ( $built > 0 ) {
-		$built_text = __( 'Last rebuilt: unknown date.', 'post-chapters' );
+		$built_text = __( 'Last rebuilt: unknown date.', 'paginova' );
 	} else {
-		$built_text = __( 'The chapter index has never been rebuilt on this site.', 'post-chapters' );
+		$built_text = __( 'The chapter index has never been rebuilt on this site.', 'paginova' );
 	}
 	?>
-	<h2 id="mpp-subpage-index"><?php esc_html_e( 'Chapter index', 'post-chapters' ); ?></h2>
+	<h2 id="mpp-subpage-index"><?php esc_html_e( 'Chapter index', 'paginova' ); ?></h2>
 
-	<p><?php esc_html_e( 'Post Chapters stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background.', 'post-chapters' ); ?></p>
+	<p><?php esc_html_e( 'Paginova stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background.', 'paginova' ); ?></p>
 
 	<p class="mpp-rebuild-status"><?php echo esc_html( $built_text ); ?></p>
 
@@ -112,7 +112,7 @@ function pchap_admin_rebuild_postmeta_section() {
 						'A rebuild is in progress in the background: %s post checked so far.',
 						'A rebuild is in progress in the background: %s posts checked so far.',
 						(int) $state['processed'],
-						'post-chapters'
+						'paginova'
 					),
 					number_format_i18n( (int) $state['processed'] )
 				)
@@ -124,7 +124,7 @@ function pchap_admin_rebuild_postmeta_section() {
 	<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" class="mpp-rebuild-form">
 		<input type="hidden" name="action" value="pchap_rebuild_postmeta" />
 		<?php wp_nonce_field( 'pchap_rebuild_postmeta' ); ?>
-		<?php submit_button( __( 'Rebuild chapter index', 'post-chapters' ), 'secondary', 'mpp-rebuild-submit', false ); ?>
+		<?php submit_button( __( 'Rebuild chapter index', 'paginova' ), 'secondary', 'mpp-rebuild-submit', false ); ?>
 	</form>
 	<?php
 }
@@ -140,7 +140,7 @@ function pchap_admin_rebuild_postmeta_section() {
 function pchap_admin_rebuild_postmeta_handler() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die(
-			esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'post-chapters' ),
+			esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'paginova' ),
 			'',
 			array( 'response' => 403 )
 		);
@@ -148,7 +148,7 @@ function pchap_admin_rebuild_postmeta_handler() {
 
 	check_admin_referer( 'pchap_rebuild_postmeta' );
 
-	$args = array( 'page' => 'post-chapters-advanced' );
+	$args = array( 'page' => 'paginova-advanced' );
 
 	if ( ! pchap_rebuild_acquire_lock() ) {
 		$args['mpp-rebuild'] = 'locked';
@@ -206,7 +206,7 @@ function pchap_admin_rebuild_postmeta_notice() {
 	$page   = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
 	$status = isset( $_GET['mpp-rebuild'] ) ? sanitize_key( wp_unslash( $_GET['mpp-rebuild'] ) ) : '';
 
-	if ( 'post-chapters-advanced' !== $page || '' === $status ) {
+	if ( 'paginova-advanced' !== $page || '' === $status ) {
 		return;
 	}
 
@@ -220,17 +220,17 @@ function pchap_admin_rebuild_postmeta_notice() {
 		$counts = array(
 			sprintf(
 				/* translators: %s: number of posts checked. */
-				_n( '%s post checked', '%s posts checked', $processed, 'post-chapters' ),
+				_n( '%s post checked', '%s posts checked', $processed, 'paginova' ),
 				number_format_i18n( $processed )
 			),
 			sprintf(
 				/* translators: %s: number of posts whose chapter index was updated. */
-				_n( '%s post updated', '%s posts updated', $updated, 'post-chapters' ),
+				_n( '%s post updated', '%s posts updated', $updated, 'paginova' ),
 				number_format_i18n( $updated )
 			),
 			sprintf(
 				/* translators: %s: number of stale chapter indexes removed. */
-				_n( '%s stale entry removed', '%s stale entries removed', $deleted, 'post-chapters' ),
+				_n( '%s stale entry removed', '%s stale entries removed', $deleted, 'paginova' ),
 				number_format_i18n( $deleted )
 			),
 		);
@@ -241,7 +241,7 @@ function pchap_admin_rebuild_postmeta_notice() {
 			$type    = 'success';
 			$message = vsprintf(
 				/* translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed. */
-				__( 'Chapter index rebuilt: %1$s, %2$s, %3$s.', 'post-chapters' ),
+				__( 'Chapter index rebuilt: %1$s, %2$s, %3$s.', 'paginova' ),
 				$counts
 			);
 			break;
@@ -250,14 +250,14 @@ function pchap_admin_rebuild_postmeta_notice() {
 			$type    = 'info';
 			$message = vsprintf(
 				/* translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed. */
-				__( 'Chapter index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background.', 'post-chapters' ),
+				__( 'Chapter index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background.', 'paginova' ),
 				$counts
 			);
 			break;
 
 		case 'locked':
 			$type    = 'warning';
-			$message = __( 'A chapter index rebuild is already running. Please try again in a few minutes.', 'post-chapters' );
+			$message = __( 'A chapter index rebuild is already running. Please try again in a few minutes.', 'paginova' );
 			break;
 
 		default:
@@ -297,22 +297,22 @@ function pchap_admin_advanced() {
 
 	<div class="wrap">
 
-		<h1><?php esc_html_e( 'Post Chapters Settings', 'post-chapters' ); ?></h1>
+		<h1><?php esc_html_e( 'Paginova Settings', 'paginova' ); ?></h1>
 		<hr class="wp-header-end" />
 
-		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Post Chapters settings sections', 'post-chapters' ); ?>"><?php pchap_admin_tabs( __( 'Advanced', 'post-chapters' ) ); ?></nav>
+		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Paginova settings sections', 'paginova' ); ?>"><?php pchap_admin_tabs( __( 'Advanced', 'paginova' ) ); ?></nav>
 
-		<h2><?php esc_html_e( 'Advanced Settings', 'post-chapters' ); ?></h2>
+		<h2><?php esc_html_e( 'Advanced Settings', 'paginova' ); ?></h2>
 
-		<p><?php esc_html_e( 'Please leave this settings to their default values, change only if you really know what to do.', 'post-chapters' ); ?></p>
+		<p><?php esc_html_e( 'Please leave this settings to their default values, change only if you really know what to do.', 'paginova' ); ?></p>
 
 		<form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
 
-			<?php settings_fields( 'post-chapters-advanced' ); ?>
+			<?php settings_fields( 'paginova-advanced' ); ?>
 
-			<?php do_settings_sections( 'post-chapters-advanced' ); ?>
+			<?php do_settings_sections( 'paginova-advanced' ); ?>
 
-			<?php submit_button( __( 'Save Settings', 'post-chapters' ) ); ?>
+			<?php submit_button( __( 'Save Settings', 'paginova' ) ); ?>
 		</form>
 
 		<?php pchap_admin_rebuild_postmeta_section(); ?>

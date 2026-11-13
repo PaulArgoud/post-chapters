@@ -2,7 +2,7 @@
 /**
  * Custom post types: chapters work on any public post type, not only on posts.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.

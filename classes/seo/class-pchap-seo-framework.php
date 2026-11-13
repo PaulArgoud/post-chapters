@@ -2,7 +2,7 @@
 /**
  * The SEO Framework integration.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 2.1.0
  */
 

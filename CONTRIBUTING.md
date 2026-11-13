@@ -1,6 +1,6 @@
-# Contributing to Post Chapters
+# Contributing to Paginova
 
-Thank you for your interest in contributing to Post Chapters! This document explains how to set up the development environment, run the checks and tests, and submit changes.
+Thank you for your interest in contributing to Paginova (named Post Chapters up to 2.1.0)! This document explains how to set up the development environment, run the checks and tests, and submit changes.
 
 ## Requirements
 
@@ -18,7 +18,7 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
 ## Getting Started
 
 1. Fork the repository on GitHub
-2. Clone your fork into a folder named `post-chapters` (wp-env mounts it under that name):
+2. Clone your fork into a folder named `post-chapters`, the name of the repository (wp-env mounts it under that name, and `composer test:wp-env` runs in `wp-content/plugins/post-chapters`):
    ```bash
    git clone https://github.com/<your-username>/post-chapters.git
    cd post-chapters
@@ -31,15 +31,15 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
    ```bash
    npx @wordpress/env@12 start
    ```
-   The site runs at http://localhost:8888 (user `admin`, password `password`), with Post Chapters active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored. Use `npx @wordpress/env@12`, not `npx wp-env`: the npm package `wp-env` is unrelated to WordPress. The same environment runs the tests: `composer test:wp-env` reinstalls its database, so anything created there by hand is erased by the next test run.
+   The site runs at http://localhost:8888 (user `admin`, password `password`), with Paginova active. Local overrides (ports, WordPress or PHP version) go in `.wp-env.override.json`, which is git-ignored. Use `npx @wordpress/env@12`, not `npx wp-env`: the npm package `wp-env` is unrelated to WordPress. The same environment runs the tests: `composer test:wp-env` reinstalls its database, so anything created there by hand is erased by the next test run.
 
-You can also use another local environment (Local, DDEV...): symlink or copy the folder into `wp-content/plugins/` and activate **Post Chapters**.
+You can also use another local environment (Local, DDEV...): symlink or copy the folder into `wp-content/plugins/` and activate **Paginova**.
 
 ## Project Structure
 
 ```
-post-chapters/
-  post-chapters.php       # Plugin entry point (header, PCHAP_VERSION)
+post-chapters/                  # Repository (the plugin folder is named paginova/ in the release zip)
+  paginova.php                  # Plugin entry point (header, PCHAP_VERSION), Post Chapters / Multipage guards
   class-pchap.php                 # PChap class: request setup, rendering, SEO
   uninstall.php                 # Data cleanup (multisite aware)
   blocks/subpage/               # Subpage block: block.json, index.js, index.asset.php, editor.css
@@ -52,8 +52,9 @@ post-chapters/
     pchap-options.php             # Option definitions, validation, getters
     pchap-update.php              # Upgrades, subpage index rebuild, WP-Cron
     pchap-blocks.php              # Block registration, JS translations
-    pchap-cli.php                 # wp post-chapters rebuild|status
-    pchap-functions.php           # Version getters, text domain
+    pchap-cli.php                 # wp paginova rebuild|status
+    pchap-functions.php           # Version getters, hook helpers
+    pchap-l10n.php                # Bundled translations of /languages (GitHub build only)
     admin/                      # Settings screens, TinyMCE plugin
   css/, admin/css/              # Frontend and admin styles (LTR / RTL, minified)
   languages/                    # .pot, .po, .mo, .l10n.php, .json
@@ -74,11 +75,11 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the request lifecycle, the parser, th
 | `composer test` | PHPUnit with the local PHP, when the WordPress test library is available (`WP_TESTS_DIR`) |
 | `bin/check-i18n.sh` | Translation files in sync with the code (see [Translations](#translations)) |
 | `bin/check-seo.sh` | Checks the chapters against Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework on the running wp-env site (installs them from wordpress.org; run it before a release, they change their output) |
-| `bin/build-zip.sh` | Release archive `build/post-chapters.zip` (`--wporg`: `build/post-chapters-wporg.zip`, without `Update URI`) |
+| `bin/build-zip.sh` | Release archive `build/paginova.zip` (`--wporg`: `build/paginova-wporg.zip`, without `Update URI` nor the bundled translations) |
 
 ### Coding standards
 
-`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `post-chapters` text domain and the global prefixes `pchap_` (internal helpers included: no leading underscore, Plugin Check rejects it) and `multipage`.
+`composer phpcs` must report **0 errors** (CI fails otherwise; warnings are reported but do not fail it). The ruleset checks PHP 7.4+ compatibility, WordPress 6.3+ APIs, the `paginova` text domain and the global prefixes `pchap` / `pchap_` (internal helpers included: no leading underscore, Plugin Check rejects it).
 
 - Follow the [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/)
 - Strict comparisons (`===` / `!==`) and Yoda conditions
@@ -130,21 +131,22 @@ Also check your change by hand in the browser: the block editor, the classic edi
 
 ## Translations
 
-- Text domain: `post-chapters`. Every string with a placeholder needs a `/* translators: */` comment, and counts use `_n()`
-- `languages/post-chapters.pot` is the template; `.po` files are the sources (not shipped); `.mo`, `.l10n.php` and `.json` (JavaScript, named after the md5 of `blocks/subpage/index.js`) are generated and committed
-- The bundled files take precedence over the language packs installed in `wp-content/languages/plugins` (those of translate.wordpress.org belong to the original plugin), for the bundled locales only; see `pchap_prefer_bundled_translations()`
+- Text domain: `paginova`. Every string with a placeholder needs a `/* translators: */` comment, and counts use `_n()`
+- `languages/paginova.pot` is the template; `.po` files are the sources (not shipped); `.mo`, `.l10n.php` and `.json` (JavaScript, named after the md5 of `blocks/subpage/index.js`) are generated and committed
+- The bundled files take precedence over the language packs installed in `wp-content/languages/plugins` (a pack can lag behind the strings of a release), for the bundled locales only; see `pchap_prefer_bundled_translations()`. The code that loads them lives in `inc/pchap-l10n.php`, loaded only when present
+- The WordPress.org build (`bin/build-zip.sh --wporg`) leaves out `inc/pchap-l10n.php` and every file of `languages/` except `paginova.pot`: WordPress.org serves the language packs of translate.wordpress.org
 
 To refresh the files after changing strings, from the plugin root:
 
 ```bash
 # 1. Template (reads PHP, JavaScript and block.json)
-wp i18n make-pot . languages/post-chapters.pot --domain=post-chapters \
-  --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name="Post Chapters" \
-  --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/post-chapters/issues"}'
+wp i18n make-pot . languages/paginova.pot --domain=paginova \
+  --exclude=vendor,tests,bin,node_modules,build,.claude,.github --package-name="Paginova" \
+  --headers='{"Report-Msgid-Bugs-To":"https://github.com/PaulArgoud/paginova/issues"}'
 
 # 2. Merge the new strings into every catalog, drop obsolete entries
 for po in languages/*.po; do
-  msgmerge --quiet --no-wrap --backup=off --update "$po" languages/post-chapters.pot
+  msgmerge --quiet --no-wrap --backup=off --update "$po" languages/paginova.pot
   msgattrib --no-obsolete --no-wrap -o "$po" "$po"
 done
 
@@ -166,13 +168,13 @@ French translations follow the French typography rules (non-breaking space befor
 ## Building a Release
 
 ```bash
-bin/build-zip.sh           # GitHub release: build/post-chapters.zip
-bin/build-zip.sh --wporg   # WordPress.org: build/post-chapters-wporg.zip
+bin/build-zip.sh           # GitHub release: build/paginova.zip
+bin/build-zip.sh --wporg   # WordPress.org: build/paginova-wporg.zip
 ```
 
-The archive `build/post-chapters.zip` holds one top-level `post-chapters/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `PCHAP_VERSION` in `post-chapters.php` and `version` in `blocks/subpage/block.json`, and the database version in `PChap::setup_globals()` when an upgrade routine is added.
+The archive `build/paginova.zip` holds one top-level `paginova/` folder with the files known to git (tracked or staged), minus everything listed in `.distignore` (tooling, tests, contributor docs, `.po` sources). Stage new files with `git add` before building, or they are left out. Bump `Version` and `PCHAP_VERSION` in `paginova.php` and `version` in `blocks/subpage/block.json`, and the database version in `PChap::setup_globals()` when an upgrade routine is added.
 
-The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapters`, so WordPress never offers to replace this version with a WordPress.org plugin of the same slug. `--wporg` builds the same archive without that line (Plugin Check rejects it, and WordPress.org updates would not reach the sites): use it for anything sent to WordPress.org, and run Plugin Check on it first. The listing assets (screenshots matching the `== Screenshots ==` captions of `readme.txt`, banners and icons) live in `.wordpress-org/` and go to the SVN `/assets` folder.
+The plugin header declares `Update URI: https://github.com/PaulArgoud/paginova`, so WordPress never offers to replace this version with a WordPress.org plugin of the same slug. `--wporg` builds the same archive without that line (Plugin Check rejects it, and WordPress.org updates would not reach the sites) and without the bundled translations: use it for anything sent to WordPress.org, and run Plugin Check on it first (`wp plugin check <extracted folder> --slug=paginova`, in wp-env). The listing assets (screenshots matching the `== Screenshots ==` captions of `readme.txt`, banners and icons) live in `.wordpress-org/` and go to the SVN `/assets` folder.
 
 ## Submitting a Pull Request
 
@@ -184,7 +186,7 @@ The plugin header declares `Update URI: https://github.com/PaulArgoud/post-chapt
 
 ## Reporting Issues
 
-- Use [GitHub Issues](https://github.com/PaulArgoud/post-chapters/issues)
+- Use [GitHub Issues](https://github.com/PaulArgoud/paginova/issues)
 - Include your WordPress version, PHP version, theme, editor (block or classic) and any relevant error messages
 - For display problems, include the post content (Code editor view) or the shortcodes used
 - Describe the steps to reproduce the problem

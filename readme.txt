@@ -1,18 +1,20 @@
-=== Post Chapters ===
+=== Paginova – Chapters for Long Posts ===
 Contributors: nightangel
-Tags: chapters, table of contents, pagination, nextpage, long posts
+Tags: chapters, pagination, nextpage, page break, long posts
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.1.0
+Stable tag: 2.2.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
-Split long posts into chapters, each on its own page with its own title, an automatic table of contents and navigation. Block and classic editors.
+Split long posts into chapters, each on its own page with its own URL and title, plus a table of contents and navigation. Block and classic editors.
 
 == Description ==
 
-Post Chapters splits a long post into chapters. Each chapter is a page of its own with its own title, and a table of contents links them together, so readers find the section they want and every chapter counts as a page view.
+Paginova splits a long post into chapters. Each chapter is a page of its own, with its own URL and title, and a table of contents links them together, so readers find the section they want and every chapter counts as a page view.
+
+A table of contents plugin links to the sections of a single long page; Paginova builds on the page breaks of WordPress (`<!--nextpage-->`) and turns them into titled chapters that search engines, SEO plugins and comments handle as pages of their own. Formerly named Post Chapters, it is the successor of Multipage and takes over its content and settings.
 
 = Features =
 
@@ -28,7 +30,7 @@ Post Chapters splits a long post into chapters. Each chapter is a page of its ow
 * **Block and classic themes**: the table of contents and the navigation are added once, only to the post being read, never to excerpts, related posts or Query Loop blocks.
 * **Your own styles**: the plugin loads a minimal stylesheet that your theme can replace.
 * **RTL support** and translations in French, German, Italian and Spanish.
-* **Developer friendly**: filters for every piece of output, WP-CLI commands (`wp post-chapters status`, `wp post-chapters rebuild`).
+* **Developer friendly**: filters for every piece of output, WP-CLI commands (`wp paginova status`, `wp paginova rebuild`).
 
 = Usage =
 
@@ -42,20 +44,24 @@ The content before the first chapter becomes the intro page. A chapter without a
 
 = Credits =
 
-Post Chapters is the continuation of Multipage, created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Paul Argoud ([paul.argoud.net](https://paul.argoud.net/)) maintained it from 1.5.13 and renamed it Post Chapters in 2.0.0. Development happens on [GitHub](https://github.com/PaulArgoud/post-chapters).
+Paginova is the continuation of Multipage, created by Sergio De Falco (SGr33n, Envire Web Solutions), who developed it up to version 1.5.12. Paul Argoud ([paul.argoud.net](https://paul.argoud.net/)) maintained it from 1.5.13, renamed it Post Chapters in 2.0.0 and Paginova in 2.2.0. Development happens on [GitHub](https://github.com/PaulArgoud/paginova).
 
 == Installation ==
 
-1. Upload the `post-chapters` folder to `/wp-content/plugins/`, or upload the zip under **Plugins > Add New > Upload Plugin**.
-2. Activate **Post Chapters** in the **Plugins** menu.
-3. Configure the plugin under **Settings > Post Chapters**.
+1. Upload the `paginova` folder to `/wp-content/plugins/`, or upload the zip under **Plugins > Add New > Upload Plugin**.
+2. Activate **Paginova** in the **Plugins** menu.
+3. Configure the plugin under **Settings > Paginova**.
 4. Add Chapter blocks or `[nextpage title="…"]` shortcodes to your posts.
 
 == Frequently Asked Questions ==
 
 = I use Multipage. How do I switch? =
 
-Post Chapters reuses the content, the settings and the index of Multipage. Activate Post Chapters (it stays idle and shows a notice while Multipage is active), then deactivate Multipage. To remove Multipage, delete its `sgr-nextpage-titles` folder over FTP or SSH rather than with **Delete** on the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the index that Post Chapters uses.
+Paginova reuses the content, the settings and the index of Multipage. Activate Paginova (it stays idle and shows a notice while Multipage is active), then deactivate Multipage. To remove Multipage, delete its `sgr-nextpage-titles` folder over FTP or SSH rather than with **Delete** on the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the index that Paginova uses.
+
+= I use Post Chapters. How do I switch? =
+
+Paginova is the new name of Post Chapters, and reuses its content and settings. Activate Paginova (it stays idle and shows a notice while Post Chapters is active), then deactivate Post Chapters. To remove Post Chapters, delete its `post-chapters` folder over FTP or SSH rather than with **Delete** on the Plugins screen, which erases the settings and the index that Paginova uses.
 
 = Do I need to change my existing posts? =
 
@@ -63,7 +69,7 @@ No. Existing Subpage blocks (now called Chapter blocks) and `[nextpage]` shortco
 
 = How do I customize the look of the table of contents? =
 
-Copy `css/post-chapters.css` from the plugin into the `css/` folder of your theme (or child theme) and edit it there. Use the name `post-chapters.min.css`, unless `SCRIPT_DEBUG` is enabled, and `post-chapters-rtl.min.css` for right-to-left languages. Post Chapters looks in the child theme first, then in the parent theme, then uses its own stylesheet; the `multipage*.css` names of Multipage are still recognized. You can also override the `.mpp-toc-container` and `.mpp-post-navigation` classes in your theme stylesheet.
+Copy `css/paginova.css` from the plugin into the `css/` folder of your theme (or child theme) and edit it there. Use the name `paginova.min.css`, unless `SCRIPT_DEBUG` is enabled, and `paginova-rtl.min.css` for right-to-left languages. Paginova looks in the child theme first, then in the parent theme, then uses its own stylesheet; the `post-chapters*.css` names of Post Chapters and the `multipage*.css` names of Multipage are still recognized. You can also override the `.mpp-toc-container` and `.mpp-post-navigation` classes in your theme stylesheet.
 
 = Can I put the shortcode inside a heading or a paragraph? =
 
@@ -75,7 +81,7 @@ Yes: Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework. On ch
 
 = Which plugins is it tested with? =
 
-On WordPress 7.1.4 with Twenty Twenty-Five, in November 2026: Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0 and Redis Object Cache 3.0.0 (with Redis 7). With each SEO plugin, a chapter has its own title, canonical URL and Open Graph URL, one pair of `rel=prev` / `rel=next` links, and is not set to `noindex` as a "paginated page". The WordPress core sitemap works as before. Custom post types, flat or hierarchical, work like posts. Elementor 4.4.0 works with its Canvas and Full Width templates for posts written in the block or classic editor; posts built with the Elementor editor are not split (see the next question). Divi, Beaver Builder, Bricks, Elementor Pro theme templates and e-commerce templates that render the post content themselves are not tested. If a plugin misbehaves with a chapter, please open an issue on [GitHub](https://github.com/PaulArgoud/post-chapters/issues).
+On WordPress 7.1.4 with Twenty Twenty-Five, in November 2026: Yoast SEO 28.8, Rank Math 1.0.281, SEOPress 10.4, All in One SEO 5.0.5, The SEO Framework 5.2.0 and Redis Object Cache 3.0.0 (with Redis 7). With each SEO plugin, a chapter has its own title, canonical URL and Open Graph URL, one pair of `rel=prev` / `rel=next` links, and is not set to `noindex` as a "paginated page". The WordPress core sitemap works as before. Custom post types, flat or hierarchical, work like posts. Elementor 4.4.0 works with its Canvas and Full Width templates for posts written in the block or classic editor; posts built with the Elementor editor are not split (see the next question). Divi, Beaver Builder, Bricks, Elementor Pro theme templates and e-commerce templates that render the post content themselves are not tested. If a plugin misbehaves with a chapter, please open an issue on [GitHub](https://github.com/PaulArgoud/paginova/issues).
 
 = Does it work with custom post types? =
 
@@ -83,7 +89,7 @@ Yes, with any public post type that supports the editor: chapters work as they d
 
 = Does it work with page builders? =
 
-A page builder such as Elementor replaces the content of the posts it builds with its own layout, on every page, so the chapters of such a post would all show the whole post. Post Chapters therefore leaves posts built with Elementor, Divi, Beaver Builder or Bricks alone: write the chapters in the block editor or the classic editor. Only Elementor is tested; the others are recognized by their post meta. A post written in the block or classic editor and displayed with a builder template (for example Elementor's Canvas) is split as usual.
+A page builder such as Elementor replaces the content of the posts it builds with its own layout, on every page, so the chapters of such a post would all show the whole post. Paginova therefore leaves posts built with Elementor, Divi, Beaver Builder or Bricks alone: write the chapters in the block editor or the classic editor. Only Elementor is tested; the others are recognized by their post meta. A post written in the block or classic editor and displayed with a builder template (for example Elementor's Canvas) is split as usual.
 
 = Is it fast? =
 
@@ -101,6 +107,16 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 4. The Chapters panel of the editor: the chapters of the post, and the button that turns its headings into chapters.
 
 == Changelog ==
+
+= 2.2.0 =
+Release Date: November 13th, 2026
+
+Post Chapters becomes Paginova. Existing content and settings need no change.
+
+* New name, slug (`paginova`) and text domain; settings under **Settings > Paginova**; the WP-CLI command is `wp paginova` (`wp post-chapters` and `wp multipage` still work).
+* Paginova stays idle, with a notice, while Post Chapters 2.x is active.
+* A theme stylesheet named `css/paginova.css` comes first; the `post-chapters*.css` and `multipage*.css` names still work.
+* The filtered HTML of the chapter title, the table of contents and the navigation is escaped with `wp_kses_post()`.
 
 = 2.1.0 =
 Release Date: November 9th, 2026
@@ -142,9 +158,12 @@ Security and reliability fixes of Multipage, released on GitHub.
 = 1.5.12 and earlier =
 Multipage by Sergio De Falco, on WordPress.org.
 
-The full history is in [CHANGELOG.md](https://github.com/PaulArgoud/post-chapters/blob/main/CHANGELOG.md).
+The full history is in [CHANGELOG.md](https://github.com/PaulArgoud/paginova/blob/main/CHANGELOG.md).
 
 == Upgrade Notice ==
+
+= 2.2.0 =
+Post Chapters is now Paginova. Content and settings are kept. Deactivate Post Chapters after activating Paginova, and delete its folder rather than using Delete on the Plugins screen.
 
 = 2.1.0 =
 Fixes for All in One SEO (chapters were noindex), SEOPress and Yoast (wrong canonical and URLs), a clean uninstall with a persistent object cache, and posts built with Elementor. New Chapters panel in the editor.

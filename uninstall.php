@@ -1,20 +1,20 @@
 <?php
 /**
- * Post Chapters Uninstall.
+ * Paginova Uninstall.
  *
  * Removes all plugin data when the plugin is deleted via the WordPress admin:
  * options, the `_mpp_data` post meta, the scheduled background rebuild and the
  * entries of the plugin in the object cache (also a persistent one, Redis...).
  * The plugin writes nothing else: no table, no user or term meta, no
  * transient, no file.
- * The option and meta names are the ones of Multipage, which Post Chapters
+ * The option and meta names are the ones of Multipage, which Paginova
  * reuses: deleting Multipage (1.7 and earlier) from the admin removes the
- * Post Chapters data too, and the other way round.
+ * Paginova data too, and the other way round.
  * On multisite, the data of every site of the network is removed.
  *
  * The plugin is not loaded when this file runs: it must stay self-contained.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.5.15
  */
 
@@ -24,7 +24,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 /**
- * Remove the Post Chapters data of the current site.
+ * Remove the Paginova data of the current site.
  *
  * @since 1.7.0
  */
@@ -68,7 +68,7 @@ $pchap_uninstall_site = static function () {
 
 	// The parsed chapters cached by the plugin (a day at most, but gone now).
 	if ( function_exists( 'wp_cache_flush_group' ) && function_exists( 'wp_cache_supports' ) && wp_cache_supports( 'flush_group' ) ) {
-		wp_cache_flush_group( 'post-chapters' );
+		wp_cache_flush_group( 'paginova' );
 	}
 };
 

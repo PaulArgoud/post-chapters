@@ -1,12 +1,12 @@
 <?php
 /**
- * Post Chapters Admin Settings.
+ * Paginova Admin Settings.
  *
- * Fields of the main settings screen (Settings > Post Chapters). The settings are
+ * Fields of the main settings screen (Settings > Paginova). The settings are
  * saved by the WordPress Settings API (options.php), see
  * PChap_Admin::register_admin_settings().
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.4
  */
 
@@ -84,7 +84,7 @@ function pchap_admin_render_select_field( $option_name, $select_id, $current, $d
 	if ( ! in_array( (string) $current, $values, true ) ) {
 		$choices[ (string) $current ] = sprintf(
 			/* translators: %s: custom value. */
-			__( 'Custom (%s)', 'post-chapters' ),
+			__( 'Custom (%s)', 'paginova' ),
 			(string) $current
 		);
 	}
@@ -109,22 +109,22 @@ function pchap_admin_render_select_field( $option_name, $select_id, $current, $d
 function pchap_get_settings_sections() {
 	return array(
 		'pchap_main'       => array(
-			'page'     => 'post-chapters',
-			'title'    => __( 'Main Settings', 'post-chapters' ),
+			'page'     => 'paginova',
+			'title'    => __( 'Main Settings', 'paginova' ),
 			'callback' => 'pchap_admin_settings_callback_main_section',
 		),
 		'pchap_pagination' => array(
-			'page'     => 'post-chapters',
-			'title'    => __( 'Pagination', 'post-chapters' ),
+			'page'     => 'paginova',
+			'title'    => __( 'Pagination', 'paginova' ),
 			'callback' => 'pchap_admin_settings_callback_pagination_section',
 		),
 		'pchap_toc'        => array(
-			'page'     => 'post-chapters',
-			'title'    => __( 'Table of contents', 'post-chapters' ),
+			'page'     => 'paginova',
+			'title'    => __( 'Table of contents', 'paginova' ),
 			'callback' => 'pchap_admin_settings_callback_toc_section',
 		),
 		'pchap_advanced'   => array(
-			'page'     => 'post-chapters-advanced',
+			'page'     => 'paginova-advanced',
 			'title'    => '',
 			'callback' => 'pchap_admin_advanced_settings_callback_main_section',
 		),
@@ -149,103 +149,103 @@ function pchap_get_settings_fields() {
 	return array(
 		'mpp-hide-intro-title'            => array(
 			'section' => 'pchap_main',
-			'title'   => __( 'Intro', 'post-chapters' ),
+			'title'   => __( 'Intro', 'paginova' ),
 			'control' => 'checkbox',
 			'id'      => 'hide-intro-title',
-			'label'   => __( 'Hide the default intro title', 'post-chapters' ),
+			'label'   => __( 'Hide the default intro title', 'paginova' ),
 			'value'   => 'pchap_hide_intro_title',
 		),
 		'mpp-comments-on-page'            => array(
 			'section' => 'pchap_main',
-			'title'   => __( 'Display comments on', 'post-chapters' ),
+			'title'   => __( 'Display comments on', 'paginova' ),
 			'control' => 'radio',
 			'id'      => 'comments-on-page',
-			'label'   => __( 'Display comments on', 'post-chapters' ),
+			'label'   => __( 'Display comments on', 'paginova' ),
 			'value'   => 'pchap_get_comments_on_page',
 		),
 		'mpp-continue-or-prev-next'       => array(
 			'section' => 'pchap_pagination',
-			'title'   => __( 'Navigation type', 'post-chapters' ),
+			'title'   => __( 'Navigation type', 'paginova' ),
 			'control' => 'select',
 			'id'      => 'continue-or-prev-next',
 			'value'   => 'pchap_get_continue_or_prev_next',
 		),
 		'mpp-disable-standard-pagination' => array(
 			'section'     => 'pchap_pagination',
-			'title'       => __( 'Disable the standard pagination', 'post-chapters' ),
+			'title'       => __( 'Disable the standard pagination', 'paginova' ),
 			'control'     => 'checkbox',
 			'id'          => 'disable-standard-pagination',
-			'label'       => __( 'Disable the WordPress standard pagination', 'post-chapters' ),
-			'description' => __( 'By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed.', 'post-chapters' ),
+			'label'       => __( 'Disable the WordPress standard pagination', 'paginova' ),
+			'description' => __( 'By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed.', 'paginova' ),
 			'value'       => 'pchap_disable_standard_pagination',
 		),
 		'mpp-toc-only-on-the-first-page'  => array(
 			'section' => 'pchap_toc',
-			'title'   => __( 'Only on the first page', 'post-chapters' ),
+			'title'   => __( 'Only on the first page', 'paginova' ),
 			'control' => 'checkbox',
 			'id'      => 'toc-only-on-the-first-page',
-			'label'   => __( 'Display the table of contents only on the first page of the post', 'post-chapters' ),
+			'label'   => __( 'Display the table of contents only on the first page of the post', 'paginova' ),
 			'value'   => 'pchap_toc_only_on_the_first_page',
 		),
 		'mpp-toc-position'                => array(
 			'section' => 'pchap_toc',
-			'title'   => __( 'Position', 'post-chapters' ),
+			'title'   => __( 'Position', 'paginova' ),
 			'control' => 'select',
 			'id'      => 'toc-position',
 			'value'   => 'pchap_get_toc_position',
 		),
 		'mpp-toc-row-labels'              => array(
 			'section' => 'pchap_toc',
-			'title'   => __( 'Row labels', 'post-chapters' ),
+			'title'   => __( 'Row labels', 'paginova' ),
 			'control' => 'radio',
 			'id'      => 'row-labels',
-			'label'   => __( 'Row labels', 'post-chapters' ),
+			'label'   => __( 'Row labels', 'paginova' ),
 			'value'   => 'pchap_get_toc_row_labels',
 		),
 		'mpp-hide-toc-header'             => array(
 			'section' => 'pchap_toc',
-			'title'   => __( 'Hide header', 'post-chapters' ),
+			'title'   => __( 'Hide header', 'paginova' ),
 			'control' => 'checkbox',
 			'id'      => 'hide-toc-header',
-			'label'   => __( 'Hide the table of contents header', 'post-chapters' ),
+			'label'   => __( 'Hide the table of contents header', 'paginova' ),
 			'value'   => 'pchap_hide_toc_header',
 		),
 		'mpp-comments-toc-link'           => array(
 			'section'     => 'pchap_toc',
-			'title'       => __( 'Comments link', 'post-chapters' ),
+			'title'       => __( 'Comments link', 'paginova' ),
 			'control'     => 'checkbox',
 			'id'          => 'comments-toc-link',
-			'label'       => __( 'Add a link for the comments inside the table of contents', 'post-chapters' ),
-			'description' => __( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'post-chapters' ),
+			'label'       => __( 'Add a link for the comments inside the table of contents', 'paginova' ),
+			'description' => __( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'paginova' ),
 			'value'       => 'pchap_comments_toc_link',
 		),
 		'_mpp-rewrite-title-priority'     => array(
 			'section'     => 'pchap_advanced',
-			'title'       => __( 'Rewrite Title Priority', 'post-chapters' ),
+			'title'       => __( 'Rewrite Title Priority', 'paginova' ),
 			'control'     => 'select',
 			'id'          => 'rewrite-title-priority',
-			'description' => __( 'Some plugins need this higher in order to correctly show the chapter title instead of "Page # of #". If the title works good please leave this to normal.', 'post-chapters' ),
+			'description' => __( 'Some plugins need this higher in order to correctly show the chapter title instead of "Page # of #". If the title works good please leave this to normal.', 'paginova' ),
 			'value'       => 'pchap_get_rewrite_title_priority',
 		),
 		'_mpp-rewrite-content-priority'   => array(
 			'section'     => 'pchap_advanced',
-			'title'       => __( 'Rewrite Content Priority', 'post-chapters' ),
+			'title'       => __( 'Rewrite Content Priority', 'paginova' ),
 			'control'     => 'select',
 			'id'          => 'rewrite-content-priority',
 			'description' => sprintf(
 				/* translators: %1$s: URL of the_content filter documentation. */
-				__( 'This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href="%1$s" target="_blank">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal.', 'post-chapters' ),
+				__( 'This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href="%1$s" target="_blank">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal.', 'paginova' ),
 				esc_url( 'https://developer.wordpress.org/reference/hooks/the_content/' )
 			),
 			'value'       => 'pchap_get_rewrite_content_priority',
 		),
 		'mpp-disable-tinymce-buttons'     => array(
 			'section'     => 'pchap_advanced',
-			'title'       => __( 'Disable TinyMCE Buttons', 'post-chapters' ),
+			'title'       => __( 'Disable TinyMCE Buttons', 'paginova' ),
 			'control'     => 'checkbox',
 			'id'          => 'disable-tinymce-buttons',
-			'label'       => __( 'Disable TinyMCE Buttons', 'post-chapters' ),
-			'description' => __( 'Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts.', 'post-chapters' ),
+			'label'       => __( 'Disable TinyMCE Buttons', 'paginova' ),
+			'description' => __( 'Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts.', 'paginova' ),
 			'value'       => 'pchap_disable_tinymce_buttons',
 		),
 	);
@@ -461,18 +461,18 @@ function pchap_admin_settings() {
 
 	<div class="wrap">
 
-		<h1><?php esc_html_e( 'Post Chapters Settings', 'post-chapters' ); ?></h1>
+		<h1><?php esc_html_e( 'Paginova Settings', 'paginova' ); ?></h1>
 		<hr class="wp-header-end" />
 
-		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Post Chapters settings sections', 'post-chapters' ); ?>"><?php pchap_admin_tabs( __( 'Options', 'post-chapters' ) ); ?></nav>
+		<nav class="nav-tab-wrapper wp-clearfix" aria-label="<?php esc_attr_e( 'Paginova settings sections', 'paginova' ); ?>"><?php pchap_admin_tabs( __( 'Options', 'paginova' ) ); ?></nav>
 
 		<form action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>" method="post">
 
-			<?php settings_fields( 'post-chapters' ); ?>
+			<?php settings_fields( 'paginova' ); ?>
 
-			<?php do_settings_sections( 'post-chapters' ); ?>
+			<?php do_settings_sections( 'paginova' ); ?>
 
-			<?php submit_button( __( 'Save Settings', 'post-chapters' ) ); ?>
+			<?php submit_button( __( 'Save Settings', 'paginova' ) ); ?>
 		</form>
 
 	</div><!-- .wrap -->

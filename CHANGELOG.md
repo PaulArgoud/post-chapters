@@ -1,9 +1,29 @@
 # Changelog
 
-All notable changes to Post Chapters (named Multipage, slug `sgr-nextpage-titles`, up to 1.7.1) are documented in this file. The entries before 2.0.0 use the names of that time (`mpp_*` functions and hooks, `Multipage` class, `wp multipage`).
+All notable changes to Paginova (named Multipage, slug `sgr-nextpage-titles`, up to 1.7.1, then Post Chapters, slug `post-chapters`, from 2.0.0 to 2.1.0) are documented in this file. Each entry uses the names of its time (`mpp_*` functions and hooks, `Multipage` class and `wp multipage` before 2.0.0; `post-chapters` slug, files and settings pages in 2.0.0 and 2.1.0).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [2.2.0] - 2026-11-13
+
+Post Chapters becomes **Paginova**, at the request of the WordPress.org plugin review team ("Post Chapters" is too generic a name for the directory). Content and settings need no change; no database upgrade.
+
+### Changed
+
+- New name, slug and text domain `paginova`: main file `paginova.php`, release archive `build/paginova.zip`, settings pages `options-general.php?page=paginova` and `paginova-advanced` (option groups renamed the same way), object cache group `paginova`, style handles `paginova` and `paginova-admin`, stylesheets `css/paginova*.css`, `admin/css/paginova-admin*.css` and `inc/admin/tinymce/css/paginova*.css`, translation files `languages/paginova-*`, TinyMCE plugin `paginova`. The `pchap` code prefix, the hooks and the data (options, `_mpp_data`, `[nextpage]`, `multipage/subpage`, `.mpp-*` classes) are unchanged
+- WP-CLI: `wp paginova`; `wp post-chapters` and `wp multipage` still work
+- A theme stylesheet `css/paginova[-rtl][.min].css` comes first; the `css/post-chapters*.css` names of Post Chapters and `css/multipage*.css` names of Multipage still work, in this order
+- The bundled translations (the code that loads `/languages` and prefers it to the installed language packs) moved to `inc/pchap-l10n.php`, loaded only when present. `bin/build-zip.sh --wporg` leaves it out, with every file of `languages/` but the `.pot` template: on WordPress.org, translations come from translate.wordpress.org. The GitHub build is unchanged
+- The filtered HTML of the chapter title (`pchap_page_title_template`), the table of contents (`pchap_toc`) and the navigation (`pchap_link_pages`) is escaped with `wp_kses_post()`. The post content is never escaped, as in core
+
+### Added
+
+- Paginova stays idle, with an admin notice, while Post Chapters 2.x is active (both declare the same functions and classes; the check runs before Paginova declares anything). Deactivate Post Chapters, then delete its folder rather than using Delete on the Plugins screen, which would erase the shared settings and index
+
+### Removed
+
+- `inc/admin/tinymce/languages.php`, not loaded since 1.5 (the TinyMCE strings go through the `wp_mce_translation` filter), with its `multipage_tinymce_plugin_translation()` function
 
 ## [2.1.0] - 2026-11-09
 

@@ -1,14 +1,14 @@
 <?php
 /**
- * Content corpus shared by the Post Chapters tests.
+ * Content corpus shared by the Paginova tests.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Post Chapters post contents, as saved by the classic editor, the block editor
+ * Paginova post contents, as saved by the classic editor, the block editor
  * (1.7 and legacy 1.6 serializations) and by hand, with the expected pages.
  *
  * Every item gives:

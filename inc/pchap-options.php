@@ -1,11 +1,11 @@
 <?php
 /**
- * Post Chapters Options.
+ * Paginova Options.
  *
  * Single source of truth for the plugin settings: definitions (type, default,
  * allowed values, settings group), validation, sanitization and getters.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Options
  * @since 1.4
  */
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 /** Definitions ***************************************************************/
 
 /**
- * Return the definitions of every Post Chapters setting.
+ * Return the definitions of every Paginova setting.
  *
  * Each definition is an array with the following keys:
  * - type:    'boolean', 'string' (value restricted to `choices`) or 'priority'
@@ -38,78 +38,78 @@ function pchap_get_option_definitions() {
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-comments-on-page'            => array(
 			'type'    => 'string',
 			'default' => 'all',
 			'choices' => array( 'all', 'first-page', 'last-page' ),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-continue-or-prev-next'       => array(
 			'type'    => 'string',
 			'default' => 'continue',
 			'choices' => array( 'continue', 'next-previous', 'hidden' ),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-disable-standard-pagination' => array(
 			'type'    => 'boolean',
 			'default' => true,
 			'choices' => array(),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-toc-only-on-the-first-page'  => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-toc-position'                => array(
 			'type'    => 'string',
 			'default' => 'top-right',
 			'choices' => array( 'top-left', 'top-right', 'top', 'bottom', 'hidden' ),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-toc-row-labels'              => array(
 			'type'    => 'string',
 			'default' => 'number',
 			'choices' => array( 'number', 'page', 'hidden' ),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-hide-toc-header'             => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'mpp-comments-toc-link'           => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'post-chapters',
+			'group'   => 'paginova',
 		),
 		'_mpp-rewrite-title-priority'     => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
-			'group'   => 'post-chapters-advanced',
+			'group'   => 'paginova-advanced',
 		),
 		'_mpp-rewrite-content-priority'   => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
-			'group'   => 'post-chapters-advanced',
+			'group'   => 'paginova-advanced',
 		),
 		'mpp-disable-tinymce-buttons'     => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
-			'group'   => 'post-chapters-advanced',
+			'group'   => 'paginova-advanced',
 		),
 	);
 
 	/**
-	 * Filters the Post Chapters option definitions.
+	 * Filters the Paginova option definitions.
 	 *
 	 * Can be used to add allowed values (e.g. a custom table of contents
 	 * position handled by a theme). Removing core options is not supported.
@@ -140,7 +140,7 @@ function pchap_get_option_definitions() {
 }
 
 /**
- * Return the definition of a single Post Chapters option.
+ * Return the definition of a single Paginova option.
  *
  * @since 1.7.0
  *
@@ -167,35 +167,35 @@ function pchap_get_option_definition( $option_name ) {
  */
 function pchap_get_option_choice_labels( $option_name = '' ) {
 	$priority_labels = array(
-		100 => __( 'Highest', 'post-chapters' ),
-		50  => __( 'High', 'post-chapters' ),
-		20  => __( 'Normal', 'post-chapters' ),
-		10  => __( 'Low', 'post-chapters' ),
-		5   => __( 'Lowest', 'post-chapters' ),
+		100 => __( 'Highest', 'paginova' ),
+		50  => __( 'High', 'paginova' ),
+		20  => __( 'Normal', 'paginova' ),
+		10  => __( 'Low', 'paginova' ),
+		5   => __( 'Lowest', 'paginova' ),
 	);
 
 	$labels = array(
 		'mpp-comments-on-page'          => array(
-			'all'        => __( 'All pages — Display comments on all post pages', 'post-chapters' ),
-			'first-page' => __( 'First page — Display comments only on the first page', 'post-chapters' ),
-			'last-page'  => __( 'Last page — Display comments only on the last page', 'post-chapters' ),
+			'all'        => __( 'All pages — Display comments on all post pages', 'paginova' ),
+			'first-page' => __( 'First page — Display comments only on the first page', 'paginova' ),
+			'last-page'  => __( 'Last page — Display comments only on the last page', 'paginova' ),
 		),
 		'mpp-continue-or-prev-next'     => array(
-			'continue'      => __( 'Continue or back to intro', 'post-chapters' ),
-			'next-previous' => __( 'Next and previous', 'post-chapters' ),
-			'hidden'        => __( 'Hidden', 'post-chapters' ),
+			'continue'      => __( 'Continue or back to intro', 'paginova' ),
+			'next-previous' => __( 'Next and previous', 'paginova' ),
+			'hidden'        => __( 'Hidden', 'paginova' ),
 		),
 		'mpp-toc-position'              => array(
-			'top-left'  => __( 'above the post content, align left', 'post-chapters' ),
-			'top-right' => __( 'above the post content, align right', 'post-chapters' ),
-			'top'       => __( 'above the post content', 'post-chapters' ),
-			'bottom'    => __( 'below the post content', 'post-chapters' ),
-			'hidden'    => __( 'hidden', 'post-chapters' ),
+			'top-left'  => __( 'above the post content, align left', 'paginova' ),
+			'top-right' => __( 'above the post content, align right', 'paginova' ),
+			'top'       => __( 'above the post content', 'paginova' ),
+			'bottom'    => __( 'below the post content', 'paginova' ),
+			'hidden'    => __( 'hidden', 'paginova' ),
 		),
 		'mpp-toc-row-labels'            => array(
-			'number' => __( 'number — Display numbers before the chapter title', 'post-chapters' ),
-			'page'   => __( 'chapter # — Display "Chapter #" before the chapter title', 'post-chapters' ),
-			'hidden' => __( 'hidden — Hide the labels, display only the chapter title', 'post-chapters' ),
+			'number' => __( 'number — Display numbers before the chapter title', 'paginova' ),
+			'page'   => __( 'chapter # — Display "Chapter #" before the chapter title', 'paginova' ),
+			'hidden' => __( 'hidden — Hide the labels, display only the chapter title', 'paginova' ),
 		),
 		'_mpp-rewrite-title-priority'   => $priority_labels,
 		'_mpp-rewrite-content-priority' => $priority_labels,
@@ -331,7 +331,7 @@ function pchap_validate_option_value( $option_name, $value, $fallback = null ) {
 }
 
 /**
- * Sanitize a Post Chapters option before it is saved (Settings API callback).
+ * Sanitize a Paginova option before it is saved (Settings API callback).
  *
  * Booleans are stored as 1/0 (an unchecked checkbox is posted as null by
  * options.php and stored as 0). Invalid values keep the current valid value
@@ -378,7 +378,7 @@ function pchap_sanitize_option( $value, $option_name ) {
 			'mpp-invalid-' . $option_name,
 			sprintf(
 				/* translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type"). */
-				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'post-chapters' ),
+				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'paginova' ),
 				esc_html( pchap_get_option_field_label( $option_name ) )
 			),
 			'error'
@@ -470,7 +470,7 @@ function pchap_clear_options_cache() {
 }
 
 /**
- * Clear the in-memory options cache when a Post Chapters option changes.
+ * Clear the in-memory options cache when a Paginova option changes.
  *
  * @since 1.7.0
  *
@@ -486,7 +486,7 @@ add_action( 'updated_option', 'pchap_maybe_clear_options_cache' );
 add_action( 'deleted_option', 'pchap_maybe_clear_options_cache' );
 
 /**
- * Return the validated value of a Post Chapters option.
+ * Return the validated value of a Paginova option.
  *
  * @since 1.7.0
  * @access private

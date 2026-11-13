@@ -2,7 +2,7 @@
 /**
  * Base class of the SEO plugin integrations.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 2.1.0
  */
 

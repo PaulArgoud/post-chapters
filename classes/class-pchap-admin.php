@@ -1,11 +1,11 @@
 <?php
 /**
- * Post Chapters Admin Class.
+ * Paginova Admin Class.
  *
  * Admin menus, settings registration and editor integrations
  * (TinyMCE button and Quicktags button).
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage CoreAdministration
  * @since 1.4
  */
@@ -14,7 +14,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Loads the Post Chapters admin area.
+ * Loads the Paginova admin area.
  *
  * @since 1.4
  */
@@ -23,7 +23,7 @@ class PChap_Admin {
 	/** Directory *************************************************************/
 
 	/**
-	 * Path to the Post Chapters admin directory.
+	 * Path to the Paginova admin directory.
 	 *
 	 * @since 1.5
 	 * @var string $admin_dir
@@ -33,7 +33,7 @@ class PChap_Admin {
 	/** URLs ******************************************************************/
 
 	/**
-	 * URL to the Post Chapters admin directory.
+	 * URL to the Paginova admin directory.
 	 *
 	 * @since 1.5
 	 * @var string $admin_url
@@ -61,7 +61,7 @@ class PChap_Admin {
 	/** Methods ***************************************************************/
 
 	/**
-	 * The main Post Chapters admin loader.
+	 * The main Paginova admin loader.
 	 *
 	 * @since 1.4
 	 */
@@ -155,19 +155,19 @@ class PChap_Admin {
 		// Add the option pages.
 		$hooks[] = add_submenu_page(
 			$this->settings_page,
-			__( 'Post Chapters Options', 'post-chapters' ),
-			__( 'Post Chapters', 'post-chapters' ),
+			__( 'Paginova Options', 'paginova' ),
+			__( 'Paginova', 'paginova' ),
 			'manage_options',
-			'post-chapters',
+			'paginova',
 			'pchap_admin_settings'
 		);
 
 		$hooks[] = add_submenu_page(
 			$this->settings_page,
-			__( 'Post Chapters Advanced Settings', 'post-chapters' ),
-			__( 'Post Chapters Advanced Settings', 'post-chapters' ),
+			__( 'Paginova Advanced Settings', 'paginova' ),
+			__( 'Paginova Advanced Settings', 'paginova' ),
 			'manage_options',
-			'post-chapters-advanced',
+			'paginova-advanced',
 			'pchap_admin_advanced'
 		);
 
@@ -255,7 +255,7 @@ class PChap_Admin {
 	 * @return void
 	 */
 	public static function enqueue_scripts() {
-		$handle = 'post-chapters-admin';
+		$handle = 'paginova-admin';
 
 		// LTR or RTL.
 		$file = is_rtl() ? 'admin/css/' . $handle . '-rtl' : 'admin/css/' . $handle;
@@ -264,7 +264,7 @@ class PChap_Admin {
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 		$file   = $file . $suffix . '.css';
 
-		// Enqueue the Post Chapters Plugin styling.
+		// Enqueue the Paginova Plugin styling.
 		wp_enqueue_style( $handle, trailingslashit( PCHAP_PLUGIN_URL ) . $file, array(), PCHAP_VERSION, 'screen' );
 	}
 
@@ -278,7 +278,7 @@ class PChap_Admin {
 	 * @return array Processed links.
 	 */
 	public function modify_plugin_action_links( $links, $file ) {
-		// Return normal links if not Post Chapters.
+		// Return normal links if not Paginova.
 		if ( plugin_basename( PCHAP__PLUGIN_FILE ) !== $file ) {
 			return $links;
 		}
@@ -286,7 +286,7 @@ class PChap_Admin {
 		// Add a few links to the existing links array.
 		return array_merge(
 			array(
-				'settings' => '<a href="' . esc_url( add_query_arg( array( 'page' => 'post-chapters' ), pchap_get_admin_url( 'options-general.php' ) ) ) . '">' . esc_html__( 'Settings', 'post-chapters' ) . '</a>',
+				'settings' => '<a href="' . esc_url( add_query_arg( array( 'page' => 'paginova' ), pchap_get_admin_url( 'options-general.php' ) ) ) . '">' . esc_html__( 'Settings', 'paginova' ) . '</a>',
 			),
 			$links
 		);
@@ -299,7 +299,7 @@ class PChap_Admin {
 	 */
 	public function admin_head() {
 		// Hide the advanced settings from the submenu (accessed via tab).
-		remove_submenu_page( $this->settings_page, 'post-chapters-advanced' );
+		remove_submenu_page( $this->settings_page, 'paginova-advanced' );
 	}
 
 	/**
@@ -323,9 +323,9 @@ class PChap_Admin {
 		self::$quicktags_added = true;
 
 		$l10n = array(
-			'button' => __( 'chapter', 'post-chapters' ),
-			'title'  => __( 'Start a new chapter', 'post-chapters' ),
-			'prompt' => __( 'Enter the chapter title', 'post-chapters' ),
+			'button' => __( 'chapter', 'paginova' ),
+			'title'  => __( 'Start a new chapter', 'paginova' ),
+			'prompt' => __( 'Enter the chapter title', 'paginova' ),
 		);
 
 		$script = <<<'JS'
@@ -406,7 +406,7 @@ JS;
 		// Use minified libraries if SCRIPT_DEBUG is turned off.
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		return add_query_arg( 'ver', rawurlencode( PCHAP_VERSION ), PCHAP_PLUGIN_URL . 'inc/admin/tinymce/css/post-chapters' . $suffix . '.css' );
+		return add_query_arg( 'ver', rawurlencode( PCHAP_VERSION ), PCHAP_PLUGIN_URL . 'inc/admin/tinymce/css/paginova' . $suffix . '.css' );
 	}
 
 	/**
@@ -485,7 +485,7 @@ JS;
 		// Use minified libraries if SCRIPT_DEBUG is turned off.
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 
-		$plugin_array['postchapters'] = PCHAP_PLUGIN_URL . 'inc/admin/tinymce/js/plugin' . $suffix . '.js';
+		$plugin_array['paginova'] = PCHAP_PLUGIN_URL . 'inc/admin/tinymce/js/plugin' . $suffix . '.js';
 
 		return $plugin_array;
 	}
@@ -503,8 +503,8 @@ JS;
 	 */
 	public static function pchap_wp_mce_translation( $mce_translation, $mce_locale ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Filter signature.
 		$pchap_wp_mce_strings = array(
-			'Start a new chapter'     => __( 'Start a new chapter', 'post-chapters' ),
-			'Enter the chapter title' => __( 'Enter the chapter title', 'post-chapters' ),
+			'Start a new chapter'     => __( 'Start a new chapter', 'paginova' ),
+			'Enter the chapter title' => __( 'Enter the chapter title', 'paginova' ),
 		);
 
 		return array_merge( (array) $mce_translation, $pchap_wp_mce_strings );

@@ -222,11 +222,11 @@ jobs:
         run: bash bin/build-zip.sh
 
       - name: List the archive content
-        run: unzip -l build/post-chapters.zip
+        run: unzip -l build/paginova.zip
 
       - name: Upload the plugin zip
         uses: actions/upload-artifact@v4
         with:
-          name: post-chapters
-          path: build/post-chapters.zip
+          name: paginova
+          path: build/paginova.zip
           if-no-files-found: error

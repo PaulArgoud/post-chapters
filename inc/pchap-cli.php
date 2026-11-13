@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters WP-CLI commands.
+ * Paginova WP-CLI commands.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage CLI
  * @since 1.7.0
  */
@@ -18,15 +18,15 @@ if ( ! defined( 'WP_CLI' ) || ! WP_CLI ) {
 if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 
 	/**
-	 * Manage the Post Chapters chapter index.
+	 * Manage the Paginova chapter index.
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Show the state of the chapter index.
-	 *     $ wp post-chapters status
+	 *     $ wp paginova status
 	 *
 	 *     # Rebuild the chapter index of every post.
-	 *     $ wp post-chapters rebuild
+	 *     $ wp paginova rebuild
 	 *
 	 * @since 1.7.0
 	 */
@@ -35,7 +35,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 		/**
 		 * Rebuild the chapter index (`_mpp_data` post meta) of every post.
 		 *
-		 * Parses every post containing a Post Chapters chapter (Subpage) block or a
+		 * Parses every post containing a Paginova chapter (Subpage) block or a
 		 * [nextpage] shortcode, updates its index, and deletes the index of
 		 * posts which are no longer split. Revisions and auto-drafts are
 		 * skipped. Any pending background rebuild is completed by this command.
@@ -53,11 +53,11 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 		 *
 		 * ## EXAMPLES
 		 *
-		 *     $ wp post-chapters rebuild
+		 *     $ wp paginova rebuild
 		 *     Rebuilding the chapter index  100% [==============] 0:01 / 0:01
 		 *     Success: Chapter index rebuilt: 1250 posts checked, 12 updated, 3 stale entries removed, 1235 unchanged.
 		 *
-		 *     $ wp post-chapters rebuild --dry-run --batch-size=500
+		 *     $ wp paginova rebuild --dry-run --batch-size=500
 		 *
 		 * @param array $args       Positional arguments (unused).
 		 * @param array $assoc_args Associative arguments.
@@ -71,7 +71,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 			}
 
 			if ( ! class_exists( 'PChap_Parser' ) || ! function_exists( 'pchap_run_postmeta_rebuild' ) ) {
-				WP_CLI::error( 'Post Chapters is not loaded on this site.' );
+				WP_CLI::error( 'Paginova is not loaded on this site.' );
 			}
 
 			$locked = false;
@@ -111,7 +111,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 			if ( ! empty( $stats['lock_lost'] ) ) {
 				WP_CLI::error(
 					sprintf(
-						'The rebuild lock was taken over by another process after %d posts. That process continues the rebuild; run "wp post-chapters status" to follow it.',
+						'The rebuild lock was taken over by another process after %d posts. That process continues the rebuild; run "wp paginova status" to follow it.',
 						$stats['processed']
 					)
 				);
@@ -158,7 +158,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 		 *
 		 * ## EXAMPLES
 		 *
-		 *     $ wp post-chapters status
+		 *     $ wp paginova status
 		 *     +-------------------+---------------------+
 		 *     | key               | value               |
 		 *     +-------------------+---------------------+
@@ -171,7 +171,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 		 */
 		public function status( $args, $assoc_args ) {
 			if ( ! function_exists( 'pchap_get_postmeta_index_stats' ) ) {
-				WP_CLI::error( 'Post Chapters is not loaded on this site.' );
+				WP_CLI::error( 'Paginova is not loaded on this site.' );
 			}
 
 			$format = \WP_CLI\Utils\get_flag_value( $assoc_args, 'format', 'table' );
@@ -208,11 +208,14 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 			}
 
 			if ( $stats['missing_index'] > 0 || $stats['stale_index'] > 0 ) {
-				WP_CLI::warning( 'The chapter index is out of date. Run "wp post-chapters rebuild" to fix it.' );
+				WP_CLI::warning( 'The chapter index is out of date. Run "wp paginova rebuild" to fix it.' );
 			}
 		}
 	}
 
+	WP_CLI::add_command( 'paginova', 'PChap_CLI_Command' );
+
+	// Post Chapters 2.x name, kept for existing scripts.
 	WP_CLI::add_command( 'post-chapters', 'PChap_CLI_Command' );
 
 	// Multipage 1.x name, kept for existing scripts.

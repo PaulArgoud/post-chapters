@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the Multipage package (GPL v3).
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Chapters 2.1.0\n"
-"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/post-chapters/issues\n"
-"POT-Creation-Date: 2026-11-09T17:24:42+00:00\n"
+"Project-Id-Version: Paginova 2.2.0\n"
+"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/paginova/issues\n"
+"POT-Creation-Date: 2026-11-13T12:54:45+00:00\n"
 "PO-Revision-Date: 2026-11-07 20:54+0000\n"
 "Last-Translator: Multipage contributors\n"
 "Language-Team: French (France)\n"
@@ -15,63 +15,67 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 "X-Generator: GNU gettext msgmerge + reviewed translations\n"
-"X-Domain: post-chapters\n"
+"X-Domain: paginova\n"
 
 #. Plugin Name of the plugin
-#: post-chapters.php classes/class-pchap-admin.php:159
-msgid "Post Chapters"
-msgstr "Post Chapters"
+#: paginova.php
+msgid "Paginova – Chapters for Long Posts"
+msgstr "Paginova – Chapitres pour les longs articles"
 
 #. Plugin URI of the plugin
-#: post-chapters.php
-msgid "https://github.com/PaulArgoud/post-chapters"
-msgstr "https://github.com/PaulArgoud/post-chapters"
+#: paginova.php
+msgid "https://github.com/PaulArgoud/paginova"
+msgstr "https://github.com/PaulArgoud/paginova"
 
 #. Description of the plugin
-#: post-chapters.php
-msgid "Split your long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation."
-msgstr "Divisez vos longs articles WordPress en chapitres, chacun sur sa propre page avec son propre titre, et ajoutez une table des matières automatique. Prend en charge les blocs Gutenberg, les codes courts de l’éditeur classique, un balisage optimisé pour le référencement et une navigation personnalisable."
+#: paginova.php
+msgid "Split long posts into chapters, each on its own page with its own URL and title, with a table of contents and chapter navigation. Works with the block editor and the classic editor. Formerly Post Chapters, successor of Multipage."
+msgstr "Découpez vos longs articles en chapitres, chacun sur sa propre page avec sa propre URL et son propre titre, avec une table des matières et une navigation entre les chapitres. Fonctionne avec l’éditeur de blocs et l’éditeur classique. Anciennement Post Chapters, successeur de Multipage."
 
 #. Author of the plugin
-#: post-chapters.php
+#: paginova.php
 msgid "Paul ARGOUD, based on Multipage by SGr33n (aka Sergio De Falco, Envire Web Solutions)."
 msgstr "Paul ARGOUD, d’après Multipage de SGr33n (alias Sergio De Falco, Envire Web Solutions)."
 
 #. Author URI of the plugin
-#: post-chapters.php
+#: paginova.php
 msgid "https://paul.argoud.net"
 msgstr "https://paul.argoud.net"
 
-#: class-pchap.php:615 inc/admin/admin-settings.php:152
+#: class-pchap.php:620 inc/admin/admin-settings.php:152
 msgid "Intro"
 msgstr "Introduction"
 
 #. translators: %d: chapter number.
-#: class-pchap.php:623
+#: class-pchap.php:628
 #, php-format
 msgid "Chapter %d"
 msgstr "Chapitre %d"
 
 #. translators: %: chapter number (literal percent sign, replaced by the number).
-#: class-pchap.php:1314
+#: class-pchap.php:1320
 msgid "Chapter %"
 msgstr "Chapitre %"
 
-#: class-pchap.php:1331
+#: class-pchap.php:1337
 msgid "Chapter navigation"
 msgstr "Navigation des chapitres"
 
-#: class-pchap.php:1365 inc/admin/admin-settings.php:123
+#: class-pchap.php:1371 inc/admin/admin-settings.php:123
 msgid "Table of contents"
 msgstr "Table des matières"
 
 #: classes/class-pchap-admin.php:158
-msgid "Post Chapters Options"
-msgstr "Options de Post Chapters"
+msgid "Paginova Options"
+msgstr "Options de Paginova"
+
+#: classes/class-pchap-admin.php:159
+msgid "Paginova"
+msgstr "Paginova"
 
 #: classes/class-pchap-admin.php:167 classes/class-pchap-admin.php:168
-msgid "Post Chapters Advanced Settings"
-msgstr "Réglages avancés de Post Chapters"
+msgid "Paginova Advanced Settings"
+msgstr "Réglages avancés de Paginova"
 
 #: classes/class-pchap-admin.php:289
 msgid "Settings"
@@ -82,12 +86,10 @@ msgid "chapter"
 msgstr "chapitre"
 
 #: classes/class-pchap-admin.php:327 classes/class-pchap-admin.php:506
-#: inc/admin/tinymce/languages.php:34
 msgid "Start a new chapter"
 msgstr "Commencer un nouveau chapitre"
 
 #: classes/class-pchap-admin.php:328 classes/class-pchap-admin.php:507
-#: inc/admin/tinymce/languages.php:35
 msgid "Enter the chapter title"
 msgstr "Saisissez le titre du chapitre"
 
@@ -110,8 +112,8 @@ msgid "Chapter index"
 msgstr "Index des chapitres"
 
 #: inc/admin/admin-advanced-settings.php:101
-msgid "Post Chapters stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
-msgstr "Post Chapters mémorise la liste des chapitres de chaque article lors de son enregistrement. Reconstruisez cet index après une mise à jour, une importation ou si la table des matières d’un article semble obsolète. Les articles sont traités par lots ; sur les sites volumineux, les articles restants sont traités en arrière-plan."
+msgid "Paginova stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
+msgstr "Paginova mémorise la liste des chapitres de chaque article lors de son enregistrement. Reconstruisez cet index après une mise à jour, une importation ou si la table des matières d’un article semble obsolète. Les articles sont traités par lots ; sur les sites volumineux, les articles restants sont traités en arrière-plan."
 
 #. translators: %s: number of posts already checked.
 #: inc/admin/admin-advanced-settings.php:111
@@ -170,12 +172,12 @@ msgid "A chapter index rebuild is already running. Please try again in a few min
 msgstr "Une reconstruction de l’index des chapitres est déjà en cours. Veuillez réessayer dans quelques minutes."
 
 #: inc/admin/admin-advanced-settings.php:300 inc/admin/admin-settings.php:464
-msgid "Post Chapters Settings"
-msgstr "Réglages de Post Chapters"
+msgid "Paginova Settings"
+msgstr "Réglages de Paginova"
 
 #: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-settings.php:467
-msgid "Post Chapters settings sections"
-msgstr "Sections des réglages de Post Chapters"
+msgid "Paginova settings sections"
+msgstr "Sections des réglages de Paginova"
 
 #: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-functions.php:126
 msgid "Advanced"
@@ -399,25 +401,33 @@ msgstr "Continuer : %s"
 msgid "Back to: %s"
 msgstr "Retour à : %s"
 
-#: inc/pchap-template.php:397
+#: inc/pchap-template.php:398
 msgid "Comments"
 msgstr "Commentaires"
 
-#: inc/pchap-template.php:419
+#: inc/pchap-template.php:420
 msgid "Contents"
 msgstr "Sommaire"
 
-#: post-chapters.php:75
-msgid "Post Chapters is not running yet."
-msgstr "Post Chapters n’est pas encore actif."
+#: paginova.php:83 paginova.php:145
+msgid "Paginova is not running yet."
+msgstr "Paginova n’est pas encore actif."
 
-#: post-chapters.php:76
-msgid "Deactivate Multipage: Post Chapters replaces it and takes over its settings and content."
-msgstr "Désactivez Multipage : Post Chapters le remplace et reprend ses réglages et ses contenus."
+#: paginova.php:84
+msgid "Deactivate Post Chapters: Paginova is its new name and takes over its settings and content."
+msgstr "Désactivez Post Chapters : Paginova est son nouveau nom et reprend ses réglages et ses contenus."
 
-#: post-chapters.php:77
-msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Post Chapters uses."
-msgstr "Pour supprimer ensuite Multipage, effacez son dossier sur le serveur plutôt que depuis l’écran Extensions : supprimés depuis l’écran Extensions, Multipage 1.5.15 et les versions suivantes effacent les réglages et l’index des chapitres utilisés par Post Chapters."
+#: paginova.php:85
+msgid "To remove Post Chapters afterwards, delete its folder from the server rather than from the Plugins screen: deleting it from the Plugins screen erases the settings and the chapter index that Paginova uses."
+msgstr "Pour supprimer ensuite Post Chapters, effacez son dossier sur le serveur plutôt que depuis l’écran Extensions : le supprimer depuis l’écran Extensions efface les réglages et l’index des chapitres utilisés par Paginova."
+
+#: paginova.php:146
+msgid "Deactivate Multipage: Paginova replaces it and takes over its settings and content."
+msgstr "Désactivez Multipage : Paginova le remplace et reprend ses réglages et ses contenus."
+
+#: paginova.php:147
+msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Paginova uses."
+msgstr "Pour supprimer ensuite Multipage, effacez son dossier sur le serveur plutôt que depuis l’écran Extensions : supprimés depuis l’écran Extensions, Multipage 1.5.15 et les versions suivantes effacent les réglages et l’index des chapitres utilisés par Paginova."
 
 #: blocks/subpage/index.js:121
 msgid "Write chapter title…"

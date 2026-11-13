@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Post Chapters Admin Class.
+ * Main Paginova Admin Class.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage CoreAdministration
  * @since 1.4
  */
@@ -11,7 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Setup Post Chapters Admin.
+ * Setup Paginova Admin.
  *
  * @since 1.4
  */

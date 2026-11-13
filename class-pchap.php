@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Post Chapters class: bootstrap, request setup and frontend rendering.
+ * Main Paginova class: bootstrap, request setup and frontend rendering.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 0.6
  */
 
@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Load the Main Post Chapters Class
+ * Load the Main Paginova Class
  *
  * @since 0.6
  */
@@ -105,7 +105,7 @@ class PChap {
 	 */
 	public $plugin_url = '';
 
-	/** Post Chapters Data ********************************************************/
+	/** Paginova Data ********************************************************/
 
 	/**
 	 * Subpages of the current post: slug => display title (fallbacks applied), or false.
@@ -241,7 +241,7 @@ class PChap {
 	private $post_content_depth = 0;
 
 	/**
-	 * Main Post Chapters Instance.
+	 * Main Paginova Instance.
 	 *
 	 * @since 1.4
 	 */
@@ -312,12 +312,12 @@ class PChap {
 
 		// Paths.
 
-		$this->file       = PCHAP_PLUGIN_DIR . 'post-chapters.php';
-		$this->basename   = basename( PCHAP_PLUGIN_DIR ) . '/post-chapters.php';
+		$this->file       = PCHAP_PLUGIN_DIR . 'paginova.php';
+		$this->basename   = basename( PCHAP_PLUGIN_DIR ) . '/paginova.php';
 		$this->plugin_dir = PCHAP_PLUGIN_DIR;
 		$this->plugin_url = PCHAP_PLUGIN_URL;
 
-		// Post Chapters data.
+		// Paginova data.
 
 		$this->pchap_data  = false;
 		$this->pchap_index = false;
@@ -358,6 +358,11 @@ class PChap {
 		require_once $this->plugin_dir . 'inc/pchap-update.php';
 		require_once $this->plugin_dir . 'inc/pchap-blocks.php';
 		require_once $this->plugin_dir . 'inc/pchap-cli.php';
+
+		// Bundled translations: GitHub build only (see inc/pchap-l10n.php).
+		if ( file_exists( $this->plugin_dir . 'inc/pchap-l10n.php' ) ) {
+			require_once $this->plugin_dir . 'inc/pchap-l10n.php';
+		}
 
 		$this->seo         = new PChap_SEO( $this );
 		$this->comments    = new PChap_Comments( $this );
@@ -497,14 +502,14 @@ class PChap {
 		}
 
 		$key    = 'parse-' . self::parser_revision() . '-' . md5( $content );
-		$parsed = wp_cache_get( $key, 'post-chapters' );
+		$parsed = wp_cache_get( $key, 'paginova' );
 
 		if ( is_array( $parsed ) && isset( $parsed['is_multipage'], $parsed['pages'] ) && is_array( $parsed['pages'] ) ) {
 			return $parsed;
 		}
 
 		$parsed = PChap_Parser::parse( $content );
-		wp_cache_set( $key, $parsed, 'post-chapters', DAY_IN_SECONDS );
+		wp_cache_set( $key, $parsed, 'paginova', DAY_IN_SECONDS );
 
 		return $parsed;
 	}
@@ -612,7 +617,7 @@ class PChap {
 	 */
 	private function get_display_title( $page, $number ) {
 		if ( 'intro' === $page['kind'] ) {
-			return __( 'Intro', 'post-chapters' );
+			return __( 'Intro', 'paginova' );
 		}
 
 		if ( '' !== $page['title'] ) {
@@ -620,7 +625,7 @@ class PChap {
 		}
 
 		/* translators: %d: chapter number. */
-		$title = sprintf( __( 'Chapter %d', 'post-chapters' ), $number );
+		$title = sprintf( __( 'Chapter %d', 'paginova' ), $number );
 
 		/**
 		 * Filters the fallback title of an untitled subpage.
@@ -877,7 +882,7 @@ class PChap {
 	}
 
 	/**
-	 * Filter the document title for Post Chapters pages.
+	 * Filter the document title for Paginova pages.
 	 *
 	 * No longer hooked: SEO plugins are handled by dedicated integrations
 	 * (see register_seo_integrations()). Kept for backward compatibility.
@@ -1219,12 +1224,12 @@ class PChap {
 	}
 
 	/**
-	 * Filter the WordPress post content for Post Chapters pages.
+	 * Filter the WordPress post content for Paginova pages.
 	 *
 	 * @since 0.6
 	 *
 	 * @param string $content Original page content.
-	 * @return string the content enhanced by Post Chapters.
+	 * @return string the content enhanced by Paginova.
 	 */
 	public function pchap_the_content( $content ) {
 		// Table of contents should not be the only content in the post.
@@ -1301,8 +1306,9 @@ class PChap {
 		 */
 		$page_title_template = pchap_apply_filters( 'pchap_page_title_template', '<h2>%s</h2>' );
 
+		// The template is filterable: the title HTML is escaped as post content.
 		$is_intro   = 1 === $current_page && ! empty( $this->pages ) && 'intro' === $this->pages[0]['kind'];
-		$page_title = pchap_hide_intro_title() && $is_intro ? '' : sprintf( (string) $page_title_template, pchap_get_subpage_title_html( $this->page_title, $this->get_current_title_format() ) );
+		$page_title = pchap_hide_intro_title() && $is_intro ? '' : wp_kses_post( sprintf( (string) $page_title_template, pchap_get_subpage_title_html( $this->page_title, $this->get_current_title_format() ) ) );
 
 		$toc_labels   = pchap_get_toc_row_labels();
 		$toc_position = pchap_get_toc_position();
@@ -1311,7 +1317,7 @@ class PChap {
 			case 'page':
 				$toc_row_separator = ': ';
 				/* translators: %: chapter number (literal percent sign, replaced by the number). */
-				$toc_row_pagelink = esc_html__( 'Chapter %', 'post-chapters' );
+				$toc_row_pagelink = esc_html__( 'Chapter %', 'paginova' );
 				break;
 			case 'hidden':
 				$toc_row_separator = '';
@@ -1328,7 +1334,7 @@ class PChap {
 			$navigation = pchap_link_pages(
 				$this,
 				array(
-					'before'                => '<nav class="mpp-post-navigation ' . sanitize_html_class( $continue_or_prev_next ) . '" aria-label="' . esc_attr__( 'Chapter navigation', 'post-chapters' ) . '"><div class="nav-links">',
+					'before'                => '<nav class="mpp-post-navigation ' . sanitize_html_class( $continue_or_prev_next ) . '" aria-label="' . esc_attr__( 'Chapter navigation', 'paginova' ) . '"><div class="nav-links">',
 					'after'                 => '</div></nav>',
 					'continue_or_prev_next' => $continue_or_prev_next,
 				)
@@ -1362,7 +1368,7 @@ class PChap {
 				'hide_header' => pchap_hide_toc_header(),
 				'comments'    => $comments_link,
 				'position'    => $toc_position,
-				'before'      => '<nav class="mpp-toc toc" aria-label="' . esc_attr__( 'Table of contents', 'post-chapters' ) . '"><ul>',
+				'before'      => '<nav class="mpp-toc toc" aria-label="' . esc_attr__( 'Table of contents', 'paginova' ) . '"><ul>',
 				'after'       => '</ul></nav>',
 				'separator'   => $toc_row_separator,
 				'pagelink'    => $toc_row_pagelink,
@@ -1393,6 +1399,10 @@ class PChap {
 		 * @param string $toc        The table of contents HTML.
 		 * @param string $content    The original content.
 		 */
+		// The parts built by the plugin (title, table of contents, navigation) are escaped
+		// with wp_kses_post(). The post content itself is never escaped, as in core:
+		// kses would strip the embeds, iframes and scripts that authors with the
+		// unfiltered_html capability are allowed to publish.
 		$output = pchap_apply_filters( 'pchap_the_content', $output, $page_title, $toc, $content );
 
 		// Add the page navigation.
@@ -1448,20 +1458,22 @@ class PChap {
 	/**
 	 * Styles applied to public-facing pages
 	 *
-	 * A theme can override the stylesheet with css/post-chapters[-rtl][.min].css
+	 * A theme can override the stylesheet with css/paginova[-rtl][.min].css
 	 * (child theme first, then parent theme). In each theme, the
-	 * css/multipage[-rtl][.min].css name used by Multipage is still honoured,
-	 * after the new one.
+	 * css/post-chapters[-rtl][.min].css name of
+	 * Post Chapters 2.x and the css/multipage[-rtl][.min].css name of Multipage
+	 * are still honoured, in this order, after the new one.
 	 *
 	 * @since 0.6
 	 * @since 2.0.0 Looks for css/post-chapters*.css first, css/multipage*.css as a fallback.
+	 * @since 2.2.0 Looks for css/paginova*.css first, then the former names.
 	 */
 	public function enqueue_styles() {
 		// Use minified libraries if SCRIPT_DEBUG is turned off.
 		$suffix = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? '' : '.min';
 		$rtl    = is_rtl() ? '-rtl' : '';
 
-		$file     = 'css/post-chapters' . $rtl . $suffix . '.css';
+		$file     = 'css/paginova' . $rtl . $suffix . '.css';
 		$location = '';
 		$handle   = '';
 		$path     = '';
@@ -1471,12 +1483,12 @@ class PChap {
 			array( get_template_directory(), get_template_directory_uri(), get_template() ),
 		);
 		foreach ( $themes as $theme ) {
-			foreach ( array( 'post-chapters', 'multipage' ) as $basename ) {
+			foreach ( array( 'paginova', 'post-chapters', 'multipage' ) as $basename ) {
 				$candidate = 'css/' . $basename . $rtl . $suffix . '.css';
 				if ( file_exists( trailingslashit( $theme[0] ) . $candidate ) ) {
 					$file     = $candidate;
 					$location = trailingslashit( $theme[1] );
-					$handle   = $theme[2] . '-post-chapters';
+					$handle   = $theme[2] . '-paginova';
 					$path     = trailingslashit( $theme[0] ) . $candidate;
 					break 2;
 				}
@@ -1484,19 +1496,19 @@ class PChap {
 		}
 
 		if ( '' === $location ) {
-			// Post Chapters default style.
+			// Paginova default style.
 			$location = trailingslashit( PCHAP_PLUGIN_URL );
-			$handle   = 'post-chapters';
+			$handle   = 'paginova';
 
 			// Never point to a missing file.
 			if ( ! file_exists( PCHAP_PLUGIN_DIR . $file ) ) {
-				$file = 'css/post-chapters' . $suffix . '.css';
+				$file = 'css/paginova' . $suffix . '.css';
 			}
 
 			$path = PCHAP_PLUGIN_DIR . $file;
 		}
 
-		// Enqueue the Post Chapters styling.
+		// Enqueue the Paginova styling.
 		wp_enqueue_style( $handle, $location . $file, array(), $this->version, 'screen' );
 
 		// Small stylesheet: with its path, WordPress prints it inline (no extra request),

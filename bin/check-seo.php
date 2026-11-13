@@ -8,7 +8,7 @@
  * plugin must say about the second one: its own title, canonical, Open Graph URL and
  * robots, and a single pair of rel prev/next links. Exits with 1 when a check fails.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 if ( 'cli' !== PHP_SAPI ) {

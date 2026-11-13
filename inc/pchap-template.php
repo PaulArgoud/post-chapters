@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters Templates.
+ * Paginova Templates.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Templates
  * @since 1.5
  */
@@ -143,7 +143,7 @@ function pchap_get_subpage_title_text( $title, $format = 'html' ) {
  * @since 1.7.0
  * @access private
  *
- * @param PChap|mixed $multipage The Post Chapters instance.
+ * @param PChap|mixed $multipage The Paginova instance.
  * @param int         $index     0-based subpage index.
  * @param int         $count     Number of titles being rendered.
  * @return string 'html' or 'text'.
@@ -164,7 +164,7 @@ function pchap_get_title_format( $multipage, $index, $count ) {
  *
  * @global int $page
  *
- * @param PChap|mixed $multipage The Post Chapters instance.
+ * @param PChap|mixed $multipage The Paginova instance.
  * @return int
  */
 function pchap_get_current_page( $multipage ) {
@@ -185,7 +185,7 @@ function pchap_get_current_page( $multipage ) {
  *
  * @since 1.2.0
  *
- * @param PChap        $multipage The Post Chapters instance.
+ * @param PChap        $multipage The Paginova instance.
  * @param string|array $args {
  *     Optional. Array or string of default arguments.
  *
@@ -212,8 +212,8 @@ function pchap_link_pages( $multipage, $args = '' ) {
 		'link_after'            => '',
 		'continue_or_prev_next' => 'continue',
 		'separator'             => ' ',
-		'nextpagelink'          => esc_html__( 'Next page', 'post-chapters' ),
-		'previouspagelink'      => esc_html__( 'Previous page', 'post-chapters' ),
+		'nextpagelink'          => esc_html__( 'Next page', 'paginova' ),
+		'previouspagelink'      => esc_html__( 'Previous page', 'paginova' ),
 		'echo'                  => 0,
 	);
 
@@ -241,11 +241,11 @@ function pchap_link_pages( $multipage, $args = '' ) {
 			if ( $next <= $numpages ) {
 				$link = pchap_link_page( $next, 'next' ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[ $next - 1 ], pchap_get_title_format( $multipage, $next - 1, $numpages ) ) . $r['link_after'] . '</a>';
 				/* translators: %s: link to the next chapter. */
-				$text = sprintf( esc_html__( 'Continue: %s', 'post-chapters' ), $link );
+				$text = sprintf( esc_html__( 'Continue: %s', 'paginova' ), $link );
 			} else {
 				$link = pchap_link_page( 1 ) . $r['link_before'] . pchap_get_subpage_title_html( $titles[0], pchap_get_title_format( $multipage, 0, $numpages ) ) . $r['link_after'] . '</a>';
 				/* translators: %s: link to the first chapter. */
-				$text = sprintf( esc_html__( 'Back to: %s', 'post-chapters' ), $link );
+				$text = sprintf( esc_html__( 'Back to: %s', 'paginova' ), $link );
 			}
 
 			/**
@@ -290,10 +290,11 @@ function pchap_link_pages( $multipage, $args = '' ) {
 	 * @param string $output HTML output of paginated posts' page links.
 	 * @param array  $args   An array of arguments.
 	 */
-	$html = pchap_apply_filters( 'pchap_link_pages', $output, $args );
+	// Filtered HTML: escaped as post content (wp_kses_post()).
+	$html = wp_kses_post( (string) pchap_apply_filters( 'pchap_link_pages', $output, $args ) );
 
 	if ( $r['echo'] ) {
-		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts.
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped with wp_kses_post() above.
 	}
 
 	return $html;
@@ -309,7 +310,7 @@ function pchap_link_pages( $multipage, $args = '' ) {
  *
  * @global int $more
  *
- * @param PChap        $multipage The Post Chapters instance.
+ * @param PChap        $multipage The Paginova instance.
  * @param string|array $args {
  *     Optional. Array or string of default arguments.
  *
@@ -394,7 +395,7 @@ function pchap_toc( $multipage, $args = '' ) {
 
 	// Add a link for comments.
 	if ( $r['comments'] ) {
-		$link    = $r['comments'] . esc_html__( 'Comments', 'post-chapters' ) . '</a>';
+		$link    = $r['comments'] . esc_html__( 'Comments', 'paginova' ) . '</a>';
 		$row     = $r['row_before'] . $r['link_before'] . $link . $r['link_after'] . $r['row_after'];
 		$output .= $row;
 	}
@@ -416,7 +417,7 @@ function pchap_toc( $multipage, $args = '' ) {
 
 	$output = sprintf(
 		$template,
-		esc_html__( 'Contents', 'post-chapters' ),
+		esc_html__( 'Contents', 'paginova' ),
 		$output
 	);
 
@@ -428,10 +429,11 @@ function pchap_toc( $multipage, $args = '' ) {
 	 * @param string $output HTML output of paginated posts' page links.
 	 * @param array  $args   An array of arguments.
 	 */
-	$html = pchap_apply_filters( 'pchap_toc', $output, $args );
+	// Filtered HTML: escaped as post content (wp_kses_post()).
+	$html = wp_kses_post( (string) pchap_apply_filters( 'pchap_toc', $output, $args ) );
 
 	if ( $r['echo'] ) {
-		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built from escaped parts.
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped with wp_kses_post() above.
 	}
 
 	return $html;

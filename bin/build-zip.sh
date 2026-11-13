@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 #
-# Build the distributable plugin archive: build/post-chapters.zip
+# Build the distributable plugin archive: build/paginova.zip
 #
-# The archive contains a single top-level "post-chapters/" folder, as
+# The archive contains a single top-level "paginova/" folder, as
 # expected by the WordPress plugin uploader. Only files known to git are
 # packaged, and every path listed in .distignore is left out (development
 # tooling, tests, contributor docs, .po sources...).
 #
 # Usage: bin/build-zip.sh [--wporg]
 #
-#   --wporg  Build build/post-chapters-wporg.zip for WordPress.org instead: same
-#            files, without the "Update URI" header of post-chapters.php (Plugin
-#            Check rejects it on WordPress.org-hosted plugins).
+#   --wporg  Build build/paginova-wporg.zip for WordPress.org instead: without
+#            the "Update URI" header of paginova.php (Plugin Check rejects it on
+#            WordPress.org-hosted plugins), and without the bundled translations
+#            (languages/ except the .pot template, and inc/pchap-l10n.php that
+#            loads them): WordPress.org serves the language packs of
+#            translate.wordpress.org.
 #
 set -euo pipefail
 
-SLUG="post-chapters"
+SLUG="paginova"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_DIR="${ROOT}/build"
 ZIP_FILE="${BUILD_DIR}/${SLUG}.zip"
@@ -88,8 +91,11 @@ fi
 # contributor docs, .po sources, build/ itself...).
 rsync -a --exclude-from="${DISTIGNORE}" "${SOURCE_DIR}/" "${STAGE_DIR}/"
 
-# WordPress.org build: drop the "Update URI" header line.
+# WordPress.org build: drop the "Update URI" header line and the bundled translations.
 if [[ "${WPORG}" == 1 ]]; then
+	rm -f "${STAGE_DIR}/inc/pchap-l10n.php"
+	find "${STAGE_DIR}/languages" -type f ! -name "${SLUG}.pot" ! -name index.php -delete
+
 	MAIN_FILE="${STAGE_DIR}/${SLUG}.php"
 	grep -v -E '^[[:space:]]*\*[[:space:]]*Update URI:' "${MAIN_FILE}" > "${MAIN_FILE}.tmp"
 	mv "${MAIN_FILE}.tmp" "${MAIN_FILE}"
@@ -114,6 +120,11 @@ if ! grep -qx "${SLUG}/${SLUG}.php" <<< "${LISTING}"; then
 fi
 if grep -E "^${SLUG}/(vendor|node_modules|tests|bin|build|tmp|\.[^/]+)/|^${SLUG}/(composer\.(json|lock)|package(-lock)?\.json|phpcs\.xml(\.dist)?|phpunit\.xml(\.dist)?|phpstan\.neon(\.dist)?|\.[^/]+)$|\.(po|log)$" <<< "${LISTING}"; then
 	echo "Error: the development files above leaked into the archive; check .distignore." >&2
+	exit 1
+fi
+
+if [[ "${WPORG}" == 1 ]] && grep -E "^${SLUG}/(inc/pchap-l10n\.php|languages/.*\.(mo|json|l10n\.php))$" <<<"${LISTING}"; then
+	echo "Error: the bundled translations above leaked into the WordPress.org archive." >&2
 	exit 1
 fi
 

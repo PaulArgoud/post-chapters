@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters Admin Functions.
+ * Paginova Admin Functions.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.4
  */
 
@@ -10,8 +10,8 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Highlight the Settings > Post Chapters menu item, regardless of which actual
- * Post Chapters admin screen we are on.
+ * Highlight the Settings > Paginova menu item, regardless of which actual
+ * Paginova admin screen we are on.
  *
  * @since 1.4
  *
@@ -21,10 +21,10 @@ defined( 'ABSPATH' ) || exit;
 function pchap_modify_admin_menu_highlight() {
 	global $plugin_page, $submenu_file;
 
-	// This tweaks the Settings subnav menu to show only one Post Chapters menu item.
-	if ( in_array( $plugin_page, array( 'post-chapters-advanced' ), true ) ) {
+	// This tweaks the Settings subnav menu to show only one Paginova menu item.
+	if ( in_array( $plugin_page, array( 'paginova-advanced' ), true ) ) {
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Intended.
-		$submenu_file = 'post-chapters';
+		$submenu_file = 'paginova';
 	}
 }
 
@@ -118,12 +118,12 @@ function pchap_admin_tabs( $active_tab = '' ) {
 function pchap_get_admin_tabs( $active_tab = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found -- Public 1.4+ signature kept for backward compatibility.
 	$tabs = array(
 		'0' => array(
-			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'post-chapters' ), 'options-general.php' ) ),
-			'name' => __( 'Options', 'post-chapters' ),
+			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'paginova' ), 'options-general.php' ) ),
+			'name' => __( 'Options', 'paginova' ),
 		),
 		'1' => array(
-			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'post-chapters-advanced' ), 'options-general.php' ) ),
-			'name' => __( 'Advanced', 'post-chapters' ),
+			'href' => pchap_get_admin_url( add_query_arg( array( 'page' => 'paginova-advanced' ), 'options-general.php' ) ),
+			'name' => __( 'Advanced', 'paginova' ),
 		),
 	);
 

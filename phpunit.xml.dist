@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-	PHPUnit configuration for the Post Chapters plugin.
+	PHPUnit configuration for the Paginova plugin.
 
 	The tests need the WordPress PHPUnit test library: run them inside the
 	wp-env cli container, e.g. "composer test:wp-env" once
@@ -23,7 +23,7 @@
 	failOnWarning="true"
 	>
 	<testsuites>
-		<testsuite name="post-chapters">
+		<testsuite name="paginova">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>

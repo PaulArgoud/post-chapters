@@ -2,7 +2,7 @@
 /**
  * Speculative loading: the links of the chapters are prefetched before the click.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -54,7 +54,7 @@ class Test_PChap_Speculation extends PChap_UnitTestCase {
 
 		$rules = wp_get_speculation_rules();
 		$this->assertInstanceOf( 'WP_Speculation_Rules', $rules );
-		$this->assertTrue( $rules->has_rule( 'prefetch', 'post-chapters' ) );
+		$this->assertTrue( $rules->has_rule( 'prefetch', 'paginova' ) );
 
 		$list = $this->rules_of( $rules, 'prefetch' );
 		$mine = array_values(
@@ -81,7 +81,7 @@ class Test_PChap_Speculation extends PChap_UnitTestCase {
 
 		$rules = wp_get_speculation_rules();
 		$this->assertInstanceOf( 'WP_Speculation_Rules', $rules );
-		$this->assertFalse( $rules->has_rule( 'prefetch', 'post-chapters' ) );
+		$this->assertFalse( $rules->has_rule( 'prefetch', 'paginova' ) );
 	}
 
 	/**
@@ -106,15 +106,15 @@ class Test_PChap_Speculation extends PChap_UnitTestCase {
 		$this->go_to_subpage( $post_id, 2 );
 
 		$rules = wp_get_speculation_rules();
-		$this->assertTrue( $rules->has_rule( 'prerender', 'post-chapters' ) );
-		$this->assertFalse( $rules->has_rule( 'prefetch', 'post-chapters' ) );
+		$this->assertTrue( $rules->has_rule( 'prerender', 'paginova' ) );
+		$this->assertFalse( $rules->has_rule( 'prefetch', 'paginova' ) );
 
 		$this->reset_multipage();
 		remove_all_filters( 'pchap_speculation_rule' );
 		add_filter( 'pchap_speculation_rule', '__return_false' );
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertFalse( wp_get_speculation_rules()->has_rule( 'prefetch', 'post-chapters' ) );
+		$this->assertFalse( wp_get_speculation_rules()->has_rule( 'prefetch', 'paginova' ) );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Test_PChap_Speculation extends PChap_UnitTestCase {
 		$post_id = $this->create_post( self::CONTENT, array( 'post_name' => 'mon-article' ) );
 		$this->go_to_subpage( $post_id, 2 );
 
-		$this->assertTrue( wp_get_speculation_rules()->has_rule( 'prefetch', 'post-chapters' ) );
+		$this->assertTrue( wp_get_speculation_rules()->has_rule( 'prefetch', 'paginova' ) );
 	}
 
 	/**

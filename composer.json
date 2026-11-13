@@ -1,9 +1,9 @@
 {
-	"name": "paulargoud/post-chapters",
-	"description": "Post Chapters: split long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents.",
+	"name": "paulargoud/paginova",
+	"description": "Paginova: split long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents.",
 	"type": "wordpress-plugin",
 	"license": "GPL-3.0-or-later",
-	"homepage": "https://github.com/PaulArgoud/post-chapters",
+	"homepage": "https://github.com/PaulArgoud/paginova",
 	"authors": [
 		{
 			"name": "Paul ARGOUD",
@@ -11,8 +11,8 @@
 		}
 	],
 	"support": {
-		"issues": "https://github.com/PaulArgoud/post-chapters/issues",
-		"source": "https://github.com/PaulArgoud/post-chapters"
+		"issues": "https://github.com/PaulArgoud/paginova/issues",
+		"source": "https://github.com/PaulArgoud/paginova"
 	},
 	"require": {
 		"php": ">=7.4"
@@ -55,6 +55,6 @@
 		"phpcs": "Check the code against the WordPress Coding Standards and PHPCompatibilityWP.",
 		"phpcbf": "Automatically fix the coding standard violations that can be fixed.",
 		"test": "Run the PHPUnit test suite (needs the WordPress test library, e.g. inside the wp-env cli container).",
-		"test:wp-env": "Run the PHPUnit test suite inside a started wp-env (plugin folder must be named post-chapters). It reinstalls the wp-env database."
+		"test:wp-env": "Run the PHPUnit test suite inside a started wp-env (plugin folder must be named paginova). It reinstalls the wp-env database."
 	}
 }

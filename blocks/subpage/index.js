@@ -1,5 +1,5 @@
 /**
- * Post Chapters "Subpage" block (multipage/subpage) - editor script.
+ * Paginova "Subpage" block (multipage/subpage) - editor script.
  *
  * Buildless: plain ES5 using the wp.* globals, no JSX and no build step.
  * The block metadata (title, category, attributes, supports...) lives in
@@ -9,7 +9,7 @@
  * server definitions (third-party or front-end editors); where both exist,
  * the server definition wins.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since   1.7.0
  */
 ( function( wp ) {
@@ -46,7 +46,7 @@
 		category: 'design',
 		description: 'Start a new chapter: split your post into pages, each with its own title.',
 		keywords: [ 'chapter', 'multipage', 'page' ],
-		textdomain: 'post-chapters',
+		textdomain: 'paginova',
 		attributes: {
 			title: {
 				type: 'string',
@@ -118,7 +118,7 @@
 					onChange: function( value ) {
 						setAttributes( { title: value } );
 					},
-					placeholder: __( 'Write chapter title…', 'post-chapters' ),
+					placeholder: __( 'Write chapter title…', 'paginova' ),
 					allowedFormats: [],
 					withoutInteractiveFormatting: true,
 					disableLineBreaks: true,
@@ -270,7 +270,7 @@
 			notices.createSuccessNotice(
 				sprintf(
 					/* translators: %d: number of headings. */
-					_n( '%d heading turned into a chapter. You can undo it.', '%d headings turned into chapters. You can undo it.', count, 'post-chapters' ),
+					_n( '%d heading turned into a chapter. You can undo it.', '%d headings turned into chapters. You can undo it.', count, 'paginova' ),
 					count
 				),
 				{ type: 'snackbar' }
@@ -292,19 +292,19 @@
 							scrollToBlock( chapter.clientId );
 						}
 					},
-					'' !== text ? text : __( 'Untitled chapter', 'post-chapters' )
+					'' !== text ? text : __( 'Untitled chapter', 'paginova' )
 				)
 			);
 		} );
 
 		return el(
 			props.Panel,
-			{ name: 'post-chapters', title: __( 'Chapters', 'post-chapters' ), className: 'mpp-chapters-panel' },
+			{ name: 'paginova', title: __( 'Chapters', 'paginova' ), className: 'mpp-chapters-panel' },
 			items.length
 				? el( 'ol', { className: 'mpp-chapters-list' }, items )
-				: el( 'p', null, __( 'No chapters yet. Add a Chapter block where a chapter starts, or turn headings into chapters.', 'post-chapters' ) ),
+				: el( 'p', null, __( 'No chapters yet. Add a Chapter block where a chapter starts, or turn headings into chapters.', 'paginova' ) ),
 			el( SelectControl, {
-				label: __( 'Heading level', 'post-chapters' ),
+				label: __( 'Heading level', 'paginova' ),
 				value: level,
 				options: [
 					{ label: 'H2', value: 2 },
@@ -314,7 +314,7 @@
 				onChange: function( value ) {
 					setLevel( parseInt( value, 10 ) );
 				},
-				help: __( 'Only the headings at the top level of the post.', 'post-chapters' )
+				help: __( 'Only the headings at the top level of the post.', 'paginova' )
 			} ),
 			el(
 				Button,
@@ -322,10 +322,10 @@
 				headings.length
 					? sprintf(
 						/* translators: %d: number of headings. */
-						_n( 'Turn %d heading into a chapter', 'Turn %d headings into chapters', headings.length, 'post-chapters' ),
+						_n( 'Turn %d heading into a chapter', 'Turn %d headings into chapters', headings.length, 'paginova' ),
 						headings.length
 					)
-					: __( 'No heading of this level', 'post-chapters' )
+					: __( 'No heading of this level', 'paginova' )
 			)
 		);
 	}
@@ -339,7 +339,7 @@
 				return;
 			}
 
-			wp.plugins.registerPlugin( 'post-chapters', {
+			wp.plugins.registerPlugin( 'paginova', {
 				render: function() {
 					return el( ChaptersPanel, { Panel: Panel } );
 				}

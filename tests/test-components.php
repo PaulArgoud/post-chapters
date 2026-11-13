@@ -3,7 +3,7 @@
  * Components of the main instance (pchap()->seo, pchap()->comments) and the
  * deprecated PChap methods that delegate to them.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.

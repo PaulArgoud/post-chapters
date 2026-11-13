@@ -2,7 +2,7 @@
 /**
  * Block registration tests.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -76,7 +76,7 @@ class Test_PChap_Blocks extends PChap_UnitTestCase {
 			$this->assertArrayHasKey( $handle, $scripts->registered, "Script {$handle} is not registered." );
 
 			$script = $scripts->registered[ $handle ];
-			$this->assertSame( 'post-chapters', $script->textdomain );
+			$this->assertSame( 'paginova', $script->textdomain );
 			$this->assertTrue(
 				untrailingslashit( PCHAP_PLUGIN_DIR . 'languages' ) === untrailingslashit( (string) $script->translations_path )
 					|| false !== has_filter( 'load_script_translation_file', 'pchap_load_bundled_script_translation_file' ),

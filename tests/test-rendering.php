@@ -2,7 +2,7 @@
 /**
  * Rendering tests: page title, table of contents, navigation and settings.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -25,13 +25,16 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	/**
 	 * Expected href attribute of a subpage link.
 	 *
+	 * The table of contents and the navigation go through wp_kses_post(), which
+	 * writes the &#038; of esc_url() as &amp;.
+	 *
 	 * @param int    $post_id  Post ID.
 	 * @param int    $page     Subpage.
 	 * @param string $fragment Optional. Fragment.
 	 * @return string
 	 */
 	private function href( $post_id, $page, $fragment = '' ) {
-		return 'href="' . esc_url( pchap_link_page_url( $page, $fragment, $post_id ) ) . '"';
+		return 'href="' . str_replace( '&#038;', '&amp;', esc_url( pchap_link_page_url( $page, $fragment, $post_id ) ) ) . '"';
 	}
 
 	/**
@@ -490,6 +493,42 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	}
 
 	/**
+	 * The filtered HTML of the title template, the table of contents and the
+	 * navigation is escaped with wp_kses_post().
+	 */
+	public function test_filtered_markup_is_escaped() {
+		add_filter(
+			'pchap_page_title_template',
+			static function () {
+				return '<h3 class="custom-title" onclick="evil()">%s<script>evil("title")</script></h3>';
+			}
+		);
+		add_filter(
+			'pchap_toc',
+			static function ( $html ) {
+				return $html . '<script>evil("toc")</script><p class="toc-extra">TOC-EXTRA</p>';
+			}
+		);
+		add_filter(
+			'pchap_link_pages',
+			static function ( $html ) {
+				return $html . '<iframe src="https://example.com/"></iframe><span class="nav-extra">NAV-EXTRA</span>';
+			}
+		);
+
+		$post_id = $this->create_post( self::CLASSIC );
+		$html    = $this->render_subpage( $post_id, 2 );
+
+		$this->assertStringContainsString( '<h3 class="custom-title">Deux', $html );
+		$this->assertStringContainsString( '<p class="toc-extra">TOC-EXTRA</p>', $html );
+		$this->assertStringContainsString( '<span class="nav-extra">NAV-EXTRA</span>', $html );
+		$this->assertStringNotContainsString( 'onclick', $html );
+		$this->assertStringNotContainsString( '<script', $html );
+		$this->assertStringNotContainsString( '<iframe', $html );
+		$this->assertStringContainsString( 'BODY-2', $html );
+	}
+
+	/**
 	 * The 1.6 template filters still apply: pchap_toc_args, pchap_toc_pages_row, pchap_toc,
 	 * pchap_link_pages_args, pchap_link_pages_link and pchap_link_pages.
 	 */
@@ -820,16 +859,16 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 
 		do_action( 'wp_enqueue_scripts' );
 
-		$this->assertTrue( wp_style_is( 'post-chapters', 'enqueued' ) );
-		$this->assertStringContainsString( 'css/post-chapters', wp_styles()->registered['post-chapters']->src );
+		$this->assertTrue( wp_style_is( 'paginova', 'enqueued' ) );
+		$this->assertStringContainsString( 'css/paginova', wp_styles()->registered['paginova']->src );
 
-		wp_dequeue_style( 'post-chapters' );
-		wp_deregister_style( 'post-chapters' );
+		wp_dequeue_style( 'paginova' );
+		wp_deregister_style( 'paginova' );
 
 		$plain_id = $this->create_post( 'Plain' );
 		$this->go_to_subpage( $plain_id, 1 );
 		do_action( 'wp_enqueue_scripts' );
-		$this->assertFalse( wp_style_is( 'post-chapters', 'enqueued' ) );
+		$this->assertFalse( wp_style_is( 'paginova', 'enqueued' ) );
 	}
 
 	/**
@@ -878,7 +917,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 		add_action(
 			'parse_request',
 			static function () use ( $content, $stale ) {
-				wp_cache_set( 'parse-' . PCHAP_VERSION . '-' . md5( $content ), $stale, 'post-chapters' );
+				wp_cache_set( 'parse-' . PCHAP_VERSION . '-' . md5( $content ), $stale, 'paginova' );
 			}
 		);
 

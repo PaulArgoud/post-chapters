@@ -2,7 +2,7 @@
 /**
  * Tests of uninstall.php.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -68,7 +68,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 	 */
 	private function uninstall() {
 		if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-			define( 'WP_UNINSTALL_PLUGIN', 'post-chapters/post-chapters.php' );
+			define( 'WP_UNINSTALL_PLUGIN', 'paginova/paginova.php' );
 		}
 
 		include PCHAP_PLUGIN_DIR . 'uninstall.php';
@@ -114,12 +114,12 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 			$this->markTestSkipped( 'The object cache cannot flush a group.' );
 		}
 
-		wp_cache_set( 'parse-x', array( 'pages' ), 'post-chapters' );
+		wp_cache_set( 'parse-x', array( 'pages' ), 'paginova' );
 		wp_cache_set( 'other', 'kept', 'unrelated-group' );
 
 		$this->uninstall();
 
-		$this->assertFalse( wp_cache_get( 'parse-x', 'post-chapters' ) );
+		$this->assertFalse( wp_cache_get( 'parse-x', 'paginova' ) );
 		$this->assertSame( 'kept', wp_cache_get( 'other', 'unrelated-group' ) );
 	}
 
@@ -163,7 +163,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 
 		$this->uninstall();
 
-		$pattern = '(^|[_-])(mpp|pchap)([_-]|$)|^multipage$|post-chapters|nextpage-titles';
+		$pattern = '(^|[_-])(mpp|pchap)([_-]|$)|^multipage$|paginova|nextpage-titles';
 		$tables  = array(
 			$wpdb->options     => 'option_name',
 			$wpdb->postmeta    => 'meta_key',

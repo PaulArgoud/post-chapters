@@ -2,7 +2,7 @@
 /**
  * Upgrade routine tests.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -239,7 +239,7 @@ class Test_PChap_Upgrade extends PChap_UnitTestCase {
 	}
 
 	/**
-	 * Multipage 1.7 -> Post Chapters 2.0 with a pending rebuild: the old WP-Cron
+	 * Multipage 1.7 -> Paginova 2.0 with a pending rebuild: the old WP-Cron
 	 * event is dropped and the rebuild continues under the new event name.
 	 */
 	public function test_update_from_1_7_moves_pending_rebuild() {
@@ -260,7 +260,7 @@ class Test_PChap_Upgrade extends PChap_UnitTestCase {
 	}
 
 	/**
-	 * Multipage 1.7 -> Post Chapters 2.0 without a pending rebuild: no event at all.
+	 * Multipage 1.7 -> Paginova 2.0 without a pending rebuild: no event at all.
 	 */
 	public function test_update_from_1_7_without_pending_rebuild() {
 		update_option( '_mpp_db_version', 1700 );

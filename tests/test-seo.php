@@ -3,7 +3,7 @@
  * SEO: the chapter title in the titles of SEO plugins, the URLs and robots of the chapters,
  * and the integrations of Yoast SEO, Rank Math, SEOPress, All in One SEO and The SEO Framework.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.

@@ -2,7 +2,7 @@
 /**
  * The stylesheet of the chapters: which file is loaded, and that WordPress prints it inline.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.
@@ -42,10 +42,10 @@ class Test_PChap_Styles extends PChap_UnitTestCase {
 		}
 		$this->theme_files = array();
 
-		wp_dequeue_style( 'post-chapters' );
-		wp_deregister_style( 'post-chapters' );
-		wp_dequeue_style( get_stylesheet() . '-post-chapters' );
-		wp_deregister_style( get_stylesheet() . '-post-chapters' );
+		wp_dequeue_style( 'paginova' );
+		wp_deregister_style( 'paginova' );
+		wp_dequeue_style( get_stylesheet() . '-paginova' );
+		wp_deregister_style( get_stylesheet() . '-paginova' );
 		$GLOBALS['wp_styles'] = null; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- WordPress creates it again.
 
 		parent::tear_down();
@@ -67,9 +67,9 @@ class Test_PChap_Styles extends PChap_UnitTestCase {
 	public function test_plugin_stylesheet_has_its_path() {
 		$this->enqueue();
 
-		$path = wp_styles()->get_data( 'post-chapters', 'path' );
+		$path = wp_styles()->get_data( 'paginova', 'path' );
 
-		$this->assertSame( PCHAP_PLUGIN_DIR . 'css/post-chapters' . $this->min() . '.css', $path );
+		$this->assertSame( PCHAP_PLUGIN_DIR . 'css/paginova' . $this->min() . '.css', $path );
 		$this->assertFileExists( $path );
 	}
 
@@ -84,12 +84,12 @@ class Test_PChap_Styles extends PChap_UnitTestCase {
 		$this->enqueue();
 		wp_maybe_inline_styles();
 
-		$style = wp_styles()->registered['post-chapters'];
+		$style = wp_styles()->registered['paginova'];
 		$this->assertFalse( $style->src, 'The stylesheet has no file to request.' );
 
-		$output = get_echo( array( wp_styles(), 'do_items' ), array( 'post-chapters' ) );
+		$output = get_echo( array( wp_styles(), 'do_items' ), array( 'paginova' ) );
 		// WordPress 6.3 prints single quotes, later versions double quotes.
-		$this->assertMatchesRegularExpression( '/<style id=["\']post-chapters-inline-css["\']/', $output );
+		$this->assertMatchesRegularExpression( '/<style id=["\']paginova-inline-css["\']/', $output );
 		$this->assertStringContainsString( '.mpp-toc-container', $output );
 	}
 
@@ -102,14 +102,14 @@ class Test_PChap_Styles extends PChap_UnitTestCase {
 			mkdir( $directory, 0755, true );
 		}
 
-		$file = $directory . '/post-chapters' . $this->min() . '.css';
+		$file = $directory . '/paginova' . $this->min() . '.css';
 		file_put_contents( $file, '.mpp-toc-container{color:red}' );
 		$this->theme_files[] = $file;
 
 		$this->enqueue();
 
-		$this->assertSame( $file, wp_styles()->get_data( get_stylesheet() . '-post-chapters', 'path' ) );
-		$this->assertFalse( wp_style_is( 'post-chapters', 'enqueued' ), 'The plugin stylesheet is not loaded.' );
+		$this->assertSame( $file, wp_styles()->get_data( get_stylesheet() . '-paginova', 'path' ) );
+		$this->assertFalse( wp_style_is( 'paginova', 'enqueued' ), 'The plugin stylesheet is not loaded.' );
 	}
 
 	/**

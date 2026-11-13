@@ -4,7 +4,7 @@
  *
  * Read by register_block_type() for the block.json "editorScript" field.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.7.0
  */
 
@@ -24,5 +24,5 @@ return array(
 		'wp-plugins',
 		'wp-primitives',
 	),
-	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.1.0',
+	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.2.0',
 );

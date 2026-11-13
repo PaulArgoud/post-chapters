@@ -1,12 +1,12 @@
 <?php
 /**
- * Post Chapters Content Parser.
+ * Paginova Content Parser.
  *
  * Single source of truth for the subpage structure of a post: it finds the
  * subpage markers (Gutenberg blocks, classic [nextpage] shortcodes and core
  * page breaks) in document order and splits the content into pages.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Parser
  * @since 1.5.14
  */
@@ -15,7 +15,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Post Chapters content parser.
+ * Paginova content parser.
  *
  * @since 1.5.14
  */
@@ -168,7 +168,7 @@ class PChap_Parser {
 	 *
 	 * @param string $content The post content.
 	 * @return array {
-	 *     @type bool  $is_multipage Whether the post is a Post Chapters post.
+	 *     @type bool  $is_multipage Whether the post is a Paginova post.
 	 *     @type bool  $has_intro    Whether the first page is the automatic intro.
 	 *     @type array $pages        Ordered list of pages. Each page is an array with the keys
 	 *                               'slug' (string), 'title' (string, raw, '' when untitled,

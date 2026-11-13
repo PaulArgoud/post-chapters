@@ -2,12 +2,12 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "multipage/subpage",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"title": "Chapter",
 	"category": "design",
 	"description": "Start a new chapter: split your post into pages, each with its own title.",
 	"keywords": [ "chapter", "multipage", "page" ],
-	"textdomain": "post-chapters",
+	"textdomain": "paginova",
 	"attributes": {
 		"title": {
 			"type": "string",

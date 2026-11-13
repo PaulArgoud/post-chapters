@@ -2,7 +2,7 @@
 /**
  * Admin assets tests: the admin stylesheet points to a file of the plugin.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.
@@ -19,8 +19,8 @@ class Test_PChap_Admin_Assets extends PChap_UnitTestCase {
 	 * Remove the stylesheet and restore the text direction.
 	 */
 	public function tear_down() {
-		wp_dequeue_style( 'post-chapters-admin' );
-		wp_deregister_style( 'post-chapters-admin' );
+		wp_dequeue_style( 'paginova-admin' );
+		wp_deregister_style( 'paginova-admin' );
 		$GLOBALS['wp_locale']->text_direction = 'ltr';
 
 		parent::tear_down();
@@ -34,9 +34,9 @@ class Test_PChap_Admin_Assets extends PChap_UnitTestCase {
 	private function enqueued_stylesheet_path() {
 		PChap_Admin::enqueue_scripts();
 
-		$this->assertTrue( wp_style_is( 'post-chapters-admin', 'enqueued' ) );
+		$this->assertTrue( wp_style_is( 'paginova-admin', 'enqueued' ) );
 
-		$src  = wp_styles()->registered['post-chapters-admin']->src;
+		$src  = wp_styles()->registered['paginova-admin']->src;
 		$base = trailingslashit( PCHAP_PLUGIN_URL );
 		$this->assertStringStartsWith( $base, $src );
 

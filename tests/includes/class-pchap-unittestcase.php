@@ -1,17 +1,17 @@
 <?php
 /**
- * Base test case of the Post Chapters test suite.
+ * Base test case of the Paginova test suite.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
 
 /**
- * Shared helpers: resets the Post Chapters singleton between requests, creates
+ * Shared helpers: resets the Paginova singleton between requests, creates
  * posts, simulates front-end requests and renders the main loop.
  *
- * The Post Chapters instance is a singleton that keeps per-request state (one
+ * The Paginova instance is a singleton that keeps per-request state (one
  * PHP process = one request in production). The test suite runs many
  * requests in one process, so the state and the hooks registered by
  * PChap::pchap_post() are reset before every simulated request.
@@ -19,7 +19,7 @@
 abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 
 	/**
-	 * Post Chapters methods hooked once at boot (kept when the request state is reset).
+	 * Paginova methods hooked once at boot (kept when the request state is reset).
 	 *
 	 * @var string[]
 	 */
@@ -50,7 +50,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Reset the per-request state of the Post Chapters singleton and remove the
+	 * Reset the per-request state of the Paginova singleton and remove the
 	 * hooks registered by PChap::pchap_post().
 	 */
 	protected function reset_multipage() {
@@ -137,7 +137,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 
 		$args = array_merge(
 			array(
-				'post_title'   => 'Post Chapters test post',
+				'post_title'   => 'Paginova test post',
 				'post_status'  => 'publish',
 				'post_type'    => 'post',
 				'post_author'  => $admin_id,
@@ -219,7 +219,7 @@ abstract class PChap_UnitTestCase extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Update several Post Chapters options.
+	 * Update several Paginova options.
 	 *
 	 * @param array $options Option name => value.
 	 */

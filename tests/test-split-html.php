@@ -4,7 +4,7 @@
  * elements a cut would leave, and the table of contents / navigation never end up
  * inside a heading, a paragraph or a link.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 /**
@@ -13,7 +13,7 @@
 class Test_PChap_Split_Html extends WP_UnitTestCase {
 
 	/**
-	 * Post Chapters methods hooked once at boot (kept when the request state is reset).
+	 * Paginova methods hooked once at boot (kept when the request state is reset).
 	 *
 	 * @var string[]
 	 */
@@ -407,9 +407,10 @@ class Test_PChap_Split_Html extends WP_UnitTestCase {
 			}
 
 			// The navigation links to the next subpage (plain permalinks: ?page=N, like core).
+			// wp_kses_post() writes the &#038; of esc_url() as &amp;.
 			if ( $number < count( $expected ) ) {
 				$next_url = add_query_arg( 'page', $number + 1, get_permalink( $post_id ) );
-				$this->assertStringContainsString( '<a href="' . esc_url( $next_url ) . '" rel="next">', $output, $label . ': link to the next subpage.' );
+				$this->assertStringContainsString( '<a href="' . str_replace( '&#038;', '&amp;', esc_url( $next_url ) ) . '" rel="next">', $output, $label . ': link to the next subpage.' );
 			}
 
 			// The TOC and the navigation are never nested in a heading, a paragraph or a link.
@@ -443,7 +444,7 @@ class Test_PChap_Split_Html extends WP_UnitTestCase {
 
 		$this->assertTrue( is_singular(), 'Singular view expected for ' . $url );
 		$this->assertFalse( is_404(), 'Unexpected 404 for ' . $url );
-		$this->assertTrue( pchap()->is_multipage_view(), 'Post Chapters view expected for ' . $url );
+		$this->assertTrue( pchap()->is_multipage_view(), 'Paginova view expected for ' . $url );
 
 		$output = '';
 		while ( have_posts() ) {
@@ -455,7 +456,7 @@ class Test_PChap_Split_Html extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Reset the per-request state of the Post Chapters singleton and remove the request hooks.
+	 * Reset the per-request state of the Paginova singleton and remove the request hooks.
 	 *
 	 * The singleton keeps the state of one request (one PHP process per request in
 	 * production); the tests run many requests in one process.

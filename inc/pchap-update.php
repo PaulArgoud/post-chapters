@@ -1,12 +1,12 @@
 <?php
 /**
- * Post Chapters Updater.
+ * Paginova Updater.
  *
  * Install/update routines, activation/deactivation hooks and the subpage
  * index (post meta `_mpp_data`) rebuild, run in batches either synchronously
  * (admin action, WP-CLI) or in the background through WP-Cron.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Updater
  * @since 1.4
  */
@@ -17,7 +17,7 @@ defined( 'ABSPATH' ) || exit;
 /** Versions ******************************************************************/
 
 /**
- * Return the Post Chapters database version installed on this site.
+ * Return the Paginova database version installed on this site.
  *
  * Combines the raw version detected by PChap::versions() (999 for a
  * legacy 1.3 install still holding the `multipage` option) with the version
@@ -32,7 +32,7 @@ function pchap_get_installed_db_version() {
 }
 
 /**
- * Is this a fresh installation of Post Chapters?
+ * Is this a fresh installation of Paginova?
  *
  * If no database version is found (neither the legacy settings nor the
  * stored `_mpp_db_version`), we infer that this is the first installation.
@@ -48,9 +48,9 @@ function pchap_is_install() {
 }
 
 /**
- * Is this a Post Chapters update?
+ * Is this a Paginova update?
  *
- * Determined by comparing the registered Post Chapters version to the version
+ * Determined by comparing the registered Paginova version to the version
  * number stored in the database. If the registered version is greater, it's
  * an update.
  *
@@ -68,12 +68,12 @@ function pchap_is_update() {
 }
 
 /**
- * Determine whether Post Chapters is in the process of being deactivated.
+ * Determine whether Paginova is in the process of being deactivated.
  *
  * @since 1.4
  *
- * @param string $basename Post Chapters basename.
- * @return bool True if deactivating Post Chapters, false if not.
+ * @param string $basename Paginova basename.
+ * @return bool True if deactivating Paginova, false if not.
  */
 function pchap_is_deactivation( $basename = '' ) {
 	$mpp    = pchap();
@@ -113,12 +113,12 @@ function pchap_is_deactivation( $basename = '' ) {
 		return false;
 	}
 
-	// Is Post Chapters being deactivated?
+	// Is Paginova being deactivated?
 	return in_array( $basename, $plugins, true );
 }
 
 /**
- * Update the Post Chapters version stored in the database to the current version.
+ * Update the Paginova version stored in the database to the current version.
  *
  * @since 1.4
  */
@@ -127,13 +127,13 @@ function pchap_version_bump() {
 }
 
 /**
- * Set up the Post Chapters updater.
+ * Set up the Paginova updater.
  *
  * @since 1.4
  */
 function pchap_setup_updater() {
 
-	// Are we running an outdated version of Post Chapters?
+	// Are we running an outdated version of Paginova?
 	if ( ! pchap_is_update() ) {
 		return;
 	}
@@ -142,9 +142,9 @@ function pchap_setup_updater() {
 }
 
 /**
- * Initialize an update or installation of Post Chapters.
+ * Initialize an update or installation of Paginova.
  *
- * Post Chapters's version updater looks at what the current database version is,
+ * Paginova's version updater looks at what the current database version is,
  * and runs whatever other code is needed - either the "update" or "install"
  * code.
  *
@@ -163,7 +163,7 @@ function pchap_version_updater() {
 		pchap_schedule_postmeta_rebuild();
 
 		/**
-		 * Fires when Post Chapters is installed.
+		 * Fires when Paginova is installed.
 		 *
 		 * @since 1.4
 		 */
@@ -181,13 +181,13 @@ function pchap_version_updater() {
 			pchap_update_to_1_7();
 		}
 
-		// Version 2.0 (Multipage becomes Post Chapters).
+		// Version 2.0 (Multipage becomes Paginova).
 		if ( $raw_db_version < 2000 ) {
 			pchap_update_to_2_0();
 		}
 
 		/**
-		 * Fires when Post Chapters is updated.
+		 * Fires when Paginova is updated.
 		 *
 		 * @since 1.4
 		 */
@@ -312,7 +312,7 @@ function pchap_update_to_1_7() {
 /**
  * 2.0 update routine.
  *
- * Multipage became Post Chapters: the options and the `_mpp_data` meta keep
+ * Multipage became Paginova: the options and the `_mpp_data` meta keep
  * their names, but the WP-Cron event of the background rebuild was renamed
  * from mpp_rebuild_postmeta_batch to pchap_rebuild_postmeta_batch. Drop the
  * old event and schedule the new one when a rebuild is still pending.
@@ -360,7 +360,7 @@ function pchap_get_rebuild_batch_size() {
 
 /**
  * Return the values of the SQL condition matching the posts whose subpage index
- * must be (re)built: posts containing a Post Chapters marker and posts already
+ * must be (re)built: posts containing a Paginova marker and posts already
  * holding a `_mpp_data` meta (stale meta is deleted).
  *
  * The condition itself is written out in pchap_count_postmeta_rebuild_candidates()
@@ -1031,7 +1031,7 @@ add_action( 'pchap_rebuild_postmeta_batch', 'pchap_cron_rebuild_postmeta' );
  * @since 1.7.0
  *
  * @return array {
- *     @type int $multipage_posts Posts containing a Post Chapters marker.
+ *     @type int $multipage_posts Posts containing a Paginova marker.
  *     @type int $indexed_posts   Posts holding a `_mpp_data` meta.
  *     @type int $missing_index   Posts containing a marker but no `_mpp_data` meta.
  *     @type int $stale_index     Posts holding a `_mpp_data` meta but no marker.
@@ -1065,7 +1065,7 @@ function pchap_get_postmeta_index_stats() {
 /**
  * Fire activation hooks and events.
  *
- * Runs on Post Chapters activation. Posts edited while the plugin was inactive
+ * Runs on Paginova activation. Posts edited while the plugin was inactive
  * have an outdated subpage index, so a background rebuild is scheduled.
  *
  * @since 1.5
@@ -1075,7 +1075,7 @@ function pchap_activation() {
 	pchap_schedule_postmeta_rebuild();
 
 	/**
-	 * Fires during the activation of Post Chapters.
+	 * Fires during the activation of Paginova.
 	 *
 	 * @since 1.5
 	 */
@@ -1085,7 +1085,7 @@ function pchap_activation() {
 /**
  * Fire deactivation hooks and events.
  *
- * Runs on Post Chapters deactivation.
+ * Runs on Paginova deactivation.
  *
  * @since 1.5
  */
@@ -1095,7 +1095,7 @@ function pchap_deactivation() {
 	wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 
 	/**
-	 * Fires during the deactivation of Post Chapters.
+	 * Fires during the deactivation of Paginova.
 	 *
 	 * @since 1.5
 	 */

@@ -6,7 +6,7 @@
  * Uses the PHP binary that runs this script, so it can be called with any
  * PHP version to check syntax compatibility (e.g. in the CI lint matrix).
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 if ( 'cli' !== PHP_SAPI ) {

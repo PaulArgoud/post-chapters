@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters comments: show the comments on all, the first or the last subpage.
+ * Paginova comments: show the comments on all, the first or the last subpage.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 2.1.0
  */
 

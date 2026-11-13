@@ -1,8 +1,8 @@
 <?php
 /**
- * Post Chapters Admin Actions.
+ * Paginova Admin Actions.
  *
- * @package Post Chapters
+ * @package Paginova
  * @since 1.4
  */
 

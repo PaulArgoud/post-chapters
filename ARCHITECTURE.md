@@ -1,14 +1,14 @@
 # Architecture
 
-This document describes the internal structure and data flow of the Post Chapters plugin (version 2.0.0), named Multipage (`sgr-nextpage-titles`) up to 1.7.1.
+This document describes the internal structure and data flow of the Paginova plugin (version 2.2.0, slug `paginova`), named Multipage (`sgr-nextpage-titles`) up to 1.7.1 and Post Chapters (`post-chapters`) from 2.0.0 to 2.1.0.
 
 ## File Tree
 
 ```
-post-chapters/
+paginova/                            # Folder of the release zip (the repository clone is named post-chapters/)
 │
-├── post-chapters.php          # Plugin entry point: header (incl. Update URI), PCHAP_VERSION / PCHAP__PLUGIN_FILE,
-│                                    #   loads class-pchap.php
+├── paginova.php                     # Plugin entry point: header (incl. Update URI), Post Chapters / Multipage guards,
+│                                    #   PCHAP_VERSION / PCHAP__PLUGIN_FILE, loads class-pchap.php
 ├── class-pchap.php                    # Main PChap class (singleton): bootstrap, request setup,
 │                                    #   frontend rendering, 404/redirect handling
 ├── uninstall.php                    # Cleanup on deletion (every site of a multisite network)
@@ -34,9 +34,11 @@ post-chapters/
 │
 ├── inc/
 │   ├── pchap-admin.php                # pchap_admin(): creates the PChap_Admin instance (admin only)
-│   ├── pchap-blocks.php               # pchap_register_blocks() on init, bundled JS translations fallback
-│   ├── pchap-cli.php                  # PChap_CLI_Command: "wp post-chapters rebuild|status" (WP-CLI only)
-│   ├── pchap-functions.php            # Version getters, text domain loading
+│   ├── pchap-blocks.php               # pchap_register_blocks() on init (block type, script translations)
+│   ├── pchap-cli.php                  # PChap_CLI_Command: "wp paginova rebuild|status" (WP-CLI only)
+│   ├── pchap-functions.php            # Version getters, pchap_apply_filters() / pchap_do_action()
+│   ├── pchap-l10n.php                 # Bundled translations of /languages: text domain, .mo and JSON
+│   │                                #   swaps (GitHub build only; left out of the WordPress.org build)
 │   ├── pchap-options.php              # Option definitions, validation, sanitization, cached getters
 │   ├── pchap-parser.php               # PChap_Parser: splits the content into subpages
 │   ├── pchap-shortcodes.php           # Initializes PChap_Shortcodes
@@ -50,24 +52,23 @@ post-chapters/
 │       │                            #   option), generic renderer, render helpers
 │       ├── admin-advanced-settings.php  # Advanced screen and "Rebuild chapter index" action
 │       └── tinymce/
-│           ├── languages.php        # Deprecated, never loaded (see PChap_Admin::pchap_wp_mce_translation())
 │           ├── js/plugin[.min].js   # TinyMCE "Subpage" button and placeholders
-│           ├── css/post-chapters[.min].css  # TinyMCE content styles (placeholder image)
+│           ├── css/paginova[.min].css # TinyMCE content styles (placeholder image)
 │           └── images/              # Placeholder images (1x and 2x)
 │
 ├── admin/
-│   └── css/post-chapters-admin[-rtl][.min].css  # Admin styles (LTR / RTL)
+│   └── css/paginova-admin[-rtl][.min].css  # Admin styles (LTR / RTL)
 │
 ├── css/
-│   └── post-chapters[-rtl][.min].css    # Frontend styles (LTR / RTL)
+│   └── paginova[-rtl][.min].css     # Frontend styles (LTR / RTL)
 │
-├── languages/
-│   ├── post-chapters.pot                       # Translation template (wp i18n make-pot)
-│   ├── post-chapters-{locale}.po               # Translation sources (not shipped)
-│   ├── post-chapters-{locale}.mo               # Compiled translations
-│   ├── post-chapters-{locale}.l10n.php         # PHP translations (WordPress 6.5+, wp i18n make-php)
-│   └── post-chapters-{locale}-{md5}.json       # JS translations of blocks/subpage/index.js
-│                                                     #   (md5 of "blocks/subpage/index.js", wp i18n make-json)
+├── languages/                       # The WordPress.org build keeps only paginova.pot
+│   ├── paginova.pot                 # Translation template (wp i18n make-pot)
+│   ├── paginova-{locale}.po         # Translation sources (not shipped)
+│   ├── paginova-{locale}.mo         # Compiled translations
+│   ├── paginova-{locale}.l10n.php   # PHP translations (WordPress 6.5+, wp i18n make-php)
+│   └── paginova-{locale}-{md5}.json  # JS translations of blocks/subpage/index.js
+│                                    #   (md5 of "blocks/subpage/index.js", wp i18n make-json)
 │
 ├── tests/                           # PHPUnit integration suite (WordPress test library, wp-env)
 │   ├── bootstrap.php                # Locates the WP test library, loads the plugin on muplugins_loaded
@@ -79,7 +80,8 @@ post-chapters/
 │                                    #   rebuild, upgrade, blocks, shortcode, uninstall
 │
 ├── bin/
-│   ├── build-zip.sh                 # Builds build/post-chapters.zip (git-known files minus .distignore; --wporg: without Update URI)
+│   ├── build-zip.sh                 # Builds build/paginova.zip (git-known files minus .distignore; --wporg: build/paginova-wporg.zip,
+│   │                                #   without Update URI, inc/pchap-l10n.php and the languages/ files but the .pot)
 │   ├── check-i18n.sh                # Fails when the translation files are out of sync with the code
 │   └── php-lint.php                 # php -l on every PHP file (composer lint)
 │
@@ -94,9 +96,10 @@ post-chapters/
 ## Boot Sequence
 
 ```
-1. WordPress loads post-chapters.php
+1. WordPress loads paginova.php
    │
-   ├── Defines PCHAP_VERSION ('2.0.0') and PCHAP__PLUGIN_FILE
+   ├── pchap_is_post_chapters_active()? → only an admin notice, nothing else is declared
+   ├── Defines PCHAP_VERSION ('2.2.0') and PCHAP__PLUGIN_FILE
    ├── pchap_is_multipage_active()? → only an admin notice, nothing else is loaded
    ├── require class-pchap.php
    └── pchap() → PChap::instance()
@@ -107,20 +110,23 @@ post-chapters/
        ├── includes()        → versions() (detects a legacy 1.3 install), then:
        │   ├── if is_admin(): add_action( 'init', 'pchap_admin' ) → new PChap_Admin
        │   ├── classes/class-pchap-{admin,shortcodes,seo,comments}.php (then new PChap_SEO / PChap_Comments)
-       │   └── inc/pchap-{admin,functions,options,parser,shortcodes,template,update,blocks,cli}.php
-       │       (pchap-cli.php returns immediately unless WP_CLI is running)
+       │   ├── inc/pchap-{admin,functions,options,parser,shortcodes,template,update,blocks,cli}.php
+       │   │   (pchap-cli.php returns immediately unless WP_CLI is running)
+       │   └── inc/pchap-l10n.php, only if the file exists (absent from the WordPress.org build)
        ├── setup_actions()   → activation/deactivation hooks; unless the plugin is being
        │                       deactivated: save_post, pre_handle_404 (100), redirect_canonical (10)
        └── frontend_init()   → add_action( 'wp', pchap_post )
 ```
 
-Hooks registered at file load: `init` → `pchap_load_textdomain()` and `pchap_register_blocks()`; `load_script_translation_file` → `pchap_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `pchap_maybe_clear_options_cache()`; `pchap_rebuild_postmeta_batch` (WP-Cron) → `pchap_cron_rebuild_postmeta()`. No string is translated before `init`.
+Hooks registered at file load: `init` → `pchap_register_blocks()`; with `inc/pchap-l10n.php`: `init` → `pchap_load_textdomain()`, `load_textdomain_mofile` → `pchap_load_bundled_textdomain_mofile()`, `load_script_translation_file` → `pchap_load_bundled_script_translation_file()`; `added_option` / `updated_option` / `deleted_option` → `pchap_maybe_clear_options_cache()`; `pchap_rebuild_postmeta_batch` (WP-Cron) → `pchap_cron_rebuild_postmeta()`. No string is translated before `init`.
 
-**Coexistence with Multipage.** Multipage handles the same shortcode, block and options. `pchap_is_multipage_active()` reads the active plugins (site and network) for an existing file named `sgr-nextpage-titles.php` (an entry whose file was deleted is ignored, as WordPress does), and checks the `Multipage` class: the class alone is not enough, because `post-chapters/` loads before `sgr-nextpage-titles/`. When Multipage is active, `post-chapters.php` only hooks `pchap_multipage_active_notice()` to `admin_notices` / `network_admin_notices` and returns. Since every class, function and constant was renamed in 2.0.0, both plugins can be installed (and even active) at the same time without a fatal error.
+**Coexistence with Post Chapters.** Post Chapters 2.x is the same plugin under its former slug: it declares the same functions, classes and constants, so the two cannot run together. `pchap_is_post_chapters_active()` is the first thing `paginova.php` runs, before it declares anything Post Chapters also declares (`paginova/` loads before `post-chapters/`): it returns true when `pchap()` or `PCHAP_VERSION` already exists, or when the active plugins (site and network) list an existing file named `post-chapters.php`. Paginova then only hooks `pchap_post_chapters_active_notice()` to `admin_notices` / `network_admin_notices` and returns. The idle notices load the bundled `.mo` file with `pchap_load_idle_textdomain()`, when it is readable, since the plugin text domain is not set up. Post Chapters must be removed by deleting its folder: its `uninstall.php` deletes the `mpp-*` options and `_mpp_data`, which Paginova uses.
+
+**Coexistence with Multipage.** Multipage handles the same shortcode, block and options. `pchap_is_multipage_active()` reads the active plugins (site and network) for an existing file named `sgr-nextpage-titles.php` (an entry whose file was deleted is ignored, as WordPress does), and checks the `Multipage` class: the class alone is not enough, because `paginova/` loads before `sgr-nextpage-titles/`. When Multipage is active, `paginova.php` only hooks `pchap_multipage_active_notice()` to `admin_notices` / `network_admin_notices` and returns. Since every class, function and constant was renamed in 2.0.0, both plugins can be installed (and even active) at the same time without a fatal error.
 
 **Hooks.** Every hook of the plugin is fired through `pchap_apply_filters()` / `pchap_do_action()` (`inc/pchap-functions.php`): they run the `pchap_*` hook, then, when callbacks are attached to it, the matching `mpp_*` name of Multipage through `apply_filters_deprecated()` / `do_action_deprecated()` (deprecated since 2.0.0, same arguments, after the `pchap_*` callbacks).
 
-The header declares `Update URI: https://github.com/PaulArgoud/post-chapters`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error): `bin/build-zip.sh --wporg` does it.
+The header declares `Update URI: https://github.com/PaulArgoud/paginova`. Since WordPress 5.8, the WordPress.org update API ignores plugins whose Update URI points elsewhere, so a WordPress.org plugin of the same slug can never overwrite this version. Builds published to WordPress.org must drop that line (Plugin Check reports it as an error): `bin/build-zip.sh --wporg` does it.
 
 ## Request Lifecycle (Frontend)
 
@@ -131,7 +137,7 @@ The live post content is the single source of truth: every request parses it wit
 `setup( $query = null )` loads the multipage data of the **main query** and is idempotent (keyed by post ID, raw page number and post object), so it can be called from several hooks and still works when another plugin short-circuits one of them.
 
 - Bails out for admin, non-singular, 404, feed, embed, trackback and robots requests
-- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `post-chapters`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
+- Parses `$post->post_content` through `parse_content()`, which caches the result in the object cache (group `paginova`, key `parse-{PCHAP_VERSION}-{parser hash}-{md5(content)}`, one day; the parser hash is the first 12 characters of `md5_file( inc/pchap-parser.php )`, so a persistent cache such as Redis never serves a parse made by another build of the same version) and skips the parse when the content holds no plugin marker
 - Steps aside (returns false) for a post that a page builder renders (`PChap::is_builder_post()`: post meta of Elementor, Divi, Beaver Builder and Bricks; filter `pchap_is_builder_post`): the builder replaces the content by its layout on every page, so the chapters would show the whole post. Checked only after the parse found a chapter marker, so posts without chapters cost nothing more
 - Sets `$post_id`, `$pages`, `$page` (raw `page` query var, `0` when absent), `$current_page` (1-based: `/post/` and `/post/1/` are both page 1), `$max_num_pages`, `$pchap_data` (`slug => display title`, with the translated "Intro" and "Page N" fallbacks), `$pchap_index`, `$pchap_pagename`, `$page_title`
 - Returns whether the post is a multipage post; the requested subpage may still be out of range
@@ -186,7 +192,7 @@ A re-entrancy flag, the hashes of the produced outputs and the `open_content_run
 
 ```
 render_content($content)
-├── Title: pchap_page_title_template ('<h2>%s</h2>') + pchap_get_subpage_title_html()
+├── Title: pchap_page_title_template ('<h2>%s</h2>') + pchap_get_subpage_title_html(), through wp_kses_post()
 │     (skipped by "Hide intro title" when page 1 is the automatic intro)
 ├── Navigation: pchap_link_pages() ("continue" or "next-previous"; none when hidden)
 ├── Table of contents: pchap_toc() (hidden, or only on page 1 when configured)
@@ -194,6 +200,8 @@ render_content($content)
 ├── apply_filters( 'pchap_the_content', $output, $page_title, $toc, $content )
 └── + navigation
 ```
+
+The HTML built by the plugin is escaped after its filters: the chapter title template output, and the filtered output of `pchap_toc()` (`pchap_toc`) and `pchap_link_pages()` (`pchap_link_pages`), go through `wp_kses_post()`. The post content itself is never escaped, as in core: kses would strip the embeds, iframes and scripts that authors with the `unfiltered_html` capability may publish.
 
 ### 5. `wp_head`
 
@@ -302,23 +310,23 @@ Defined in `pchap_get_option_definitions()` (type, default, allowed values, Sett
 
 | Option | Type | Default | Group | Description |
 |--------|------|---------|-------|-------------|
-| `mpp-hide-intro-title` | boolean | `false` | `post-chapters` | Hide the automatic intro title |
-| `mpp-comments-on-page` | string | `all` | `post-chapters` | `all`, `first-page`, `last-page` |
-| `mpp-continue-or-prev-next` | string | `continue` | `post-chapters` | `continue`, `next-previous`, `hidden` |
-| `mpp-disable-standard-pagination` | boolean | `true` | `post-chapters` | Hide the WordPress page links |
-| `mpp-toc-only-on-the-first-page` | boolean | `false` | `post-chapters` | Show the TOC on page 1 only |
-| `mpp-toc-position` | string | `top-right` | `post-chapters` | `top-left`, `top-right`, `top`, `bottom`, `hidden` |
-| `mpp-toc-row-labels` | string | `number` | `post-chapters` | `number`, `page`, `hidden` |
-| `mpp-hide-toc-header` | boolean | `false` | `post-chapters` | Hide the "Contents" header |
-| `mpp-comments-toc-link` | boolean | `false` | `post-chapters` | Comments link in the TOC |
-| `_mpp-rewrite-title-priority` | priority | `20` | `post-chapters-advanced` | Priority of the document title filter (UI: 100, 50, 20, 10, 5; any integer is kept) |
-| `_mpp-rewrite-content-priority` | priority | `20` | `post-chapters-advanced` | Priority of the `the_content` filter |
-| `mpp-disable-tinymce-buttons` | boolean | `false` | `post-chapters-advanced` | Disable the TinyMCE Chapter button |
+| `mpp-hide-intro-title` | boolean | `false` | `paginova` | Hide the automatic intro title |
+| `mpp-comments-on-page` | string | `all` | `paginova` | `all`, `first-page`, `last-page` |
+| `mpp-continue-or-prev-next` | string | `continue` | `paginova` | `continue`, `next-previous`, `hidden` |
+| `mpp-disable-standard-pagination` | boolean | `true` | `paginova` | Hide the WordPress page links |
+| `mpp-toc-only-on-the-first-page` | boolean | `false` | `paginova` | Show the TOC on page 1 only |
+| `mpp-toc-position` | string | `top-right` | `paginova` | `top-left`, `top-right`, `top`, `bottom`, `hidden` |
+| `mpp-toc-row-labels` | string | `number` | `paginova` | `number`, `page`, `hidden` |
+| `mpp-hide-toc-header` | boolean | `false` | `paginova` | Hide the "Contents" header |
+| `mpp-comments-toc-link` | boolean | `false` | `paginova` | Comments link in the TOC |
+| `_mpp-rewrite-title-priority` | priority | `20` | `paginova-advanced` | Priority of the document title filter (UI: 100, 50, 20, 10, 5; any integer is kept) |
+| `_mpp-rewrite-content-priority` | priority | `20` | `paginova-advanced` | Priority of the `the_content` filter |
+| `mpp-disable-tinymce-buttons` | boolean | `false` | `paginova-advanced` | Disable the TinyMCE Chapter button |
 
 - Both screens post to `options.php`. `pchap_sanitize_option()` stores booleans as `1`/`0` (an unchecked checkbox is posted as `null`), and an invalid value keeps the current valid value and adds one settings error naming the field
 - Getters (`pchap_hide_intro_title()`, `pchap_get_toc_position()`...) read through `pchap_get_option()` (in-memory cache, default applied per call) and `pchap_validate_option_value()`, so they always return a valid value. Legacy stored values (`''`, `'1'`, `'on'`, `'off'`) keep their meaning
-- The cache is cleared automatically when a Post Chapters option is added, updated or deleted; `pchap_clear_options_cache()` is still available
-- Third-party fields added to these screens with `add_settings_field()` must also call `register_setting( 'post-chapters', ... )` (or `'post-chapters-advanced'`)
+- The cache is cleared automatically when a Paginova option is added, updated or deleted; `pchap_clear_options_cache()` is still available
+- Third-party fields added to these screens with `add_settings_field()` must also call `register_setting( 'paginova', ... )` (or `'paginova-advanced'`; `post-chapters` / `post-chapters-advanced` before 2.2.0)
 
 ### Internal options
 
@@ -331,7 +339,7 @@ Defined in `pchap_get_option_definitions()` (type, default, allowed values, Sett
 | `_mpp-rebuild-lock` | Rebuild lock: a timestamp and an owner token separated by a pipe (written with direct atomic queries) |
 | `multipage` | Legacy 1.3 settings, converted then deleted by `pchap_update_to_1_4()` |
 
-The object cache group `post-chapters` holds the parse results (see `PChap::setup()`).
+The object cache group `paginova` holds the parse results (see `PChap::setup()`).
 
 ## Subpage Index Rebuild
 
@@ -342,7 +350,7 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 - **Lock**: `pchap_rebuild_acquire_lock()` (atomic `INSERT IGNORE`; a lock not refreshed for 5 minutes is taken over with a compare-and-set `UPDATE`), `pchap_rebuild_refresh_lock()`, `pchap_rebuild_release_lock()` (owner only), `pchap_is_rebuild_locked()`
 - **Background (WP-Cron)**: `pchap_schedule_postmeta_rebuild()` saves `_mpp-rebuild-state` and schedules the single event `pchap_rebuild_postmeta_batch`. `pchap_cron_rebuild_postmeta()` takes the lock, schedules a watchdog, processes batches for 15 seconds (`pchap_rebuild_cron_time_limit`), then reschedules itself or completes (`pchap_complete_postmeta_rebuild()`). When locked, it retries a minute later
 - **Admin**: the "Rebuild chapter index" form on the Advanced screen posts to `admin-post.php?action=pchap_rebuild_postmeta` (nonce + `manage_options`). `pchap_admin_rebuild_postmeta_handler()` processes batches for 15 seconds (`pchap_rebuild_admin_time_limit`), hands the rest to WP-Cron, and redirects with `mpp-rebuild=done|partial|locked`; the notice is added by `pchap_admin_rebuild_postmeta_notice()`
-- **WP-CLI**: `wp post-chapters rebuild [--batch-size=<n>] [--dry-run]` and `wp post-chapters status [--format=table|json|yaml|csv]` (`wp multipage` is an alias) (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
+- **WP-CLI**: `wp paginova rebuild [--batch-size=<n>] [--dry-run]` and `wp paginova status [--format=table|json|yaml|csv]` (`wp post-chapters` and `wp multipage` are aliases) (`PChap_CLI_Command`, `pchap_get_postmeta_index_stats()`)
 
 ### Install, upgrade, activation
 
@@ -350,7 +358,7 @@ The object cache group `post-chapters` holds the parse results (see `PChap::setu
 - Fresh install: schedules a background rebuild, fires `pchap_on_install`
 - Update: `pchap_update_to_1_4()` (below 1000: converts the legacy settings, schedules a rebuild), `pchap_update_to_1_7()` (below 1700: background rebuild) and `pchap_update_to_2_0()` (below 2000: clears the `mpp_rebuild_postmeta_batch` event of Multipage and schedules `pchap_rebuild_postmeta_batch` when a rebuild is pending), then fires `pchap_on_update`; `pchap_version_bump()` stores the new version
 - `pchap_activation()` schedules a rebuild (posts edited while the plugin was inactive) and fires `pchap_activation`; `pchap_deactivation()` clears the cron hook and fires `pchap_deactivation`
-- `uninstall.php` deletes every option above, the cron hook (and its Multipage name) and all `_mpp_data` meta, on every site of a multisite network. These are the names Multipage uses: deleting either plugin from the Plugins screen erases the data of both
+- `uninstall.php` deletes every option above, the cron hook (and its Multipage name) and all `_mpp_data` meta, on every site of a multisite network. These are the names Multipage and Post Chapters use: deleting any of the three plugins from the Plugins screen erases the data of all of them
 
 ## Hooks Reference
 
@@ -447,19 +455,20 @@ The "Subpage" block (`multipage/subpage`) lives in `blocks/subpage/` and needs n
 
 ## CSS Loading
 
-`PChap::enqueue_styles()` runs on multipage views only. It looks for `css/post-chapters[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
+`PChap::enqueue_styles()` runs on multipage views only. It looks for `css/paginova[-rtl][.min].css` (`-rtl` on RTL sites, `.min` unless `SCRIPT_DEBUG`) in this order:
 
-1. Child theme: `css/post-chapters*.css`, then the Multipage name `css/multipage*.css`
-2. Parent theme: same two names
+1. Child theme: `css/paginova*.css`, then the Post Chapters 2.x name `css/post-chapters*.css`, then the Multipage name `css/multipage*.css`
+2. Parent theme: same three names
 3. Plugin default (falls back to the LTR file if the RTL one is missing)
 
-The handle is `{theme}-post-chapters` for a theme file, `post-chapters` for the plugin file.
+The handle is `{theme}-paginova` for a theme file, `paginova` for the plugin file.
 
-The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-post-navigation`. In the RTL file, the `top-left` / `top-right` TOC positions keep their physical side. The admin stylesheet is `admin/css/post-chapters-admin[-rtl][.min].css`.
+The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-post-navigation`. In the RTL file, the `top-left` / `top-right` TOC positions keep their physical side. The admin stylesheet is `admin/css/paginova-admin[-rtl][.min].css` (handle `paginova-admin`).
 
 ## Translations
 
-- `pchap_load_textdomain()` (`init`) calls `load_plugin_textdomain( 'post-chapters', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
+- Text domain `paginova`. The code that loads the bundled files of `/languages` (`pchap_load_textdomain()`, `pchap_prefer_bundled_translations()`, `pchap_get_bundled_translation_file()`, `pchap_load_bundled_textdomain_mofile()`, `pchap_load_bundled_script_translation_file()`) lives in `inc/pchap-l10n.php`, required only when the file exists. The GitHub build ships it with `/languages`; the WordPress.org build (`bin/build-zip.sh --wporg`) leaves it out with every file of `languages/` except `paginova.pot`, and WordPress then loads the translate.wordpress.org language packs just in time
+- `pchap_load_textdomain()` (`init`) calls `load_plugin_textdomain( 'paginova', false, '<plugin folder>/languages' )`. WordPress resolves `WP_LANG_DIR/plugins` (language packs) first and the bundled files only as a fallback; WordPress 6.5+ reads the `.l10n.php` file before the `.mo`
 - A language pack can lag behind the strings of a release (and, under the old `sgr-nextpage-titles` slug, the packs belonged to the original plugin). `pchap_load_bundled_textdomain_mofile()` (`load_textdomain_mofile`, applied by `load_textdomain()` before it derives the `.l10n.php` path) replaces a `.mo` path located directly in `WP_LANG_DIR/plugins` with the bundled file of the same locale when it exists, so the bundled `.l10n.php`/`.mo` are loaded. This also covers a pack deleted while still listed in the registry file cache (`translation_files` group, one hour). Other locations (e.g. Loco Translate) and locales without a bundled file are untouched; the `pchap_prefer_bundled_translations` filter turns the replacement off
 - Block strings come from `block.json` (translated in PHP, contexts "block title", "block description", "block keyword") and from `index.js` (JSON file)
 - See [CONTRIBUTING.md](CONTRIBUTING.md#translations) for the regeneration workflow and `bin/check-i18n.sh`
@@ -476,13 +485,13 @@ The styles use `rem` and reset the typography of `.mpp-toc-container` and `.mpp-
 | `PChap_Admin::pchap_enqueue_block_editor_assets()` | 1.7.0 | `pchap_register_blocks()` |
 | `pchap_admin_settings_save()`, `pchap_admin_advanced_settings_save()` | 1.7.0 | Settings API (`options.php`); no-ops |
 | `pchap_admin_advanced_callback_build_mpp_postmeta_data()` | 1.7.0 | `pchap_admin_rebuild_postmeta_section()` |
-| `inc/admin/tinymce/languages.php` | 1.5 | `PChap_Admin::pchap_wp_mce_translation()` (the file is never loaded) |
+| `inc/admin/tinymce/languages.php` | 1.5 | `PChap_Admin::pchap_wp_mce_translation()` (the file, never loaded, was deleted in 2.2.0) |
 | `PCHAP_PATTERN`, `PCHAP_GUTENBERG_PATTERN` | 1.7.0 | `PChap_Parser::parse()`. The constants are kept for backward compatibility (`PCHAP_PATTERN` is only used by the legacy `PChap_Parser::parse_nextpage_shortcode()`) |
 
 ## Tests and Tooling
 
 - PHPUnit 9.6 integration tests on the WordPress test library (`tests/`), run inside wp-env (`composer test:wp-env`). `PChap_UnitTestCase` resets the `PChap` singleton between simulated requests and provides helpers such as `go_to_subpage()` and `render_subpage()`; `PChap_Test_Corpus` holds real-world contents with their expected pages
-- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `post-chapters`, prefixes `pchap` and `pchap_`
+- `phpcs.xml.dist`: WordPress + PHPCompatibilityWP, PHP 7.4+, WordPress 6.3+, text domain `paginova`, prefixes `pchap` and `pchap_`
 - CI (`.github/workflows/ci.yml`): PHP lint 7.4–8.4, PHPCS, i18n check, PHPUnit on WordPress 6.3 / PHP 7.4, 7.1.4 / PHP 7.4 and 7.1.4 / PHP 8.4, release zip
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the commands.

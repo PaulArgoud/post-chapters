@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPUnit bootstrap file for the Post Chapters plugin.
+ * PHPUnit bootstrap file for the Paginova plugin.
  *
  * Locates the WordPress PHPUnit test library, in this order:
  * 1. the WP_TESTS_DIR environment variable (set to /wordpress-phpunit in the
@@ -12,7 +12,7 @@
  * The Yoast PHPUnit Polyfills are taken from WP_TESTS_PHPUNIT_POLYFILLS_PATH
  * (constant or environment variable) or from this plugin's vendor/ directory.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 $pchap_tests_dir = getenv( 'WP_TESTS_DIR' );
@@ -56,7 +56,7 @@ require_once $pchap_tests_dir . '/includes/functions.php';
  * "active": it is loaded as a must-use plugin would be.
  */
 function pchap_tests_manually_load_plugin() {
-	require dirname( __DIR__ ) . '/post-chapters.php';
+	require dirname( __DIR__ ) . '/paginova.php';
 }
 tests_add_filter( 'muplugins_loaded', 'pchap_tests_manually_load_plugin' );
 

@@ -1,12 +1,12 @@
 /**
- * Post Chapters TinyMCE plugin.
+ * Paginova TinyMCE plugin.
  *
  * Adds the "Subpage" toolbar button and shows [nextpage title="..."]
  * shortcodes as placeholders in the Visual editor (and in the Classic block).
  *
  * Minified copy: plugin.min.js (regenerate with `npx -y terser`).
  *
- * @package Post Chapters
+ * @package Paginova
  * @since   1.3
  */
 ( function( tinymce ) {
@@ -230,7 +230,7 @@
 	 *
 	 * @param {Object} editor TinyMCE editor instance.
 	 */
-	function postChaptersPlugin( editor ) {
+	function paginovaPlugin( editor ) {
 		var __ = editor.editorManager.i18n.translate;
 
 		// Register buttons.
@@ -280,7 +280,7 @@
 	}
 
 	// Pure helpers, exposed for tests (no global is added).
-	postChaptersPlugin.utils = {
+	paginovaPlugin.utils = {
 		escapeShortcodeAttribute: escapeShortcodeAttribute,
 		buildShortcode: buildShortcode,
 		escapeHtmlAttribute: escapeHtmlAttribute,
@@ -302,5 +302,5 @@
 		tinymce.ui.FloatPanel.zIndex = 100100;
 	}
 
-	tinymce.PluginManager.add( 'postchapters', postChaptersPlugin );
+	tinymce.PluginManager.add( 'paginova', paginovaPlugin );
 }( window.tinymce ) );

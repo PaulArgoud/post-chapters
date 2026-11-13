@@ -2,7 +2,7 @@
 /**
  * Admin notices tests: invalid setting values and subpage index rebuild results.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests apply core and third-party hooks.
@@ -116,7 +116,7 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 	 */
 	public function test_field_label_is_escaped() {
 		$GLOBALS['wp_settings_fields'] = array(
-			'post-chapters' => array(
+			'paginova' => array(
 				'pchap_toc' => array(
 					'mpp-hide-intro-title' => array( 'title' => '<b>Intro</b> &amp; "more"' ),
 				),
@@ -125,7 +125,7 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 
 		$this->assertSame( 'Intro & "more"', pchap_get_option_field_label( 'mpp-hide-intro-title' ) );
 
-		$GLOBALS['wp_settings_fields']['post-chapters']['pchap_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
+		$GLOBALS['wp_settings_fields']['paginova']['pchap_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
 		$this->assertSame( 'mpp-hide-intro-title', pchap_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
 	}
 
@@ -139,7 +139,7 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 	 * @param string $expected Expected message.
 	 */
 	public function test_rebuild_notice( $query, $type, $expected ) {
-		$_GET = array_merge( array( 'page' => 'post-chapters-advanced' ), $query );
+		$_GET = array_merge( array( 'page' => 'paginova-advanced' ), $query );
 
 		pchap_admin_rebuild_postmeta_notice();
 
@@ -217,15 +217,15 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 				array(),
 				array( 'mpp-rebuild' => 'done' ),
 				array(
-					'page'        => 'post-chapters',
+					'page'        => 'paginova',
 					'mpp-rebuild' => 'done',
 				),
 				array(
-					'page'        => 'post-chapters-advanced',
+					'page'        => 'paginova-advanced',
 					'mpp-rebuild' => 'unknown',
 				),
 				array(
-					'page'        => 'post-chapters-advanced',
+					'page'        => 'paginova-advanced',
 					'mpp-rebuild' => '',
 				),
 			) as $query

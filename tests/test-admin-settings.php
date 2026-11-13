@@ -2,7 +2,7 @@
 /**
  * Settings screens built from pchap_get_settings_sections() and pchap_get_settings_fields().
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.
@@ -73,9 +73,9 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 	public function test_label_for() {
 		global $wp_settings_fields;
 
-		$this->assertArrayNotHasKey( 'label_for', $wp_settings_fields['post-chapters']['pchap_main']['mpp-comments-on-page']['args'] );
-		$this->assertSame( 'hide-intro-title', $wp_settings_fields['post-chapters']['pchap_main']['mpp-hide-intro-title']['args']['label_for'] );
-		$this->assertSame( 'rewrite-title-priority', $wp_settings_fields['post-chapters-advanced']['pchap_advanced']['_mpp-rewrite-title-priority']['args']['label_for'] );
+		$this->assertArrayNotHasKey( 'label_for', $wp_settings_fields['paginova']['pchap_main']['mpp-comments-on-page']['args'] );
+		$this->assertSame( 'hide-intro-title', $wp_settings_fields['paginova']['pchap_main']['mpp-hide-intro-title']['args']['label_for'] );
+		$this->assertSame( 'rewrite-title-priority', $wp_settings_fields['paginova-advanced']['pchap_advanced']['_mpp-rewrite-title-priority']['args']['label_for'] );
 	}
 
 	/**

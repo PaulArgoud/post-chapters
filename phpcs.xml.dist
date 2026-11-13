@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
-<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Post Chapters" xsi:noNamespaceSchemaLocation="./vendor/squizlabs/php_codesniffer/phpcs.xsd">
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Paginova" xsi:noNamespaceSchemaLocation="./vendor/squizlabs/php_codesniffer/phpcs.xsd">
 
-	<description>Coding standards for the Post Chapters (post-chapters) WordPress plugin.</description>
+	<description>Coding standards for the Paginova (paginova) WordPress plugin.</description>
 
 	<!--
 	#############################################################################
@@ -76,7 +76,7 @@
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
-				<element value="post-chapters"/>
+				<element value="paginova"/>
 			</property>
 		</properties>
 	</rule>
@@ -107,7 +107,7 @@
 	<!--
 	The inc/ modules follow the plugin "inc/pchap-{module}.php" naming, whatever
 	they hold: inc/pchap-parser.php holds PChap_Parser and inc/pchap-cli.php
-	defines the "wp post-chapters" command class when WP-CLI runs.
+	defines the "wp paginova" command class when WP-CLI runs.
 	-->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>/inc/pchap-parser\.php$</exclude-pattern>

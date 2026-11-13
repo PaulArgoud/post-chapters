@@ -1,309 +1,311 @@
-# Translation of Multipage in German.
+# Translation of Multipage in Spanish (Spain).
 # Copyright (C) 2015-2026 the Multipage contributors.
 # This file is distributed under the same license as the Multipage package (GPL v3).
 msgid ""
 msgstr ""
-"Project-Id-Version: Post Chapters 2.1.0\n"
-"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/post-chapters/issues\n"
-"POT-Creation-Date: 2026-11-09T17:24:42+00:00\n"
+"Project-Id-Version: Paginova 2.2.0\n"
+"Report-Msgid-Bugs-To: https://github.com/PaulArgoud/paginova/issues\n"
+"POT-Creation-Date: 2026-11-13T12:54:45+00:00\n"
 "PO-Revision-Date: 2026-11-07 20:54+0000\n"
 "Last-Translator: Multipage contributors\n"
-"Language-Team: German\n"
-"Language: de_DE\n"
+"Language-Team: Spanish (Spain)\n"
+"Language: es_ES\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: GNU gettext msgmerge + reviewed translations\n"
-"X-Domain: post-chapters\n"
+"X-Domain: paginova\n"
 
 #. Plugin Name of the plugin
-#: post-chapters.php classes/class-pchap-admin.php:159
-msgid "Post Chapters"
-msgstr "Post Chapters"
+#: paginova.php
+msgid "Paginova – Chapters for Long Posts"
+msgstr "Paginova – Capítulos para entradas largas"
 
 #. Plugin URI of the plugin
-#: post-chapters.php
-msgid "https://github.com/PaulArgoud/post-chapters"
-msgstr "https://github.com/PaulArgoud/post-chapters"
+#: paginova.php
+msgid "https://github.com/PaulArgoud/paginova"
+msgstr "https://github.com/PaulArgoud/paginova"
 
 #. Description of the plugin
-#: post-chapters.php
-msgid "Split your long WordPress posts into chapters, each on its own page with its own title, and add an automatic table of contents. Supports Gutenberg blocks, classic editor shortcodes, SEO-friendly markup, and customizable navigation."
-msgstr "Teile deine langen WordPress-Beiträge in Kapitel auf, jedes auf einer eigenen Seite mit eigenem Titel, und füge ein automatisches Inhaltsverzeichnis hinzu. Unterstützt Gutenberg-Blöcke, Shortcodes des klassischen Editors, suchmaschinenfreundliches Markup und eine anpassbare Navigation."
+#: paginova.php
+msgid "Split long posts into chapters, each on its own page with its own URL and title, with a table of contents and chapter navigation. Works with the block editor and the classic editor. Formerly Post Chapters, successor of Multipage."
+msgstr "Divide las entradas largas en capítulos, cada uno en su propia página con su propia URL y su propio título, con una tabla de contenidos y navegación entre capítulos. Funciona con el editor de bloques y el editor clásico. Antes Post Chapters, sucesor de Multipage."
 
 #. Author of the plugin
-#: post-chapters.php
+#: paginova.php
 msgid "Paul ARGOUD, based on Multipage by SGr33n (aka Sergio De Falco, Envire Web Solutions)."
-msgstr "Paul ARGOUD, basierend auf Multipage von SGr33n (alias Sergio De Falco, Envire Web Solutions)."
+msgstr "Paul ARGOUD, basado en Multipage de SGr33n (alias Sergio De Falco, Envire Web Solutions)."
 
 #. Author URI of the plugin
-#: post-chapters.php
+#: paginova.php
 msgid "https://paul.argoud.net"
 msgstr "https://paul.argoud.net"
 
-#: class-pchap.php:615 inc/admin/admin-settings.php:152
+#: class-pchap.php:620 inc/admin/admin-settings.php:152
 msgid "Intro"
-msgstr "Einleitung"
+msgstr "Introducción"
 
 #. translators: %d: chapter number.
-#: class-pchap.php:623
+#: class-pchap.php:628
 #, php-format
 msgid "Chapter %d"
-msgstr "Kapitel %d"
+msgstr "Capítulo %d"
 
 #. translators: %: chapter number (literal percent sign, replaced by the number).
-#: class-pchap.php:1314
+#: class-pchap.php:1320
 msgid "Chapter %"
-msgstr "Kapitel %"
+msgstr "Capítulo %"
 
-#: class-pchap.php:1331
+#: class-pchap.php:1337
 msgid "Chapter navigation"
-msgstr "Kapitelnavigation"
+msgstr "Navegación de capítulos"
 
-#: class-pchap.php:1365 inc/admin/admin-settings.php:123
+#: class-pchap.php:1371 inc/admin/admin-settings.php:123
 msgid "Table of contents"
-msgstr "Inhaltsverzeichnis"
+msgstr "Tabla de contenidos"
 
 #: classes/class-pchap-admin.php:158
-msgid "Post Chapters Options"
-msgstr "Optionen von Post Chapters"
+msgid "Paginova Options"
+msgstr "Opciones de Paginova"
+
+#: classes/class-pchap-admin.php:159
+msgid "Paginova"
+msgstr "Paginova"
 
 #: classes/class-pchap-admin.php:167 classes/class-pchap-admin.php:168
-msgid "Post Chapters Advanced Settings"
-msgstr "Erweiterte Einstellungen von Post Chapters"
+msgid "Paginova Advanced Settings"
+msgstr "Ajustes avanzados de Paginova"
 
 #: classes/class-pchap-admin.php:289
 msgid "Settings"
-msgstr "Einstellungen"
+msgstr "Ajustes"
 
 #: classes/class-pchap-admin.php:326
 msgid "chapter"
-msgstr "Kapitel"
+msgstr "capítulo"
 
 #: classes/class-pchap-admin.php:327 classes/class-pchap-admin.php:506
-#: inc/admin/tinymce/languages.php:34
 msgid "Start a new chapter"
-msgstr "Neues Kapitel beginnen"
+msgstr "Empezar un nuevo capítulo"
 
 #: classes/class-pchap-admin.php:328 classes/class-pchap-admin.php:507
-#: inc/admin/tinymce/languages.php:35
 msgid "Enter the chapter title"
-msgstr "Gib den Titel des Kapitels ein"
+msgstr "Introduce el título del capítulo"
 
 #. translators: %s: date and time of the last rebuild.
 #: inc/admin/admin-advanced-settings.php:90
 #, php-format
 msgid "Last rebuilt: %s."
-msgstr "Zuletzt neu aufgebaut: %s."
+msgstr "Última reconstrucción: %s."
 
 #: inc/admin/admin-advanced-settings.php:94
 msgid "Last rebuilt: unknown date."
-msgstr "Zuletzt neu aufgebaut: Datum unbekannt."
+msgstr "Última reconstrucción: fecha desconocida."
 
 #: inc/admin/admin-advanced-settings.php:96
 msgid "The chapter index has never been rebuilt on this site."
-msgstr "Der Kapitelindex wurde auf dieser Website noch nie neu aufgebaut."
+msgstr "El índice de capítulos nunca se ha reconstruido en este sitio."
 
 #: inc/admin/admin-advanced-settings.php:99
 msgid "Chapter index"
-msgstr "Kapitelindex"
+msgstr "Índice de capítulos"
 
 #: inc/admin/admin-advanced-settings.php:101
-msgid "Post Chapters stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
-msgstr "Post Chapters speichert beim Speichern eines Beitrags die Liste seiner Kapitel. Baue diesen Index nach einem Update oder einem Import neu auf oder wenn das Inhaltsverzeichnis eines Beitrags veraltet wirkt. Die Beiträge werden stapelweise verarbeitet; bei großen Websites werden die verbleibenden Beiträge im Hintergrund verarbeitet."
+msgid "Paginova stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background."
+msgstr "Paginova guarda la lista de capítulos de cada entrada cuando se guarda la entrada. Reconstruye este índice después de una actualización o de una importación, o si la tabla de contenidos de una entrada parece desactualizada. Las entradas se procesan por lotes; en sitios grandes, las entradas restantes se procesan en segundo plano."
 
 #. translators: %s: number of posts already checked.
 #: inc/admin/admin-advanced-settings.php:111
 #, php-format
 msgid "A rebuild is in progress in the background: %s post checked so far."
 msgid_plural "A rebuild is in progress in the background: %s posts checked so far."
-msgstr[0] "Im Hintergrund läuft ein Neuaufbau: bisher wurde %s Beitrag geprüft."
-msgstr[1] "Im Hintergrund läuft ein Neuaufbau: bisher wurden %s Beiträge geprüft."
+msgstr[0] "Hay una reconstrucción en curso en segundo plano: %s entrada comprobada hasta ahora."
+msgstr[1] "Hay una reconstrucción en curso en segundo plano: %s entradas comprobadas hasta ahora."
 
 #: inc/admin/admin-advanced-settings.php:127
 msgid "Rebuild chapter index"
-msgstr "Kapitelindex neu aufbauen"
+msgstr "Reconstruir el índice de capítulos"
 
 #: inc/admin/admin-advanced-settings.php:143
 msgid "Sorry, you are not allowed to manage options for this site."
-msgstr "Du hast leider nicht die Berechtigung, Optionen für diese Website zu verwalten."
+msgstr "Lo siento, no tienes permisos para gestionar las opciones de este sitio."
 
 #. translators: %s: number of posts checked.
 #: inc/admin/admin-advanced-settings.php:223
 #, php-format
 msgid "%s post checked"
 msgid_plural "%s posts checked"
-msgstr[0] "%s Beitrag geprüft"
-msgstr[1] "%s Beiträge geprüft"
+msgstr[0] "%s entrada comprobada"
+msgstr[1] "%s entradas comprobadas"
 
 #. translators: %s: number of posts whose chapter index was updated.
 #: inc/admin/admin-advanced-settings.php:228
 #, php-format
 msgid "%s post updated"
 msgid_plural "%s posts updated"
-msgstr[0] "%s Beitrag aktualisiert"
-msgstr[1] "%s Beiträge aktualisiert"
+msgstr[0] "%s entrada actualizada"
+msgstr[1] "%s entradas actualizadas"
 
 #. translators: %s: number of stale chapter indexes removed.
 #: inc/admin/admin-advanced-settings.php:233
 #, php-format
 msgid "%s stale entry removed"
 msgid_plural "%s stale entries removed"
-msgstr[0] "%s veralteter Eintrag entfernt"
-msgstr[1] "%s veraltete Einträge entfernt"
+msgstr[0] "%s registro obsoleto eliminado"
+msgstr[1] "%s registros obsoletos eliminados"
 
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
 #: inc/admin/admin-advanced-settings.php:244
 #, php-format
 msgid "Chapter index rebuilt: %1$s, %2$s, %3$s."
-msgstr "Kapitelindex neu aufgebaut: %1$s, %2$s, %3$s."
+msgstr "Índice de capítulos reconstruido: %1$s, %2$s, %3$s."
 
 #. translators: 1: count of posts checked, such as 12 posts checked. 2: count of posts updated, such as 3 posts updated. 3: count of stale entries removed, such as 1 stale entry removed.
 #: inc/admin/admin-advanced-settings.php:253
 #, php-format
 msgid "Chapter index rebuild started: %1$s, %2$s, %3$s so far. The remaining posts are processed in the background."
-msgstr "Neuaufbau des Kapitelindex gestartet: bisher %1$s, %2$s, %3$s. Die verbleibenden Beiträge werden im Hintergrund verarbeitet."
+msgstr "Reconstrucción del índice de capítulos iniciada: hasta ahora, %1$s, %2$s, %3$s. Las entradas restantes se procesan en segundo plano."
 
 #: inc/admin/admin-advanced-settings.php:260
 msgid "A chapter index rebuild is already running. Please try again in a few minutes."
-msgstr "Ein Neuaufbau des Kapitelindex läuft bereits. Bitte versuche es in ein paar Minuten erneut."
+msgstr "Ya hay una reconstrucción del índice de capítulos en curso. Inténtalo de nuevo dentro de unos minutos."
 
 #: inc/admin/admin-advanced-settings.php:300 inc/admin/admin-settings.php:464
-msgid "Post Chapters Settings"
-msgstr "Einstellungen von Post Chapters"
+msgid "Paginova Settings"
+msgstr "Ajustes de Paginova"
 
 #: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-settings.php:467
-msgid "Post Chapters settings sections"
-msgstr "Bereiche der Einstellungen von Post Chapters"
+msgid "Paginova settings sections"
+msgstr "Secciones de los ajustes de Paginova"
 
 #: inc/admin/admin-advanced-settings.php:303 inc/admin/admin-functions.php:126
 msgid "Advanced"
-msgstr "Erweitert"
+msgstr "Avanzado"
 
 #: inc/admin/admin-advanced-settings.php:305
 msgid "Advanced Settings"
-msgstr "Erweiterte Einstellungen"
+msgstr "Ajustes avanzados"
 
 #: inc/admin/admin-advanced-settings.php:307
 msgid "Please leave this settings to their default values, change only if you really know what to do."
-msgstr "Bitte belasse diese Einstellungen auf ihren Standardwerten und ändere sie nur, wenn du genau weißt, was du tust."
+msgstr "Deja estos ajustes con sus valores predeterminados y cámbialos solo si sabes realmente lo que haces."
 
 #: inc/admin/admin-advanced-settings.php:315 inc/admin/admin-settings.php:475
 msgid "Save Settings"
-msgstr "Einstellungen speichern"
+msgstr "Guardar ajustes"
 
 #: inc/admin/admin-functions.php:122 inc/admin/admin-settings.php:467
 msgid "Options"
-msgstr "Optionen"
+msgstr "Opciones"
 
 #. translators: %s: custom value.
 #: inc/admin/admin-settings.php:87
 #, php-format
 msgid "Custom (%s)"
-msgstr "Individuell (%s)"
+msgstr "Personalizado (%s)"
 
 #: inc/admin/admin-settings.php:113
 msgid "Main Settings"
-msgstr "Allgemeine Einstellungen"
+msgstr "Ajustes principales"
 
 #: inc/admin/admin-settings.php:118
 msgid "Pagination"
-msgstr "Seitennummerierung"
+msgstr "Paginación"
 
 #: inc/admin/admin-settings.php:155
 msgid "Hide the default intro title"
-msgstr "Standardtitel der Einleitung ausblenden"
+msgstr "Ocultar el título predeterminado de la introducción"
 
 #: inc/admin/admin-settings.php:160 inc/admin/admin-settings.php:163
 msgid "Display comments on"
-msgstr "Kommentare anzeigen auf"
+msgstr "Mostrar los comentarios en"
 
 #: inc/admin/admin-settings.php:168
 msgid "Navigation type"
-msgstr "Art der Navigation"
+msgstr "Tipo de navegación"
 
 #: inc/admin/admin-settings.php:175
 msgid "Disable the standard pagination"
-msgstr "Standard-Seitennummerierung deaktivieren"
+msgstr "Desactivar la paginación estándar"
 
 #: inc/admin/admin-settings.php:178
 msgid "Disable the WordPress standard pagination"
-msgstr "Standard-Seitennummerierung von WordPress deaktivieren"
+msgstr "Desactivar la paginación estándar de WordPress"
 
 #: inc/admin/admin-settings.php:179
 msgid "By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed."
-msgstr "Standardmäßig zeigt WordPress bei Beiträgen, die in Seiten aufgeteilt sind, eine Seitennummerierung an, die nur aus Zahlen besteht. Deaktiviere diese Option, wenn diese Standard-Seitennummerierung trotzdem angezeigt werden soll."
+msgstr "De forma predeterminada, WordPress muestra en las entradas divididas en páginas una paginación compuesta solo por números. Desmarca esta opción si aun así quieres que se muestre esta paginación estándar."
 
 #: inc/admin/admin-settings.php:184
 msgid "Only on the first page"
-msgstr "Nur auf der ersten Seite"
+msgstr "Solo en la primera página"
 
 #: inc/admin/admin-settings.php:187
 msgid "Display the table of contents only on the first page of the post"
-msgstr "Inhaltsverzeichnis nur auf der ersten Seite des Beitrags anzeigen"
+msgstr "Mostrar la tabla de contenidos solo en la primera página de la entrada"
 
 #: inc/admin/admin-settings.php:192
 msgid "Position"
-msgstr "Position"
+msgstr "Posición"
 
 #: inc/admin/admin-settings.php:199 inc/admin/admin-settings.php:202
 msgid "Row labels"
-msgstr "Zeilenbeschriftungen"
+msgstr "Etiquetas de las filas"
 
 #: inc/admin/admin-settings.php:207
 msgid "Hide header"
-msgstr "Überschrift ausblenden"
+msgstr "Ocultar la cabecera"
 
 #: inc/admin/admin-settings.php:210
 msgid "Hide the table of contents header"
-msgstr "Überschrift des Inhaltsverzeichnisses ausblenden"
+msgstr "Ocultar la cabecera de la tabla de contenidos"
 
 #: inc/admin/admin-settings.php:215
 msgid "Comments link"
-msgstr "Link zu den Kommentaren"
+msgstr "Enlace a los comentarios"
 
 #: inc/admin/admin-settings.php:218
 msgid "Add a link for the comments inside the table of contents"
-msgstr "Im Inhaltsverzeichnis einen Link zu den Kommentaren hinzufügen"
+msgstr "Añadir un enlace a los comentarios dentro de la tabla de contenidos"
 
 #: inc/admin/admin-settings.php:219
 msgid "If comments are enabled, this will display, inside the table of contents, a link for the comments list."
-msgstr "Wenn Kommentare aktiviert sind, wird im Inhaltsverzeichnis ein Link zur Liste der Kommentare angezeigt."
+msgstr "Si los comentarios están activados, se mostrará un enlace a la lista de comentarios dentro de la tabla de contenidos."
 
 #: inc/admin/admin-settings.php:224
 msgid "Rewrite Title Priority"
-msgstr "Priorität für das Umschreiben des Titels"
+msgstr "Prioridad de reescritura del título"
 
 #: inc/admin/admin-settings.php:227
 msgid "Some plugins need this higher in order to correctly show the chapter title instead of \"Page # of #\". If the title works good please leave this to normal."
-msgstr "Einige Plugins benötigen hier einen höheren Wert, damit statt „Seite # von #“ der Titel des Kapitels korrekt angezeigt wird. Wenn der Titel richtig angezeigt wird, belasse diesen Wert bitte auf „Normal“."
+msgstr "Algunos plugins necesitan un valor más alto para mostrar correctamente el título del capítulo en lugar de «Página # de #». Si el título se muestra correctamente, deja este valor en «Normal»."
 
 #: inc/admin/admin-settings.php:232
 msgid "Rewrite Content Priority"
-msgstr "Priorität für das Umschreiben des Inhalts"
+msgstr "Prioridad de reescritura del contenido"
 
 #. translators: %1$s: URL of the_content filter documentation.
 #: inc/admin/admin-settings.php:237
 #, php-format
 msgid "This value affects the position where the table of contents is displayed, referring to other plugins that use <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> filter. e.g. above or below social buttons or related posts. If the table of contents position looks good please leave this to normal."
-msgstr "Dieser Wert bestimmt die Position des Inhaltsverzeichnisses im Verhältnis zu anderen Plugins, die den Filter <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code> verwenden, z. B. ober- oder unterhalb von Social-Media-Buttons oder ähnlichen Beiträgen. Wenn die Position des Inhaltsverzeichnisses passt, belasse diesen Wert bitte auf „Normal“."
+msgstr "Este valor determina la posición en la que se muestra la tabla de contenidos respecto a otros plugins que usan el filtro <code><a href=\"%1$s\" target=\"_blank\">the_content</a></code>, por ejemplo, encima o debajo de los botones para compartir en redes sociales o de las entradas relacionadas. Si la posición de la tabla de contenidos es correcta, deja este valor en «Normal»."
 
 #: inc/admin/admin-settings.php:244 inc/admin/admin-settings.php:247
 msgid "Disable TinyMCE Buttons"
-msgstr "TinyMCE-Buttons deaktivieren"
+msgstr "Desactivar los botones de TinyMCE"
 
 #: inc/admin/admin-settings.php:248
 msgid "Disable the TinyMCE Chapter button in the classic editor. Leave unchecked unless you experience editor conflicts."
-msgstr "Deaktiviert den TinyMCE-Button „Kapitel“ im klassischen Editor. Lass diese Option deaktiviert, sofern keine Konflikte mit dem Editor auftreten."
+msgstr "Desactiva el botón Capítulo de TinyMCE en el editor clásico. Déjalo sin marcar salvo que tengas conflictos con el editor."
 
 #: inc/pchap-options.php:170
 msgid "Highest"
-msgstr "Sehr hoch"
+msgstr "Muy alta"
 
 #: inc/pchap-options.php:171
 msgid "High"
-msgstr "Hoch"
+msgstr "Alta"
 
 #: inc/pchap-options.php:172
 msgid "Normal"
@@ -311,177 +313,185 @@ msgstr "Normal"
 
 #: inc/pchap-options.php:173
 msgid "Low"
-msgstr "Niedrig"
+msgstr "Baja"
 
 #: inc/pchap-options.php:174
 msgid "Lowest"
-msgstr "Sehr niedrig"
+msgstr "Muy baja"
 
 #: inc/pchap-options.php:179
 msgid "All pages — Display comments on all post pages"
-msgstr "Alle Seiten — Kommentare auf allen Seiten des Beitrags anzeigen"
+msgstr "Todas las páginas — Mostrar los comentarios en todas las páginas de la entrada"
 
 #: inc/pchap-options.php:180
 msgid "First page — Display comments only on the first page"
-msgstr "Erste Seite — Kommentare nur auf der ersten Seite anzeigen"
+msgstr "Primera página — Mostrar los comentarios solo en la primera página"
 
 #: inc/pchap-options.php:181
 msgid "Last page — Display comments only on the last page"
-msgstr "Letzte Seite — Kommentare nur auf der letzten Seite anzeigen"
+msgstr "Última página — Mostrar los comentarios solo en la última página"
 
 #: inc/pchap-options.php:184
 msgid "Continue or back to intro"
-msgstr "Weiter oder zurück zur Einleitung"
+msgstr "Continuar o volver a la introducción"
 
 #: inc/pchap-options.php:185
 msgid "Next and previous"
-msgstr "Weiter und zurück"
+msgstr "Siguiente y anterior"
 
 #: inc/pchap-options.php:186
 msgid "Hidden"
-msgstr "Ausgeblendet"
+msgstr "Oculta"
 
 #: inc/pchap-options.php:189
 msgid "above the post content, align left"
-msgstr "über dem Beitragsinhalt, linksbündig"
+msgstr "encima del contenido de la entrada, alineada a la izquierda"
 
 #: inc/pchap-options.php:190
 msgid "above the post content, align right"
-msgstr "über dem Beitragsinhalt, rechtsbündig"
+msgstr "encima del contenido de la entrada, alineada a la derecha"
 
 #: inc/pchap-options.php:191
 msgid "above the post content"
-msgstr "über dem Beitragsinhalt"
+msgstr "encima del contenido de la entrada"
 
 #: inc/pchap-options.php:192
 msgid "below the post content"
-msgstr "unter dem Beitragsinhalt"
+msgstr "debajo del contenido de la entrada"
 
 #: inc/pchap-options.php:193
 msgid "hidden"
-msgstr "ausgeblendet"
+msgstr "oculta"
 
 #: inc/pchap-options.php:196
 msgid "number — Display numbers before the chapter title"
-msgstr "Nummer — Nummer vor dem Titel des Kapitels anzeigen"
+msgstr "número — Mostrar el número antes del título del capítulo"
 
 #: inc/pchap-options.php:197
 msgid "chapter # — Display \"Chapter #\" before the chapter title"
-msgstr "Kapitel # — „Kapitel #“ vor dem Titel des Kapitels anzeigen"
+msgstr "capítulo # — Mostrar «Capítulo #» antes del título del capítulo"
 
 #: inc/pchap-options.php:198
 msgid "hidden — Hide the labels, display only the chapter title"
-msgstr "ausgeblendet — Beschriftungen ausblenden, nur den Titel des Kapitels anzeigen"
+msgstr "oculto — Ocultar las etiquetas y mostrar solo el título del capítulo"
 
 #. translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type").
 #: inc/pchap-options.php:381
 #, php-format
 msgid "An invalid value was submitted for the %s setting. The previous value was kept."
-msgstr "Für die Einstellung %s wurde ein ungültiger Wert übermittelt. Der bisherige Wert wurde beibehalten."
+msgstr "Se ha enviado un valor no válido para el ajuste %s. Se ha mantenido el valor anterior."
 
 #: inc/pchap-template.php:215
 msgid "Next page"
-msgstr "Nächste Seite"
+msgstr "Página siguiente"
 
 #: inc/pchap-template.php:216
 msgid "Previous page"
-msgstr "Vorherige Seite"
+msgstr "Página anterior"
 
 #. translators: %s: link to the next chapter.
 #: inc/pchap-template.php:244
 #, php-format
 msgid "Continue: %s"
-msgstr "Weiter: %s"
+msgstr "Continuar: %s"
 
 #. translators: %s: link to the first chapter.
 #: inc/pchap-template.php:248
 #, php-format
 msgid "Back to: %s"
-msgstr "Zurück zu: %s"
+msgstr "Volver a: %s"
 
-#: inc/pchap-template.php:397
+#: inc/pchap-template.php:398
 msgid "Comments"
-msgstr "Kommentare"
+msgstr "Comentarios"
 
-#: inc/pchap-template.php:419
+#: inc/pchap-template.php:420
 msgid "Contents"
-msgstr "Inhalt"
+msgstr "Contenidos"
 
-#: post-chapters.php:75
-msgid "Post Chapters is not running yet."
-msgstr "Post Chapters ist noch nicht aktiv."
+#: paginova.php:83 paginova.php:145
+msgid "Paginova is not running yet."
+msgstr "Paginova todavía no está funcionando."
 
-#: post-chapters.php:76
-msgid "Deactivate Multipage: Post Chapters replaces it and takes over its settings and content."
-msgstr "Deaktiviere Multipage: Post Chapters ersetzt es und übernimmt seine Einstellungen und Inhalte."
+#: paginova.php:84
+msgid "Deactivate Post Chapters: Paginova is its new name and takes over its settings and content."
+msgstr "Desactiva Post Chapters: Paginova es su nuevo nombre y recupera sus ajustes y contenidos."
 
-#: post-chapters.php:77
-msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Post Chapters uses."
-msgstr "Um Multipage anschließend zu entfernen, lösche seinen Ordner auf dem Server statt über die Plugin-Seite: Beim Löschen über die Plugin-Seite entfernen Multipage 1.5.15 und neuer die Einstellungen und den Kapitelindex, die Post Chapters verwendet."
+#: paginova.php:85
+msgid "To remove Post Chapters afterwards, delete its folder from the server rather than from the Plugins screen: deleting it from the Plugins screen erases the settings and the chapter index that Paginova uses."
+msgstr "Para eliminar Post Chapters después, borra su carpeta del servidor en lugar de hacerlo desde la pantalla Plugins: borrarlo desde la pantalla Plugins elimina los ajustes y el índice de capítulos que usa Paginova."
+
+#: paginova.php:146
+msgid "Deactivate Multipage: Paginova replaces it and takes over its settings and content."
+msgstr "Desactiva Multipage: Paginova lo sustituye y recupera sus ajustes y contenidos."
+
+#: paginova.php:147
+msgid "To remove Multipage afterwards, delete its folder from the server rather than from the Plugins screen: Multipage 1.5.15 and later erase, when deleted from the Plugins screen, the settings and the chapter index that Paginova uses."
+msgstr "Para eliminar Multipage después, borra su carpeta del servidor en lugar de hacerlo desde la pantalla Plugins: al borrarse desde la pantalla Plugins, Multipage 1.5.15 y posteriores eliminan los ajustes y el índice de capítulos que usa Paginova."
 
 #: blocks/subpage/index.js:121
 msgid "Write chapter title…"
-msgstr "Titel des Kapitels eingeben …"
+msgstr "Escribe el título del capítulo…"
 
 #. translators: %d: number of headings.
 #: blocks/subpage/index.js:273
 msgid "%d heading turned into a chapter. You can undo it."
 msgid_plural "%d headings turned into chapters. You can undo it."
-msgstr[0] "%d Überschrift wurde in ein Kapitel verwandelt. Du kannst das rückgängig machen."
-msgstr[1] "%d Überschriften wurden in Kapitel verwandelt. Du kannst das rückgängig machen."
+msgstr[0] "%d encabezado convertido en capítulo. Puedes deshacerlo."
+msgstr[1] "%d encabezados convertidos en capítulos. Puedes deshacerlo."
 
 #: blocks/subpage/index.js:295
 msgid "Untitled chapter"
-msgstr "Kapitel ohne Titel"
+msgstr "Capítulo sin título"
 
 #: blocks/subpage/index.js:302
 msgid "Chapters"
-msgstr "Kapitel"
+msgstr "Capítulos"
 
 #: blocks/subpage/index.js:305
 msgid "No chapters yet. Add a Chapter block where a chapter starts, or turn headings into chapters."
-msgstr "Noch keine Kapitel. Füge dort, wo ein Kapitel beginnt, einen Kapitel-Block ein oder verwandle Überschriften in Kapitel."
+msgstr "Aún no hay capítulos. Añade un bloque Capítulo donde empiece un capítulo, o convierte encabezados en capítulos."
 
 #: blocks/subpage/index.js:307
 msgid "Heading level"
-msgstr "Überschriftenebene"
+msgstr "Nivel de encabezado"
 
 #: blocks/subpage/index.js:317
 msgid "Only the headings at the top level of the post."
-msgstr "Nur Überschriften auf der obersten Ebene des Beitrags."
+msgstr "Solo los encabezados del primer nivel de la entrada."
 
 #. translators: %d: number of headings.
 #: blocks/subpage/index.js:325
 msgid "Turn %d heading into a chapter"
 msgid_plural "Turn %d headings into chapters"
-msgstr[0] "%d Überschrift in ein Kapitel verwandeln"
-msgstr[1] "%d Überschriften in Kapitel verwandeln"
+msgstr[0] "Convertir %d encabezado en un capítulo"
+msgstr[1] "Convertir %d encabezados en capítulos"
 
 #: blocks/subpage/index.js:328
 msgid "No heading of this level"
-msgstr "Keine Überschrift dieser Ebene"
+msgstr "Ningún encabezado de este nivel"
 
 #: blocks/subpage/block.json
 msgctxt "block title"
 msgid "Chapter"
-msgstr "Kapitel"
+msgstr "Capítulo"
 
 #: blocks/subpage/block.json
 msgctxt "block description"
 msgid "Start a new chapter: split your post into pages, each with its own title."
-msgstr "Beginne ein neues Kapitel: Teile deinen Beitrag in Seiten auf, jede mit eigenem Titel."
+msgstr "Empieza un nuevo capítulo: divide tu entrada en páginas, cada una con su propio título."
 
 #: blocks/subpage/block.json
 msgctxt "block keyword"
 msgid "chapter"
-msgstr "Kapitel"
+msgstr "capítulo"
 
 #: blocks/subpage/block.json
 msgctxt "block keyword"
 msgid "multipage"
-msgstr "mehrseitig"
+msgstr "multipágina"
 
 #: blocks/subpage/block.json
 msgctxt "block keyword"
 msgid "page"
-msgstr "Seite"
+msgstr "página"

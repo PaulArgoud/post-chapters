@@ -2,11 +2,11 @@
 /**
  * Translations: the bundled files win over the language packs of the original plugin.
  *
- * The post-chapters slug is shared with the original plugin, whose language packs
+ * The paginova slug is shared with the original plugin, whose language packs
  * from translate.wordpress.org (installed in WP_LANG_DIR/plugins) lack the strings of
  * this version.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 /**
@@ -91,8 +91,8 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 		$this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
 
 		$this->assert_registry_resolves_pack();
-		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
-		$this->assertSame( 'Navigation des chapitres', __( 'Chapter navigation', 'post-chapters' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'paginova' ) );
+		$this->assertSame( 'Navigation des chapitres', __( 'Chapter navigation', 'paginova' ) );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 		}
 		self::unload_all_locales();
 
-		$this->assertSame( 'Commentaires', __( 'Comments', 'post-chapters' ) );
+		$this->assertSame( 'Commentaires', __( 'Comments', 'paginova' ) );
 	}
 
 	/**
@@ -119,8 +119,8 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 		$this->locale = 'nl_NL';
 		$this->install_pack( 'nl_NL', 'Reacties' );
 
-		$this->assertFileDoesNotExist( PCHAP_PLUGIN_DIR . 'languages/post-chapters-nl_NL.mo' );
-		$this->assertSame( 'Reacties', __( 'Comments', 'post-chapters' ) );
+		$this->assertFileDoesNotExist( PCHAP_PLUGIN_DIR . 'languages/paginova-nl_NL.mo' );
+		$this->assertSame( 'Reacties', __( 'Comments', 'paginova' ) );
 	}
 
 	/**
@@ -129,23 +129,23 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 	public function test_filter_restores_language_pack_precedence() {
 		add_filter( 'pchap_prefer_bundled_translations', '__return_false' );
 		$this->install_pack( 'fr_FR', 'Commentaires (ancien pack)' );
-		$this->assertSame( 'Commentaires (ancien pack)', __( 'Comments', 'post-chapters' ) );
+		$this->assertSame( 'Commentaires (ancien pack)', __( 'Comments', 'paginova' ) );
 	}
 
 	/**
 	 * Other text domains and files outside WP_LANG_DIR/plugins are never redirected.
 	 */
 	public function test_mofile_filter_scope() {
-		$pack = WP_LANG_DIR . '/plugins/post-chapters-fr_FR.mo';
+		$pack = WP_LANG_DIR . '/plugins/paginova-fr_FR.mo';
 
-		$this->assertSame( PCHAP_PLUGIN_DIR . 'languages/post-chapters-fr_FR.mo', wp_normalize_path( pchap_load_bundled_textdomain_mofile( $pack, 'post-chapters' ) ) );
+		$this->assertSame( PCHAP_PLUGIN_DIR . 'languages/paginova-fr_FR.mo', wp_normalize_path( pchap_load_bundled_textdomain_mofile( $pack, 'paginova' ) ) );
 		$this->assertSame( $pack, pchap_load_bundled_textdomain_mofile( $pack, 'other-domain' ) );
 
-		$custom = WP_LANG_DIR . '/loco/plugins/post-chapters-fr_FR.mo';
-		$this->assertSame( $custom, pchap_load_bundled_textdomain_mofile( $custom, 'post-chapters' ) );
+		$custom = WP_LANG_DIR . '/loco/plugins/paginova-fr_FR.mo';
+		$this->assertSame( $custom, pchap_load_bundled_textdomain_mofile( $custom, 'paginova' ) );
 
-		$elsewhere = WP_CONTENT_DIR . '/custom/post-chapters-fr_FR.mo';
-		$this->assertSame( $elsewhere, pchap_load_bundled_textdomain_mofile( $elsewhere, 'post-chapters' ) );
+		$elsewhere = WP_CONTENT_DIR . '/custom/paginova-fr_FR.mo';
+		$this->assertSame( $elsewhere, pchap_load_bundled_textdomain_mofile( $elsewhere, 'paginova' ) );
 	}
 
 	/**
@@ -156,17 +156,17 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'WP_Block_Type', $block_type );
 
 		$handle   = $block_type->editor_script_handles[0];
-		$basename = 'post-chapters-fr_FR-' . md5( 'blocks/subpage/index.js' ) . '.json';
+		$basename = 'paginova-fr_FR-' . md5( 'blocks/subpage/index.js' ) . '.json';
 		$bundled  = PCHAP_PLUGIN_DIR . 'languages/' . $basename;
 		$this->assertFileExists( $bundled );
 
 		$this->ensure_packs_dir();
-		foreach ( array( $basename, 'post-chapters-fr_FR-' . $handle . '.json' ) as $name ) {
+		foreach ( array( $basename, 'paginova-fr_FR-' . $handle . '.json' ) as $name ) {
 			$this->write_file( WP_LANG_DIR . '/plugins/' . $name, '{"locale_data":{"messages":{"":{"domain":"messages"},"Subpage title":["Ancien pack"]}}}' );
 		}
 		wp_cache_delete( md5( WP_LANG_DIR . '/plugins/' ), 'translation_files' );
 
-		$this->assertSame( file_get_contents( $bundled ), load_script_textdomain( $handle, 'post-chapters' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
+		$this->assertSame( file_get_contents( $bundled ), load_script_textdomain( $handle, 'paginova' ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local file.
 	}
 
 	/**
@@ -181,7 +181,7 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 			return;
 		}
 
-		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'post-chapters', 'fr_FR' ), 'The registry should resolve the language pack first.' );
+		$this->assertSame( WP_LANG_DIR . '/plugins/', $GLOBALS['wp_textdomain_registry']->get( 'paginova', 'fr_FR' ), 'The registry should resolve the language pack first.' );
 	}
 
 	/**
@@ -194,7 +194,7 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 	private function install_pack( $locale, $translation ) {
 		$this->ensure_packs_dir();
 
-		$base = WP_LANG_DIR . '/plugins/post-chapters-' . $locale;
+		$base = WP_LANG_DIR . '/plugins/paginova-' . $locale;
 
 		$mo = new MO();
 		$mo->set_header( 'Language', $locale );
@@ -249,11 +249,11 @@ class PChap_Test_Translations extends WP_UnitTestCase {
 	 * another locale would stay loaded for the next tests.
 	 */
 	private static function unload_all_locales() {
-		unload_textdomain( 'post-chapters', true );
+		unload_textdomain( 'paginova', true );
 
 		if ( class_exists( 'WP_Translation_Controller' ) ) {
 			foreach ( array( 'fr_FR', 'nl_NL' ) as $locale ) {
-				WP_Translation_Controller::get_instance()->unload_textdomain( 'post-chapters', $locale );
+				WP_Translation_Controller::get_instance()->unload_textdomain( 'paginova', $locale );
 			}
 		}
 	}

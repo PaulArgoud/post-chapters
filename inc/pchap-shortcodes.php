@@ -1,8 +1,8 @@
 <?php
 /**
- * Main Post Chapters Shortcodes Class.
+ * Main Paginova Shortcodes Class.
  *
- * @package Post Chapters
+ * @package Paginova
  * @subpackage Shortcodes
  * @since 1.4
  */
@@ -11,7 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Initialize Post Chapters Shortcodes.
+ * Initialize Paginova Shortcodes.
  *
  * @since 1.4
  */

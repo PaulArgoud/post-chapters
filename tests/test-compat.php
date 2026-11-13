@@ -2,7 +2,7 @@
 /**
  * Multipage compatibility tests: deprecated mpp_* hooks and the coexistence guard.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix and tests hook the deprecated mpp_* names on purpose.
@@ -158,7 +158,7 @@ class Test_PChap_Compat extends PChap_UnitTestCase {
 	 * The guard is off when Multipage is not active.
 	 */
 	public function test_guard_off_without_multipage() {
-		update_option( 'active_plugins', array( 'post-chapters/post-chapters.php', 'akismet/akismet.php' ) );
+		update_option( 'active_plugins', array( 'paginova/paginova.php', 'akismet/akismet.php' ) );
 
 		$this->assertFalse( pchap_is_multipage_active() );
 	}
@@ -169,17 +169,17 @@ class Test_PChap_Compat extends PChap_UnitTestCase {
 	public function test_guard_detects_multipage() {
 		foreach ( array( 'pchap-test-multipage', 'pchap-test-multipage-main' ) as $folder ) {
 			$basename = $this->fake_multipage( $folder );
-			update_option( 'active_plugins', array( 'post-chapters/post-chapters.php', $basename ) );
+			update_option( 'active_plugins', array( 'paginova/paginova.php', $basename ) );
 			$this->assertTrue( pchap_is_multipage_active(), $basename );
 		}
 	}
 
 	/**
 	 * An active entry whose Multipage file was deleted (folder removed over FTP
-	 * while active) does not keep Post Chapters idle.
+	 * while active) does not keep Paginova idle.
 	 */
 	public function test_guard_ignores_deleted_multipage() {
-		update_option( 'active_plugins', array( 'post-chapters/post-chapters.php', 'pchap-test-deleted/sgr-nextpage-titles.php' ) );
+		update_option( 'active_plugins', array( 'paginova/paginova.php', 'pchap-test-deleted/sgr-nextpage-titles.php' ) );
 
 		$this->assertFalse( pchap_is_multipage_active() );
 	}

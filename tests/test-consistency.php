@@ -3,7 +3,7 @@
  * Consistency of the release: the version in every file, the files the plugin loads, and
  * the block metadata kept in two places.
  *
- * @package Post Chapters
+ * @package Paginova
  */
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals -- Test classes use the required Test_PChap_ prefix.
@@ -46,7 +46,7 @@ class Test_PChap_Consistency extends WP_UnitTestCase {
 	 * Every place that holds the version agrees with the plugin header.
 	 */
 	public function test_version_is_the_same_everywhere() {
-		$version = $this->capture( 'post-chapters.php', '/^\s*\*\s*Version:\s*(\S+)/m' );
+		$version = $this->capture( 'paginova.php', '/^\s*\*\s*Version:\s*(\S+)/m' );
 
 		$this->assertMatchesRegularExpression( '/^\d+\.\d+\.\d+$/', $version );
 		$this->assertSame( $version, PCHAP_VERSION, 'PCHAP_VERSION' );
@@ -78,13 +78,13 @@ class Test_PChap_Consistency extends WP_UnitTestCase {
 
 		foreach ( array( '', '-rtl' ) as $direction ) {
 			foreach ( array( '.css', '.min.css' ) as $extension ) {
-				$files[] = 'css/post-chapters' . $direction . $extension;
-				$files[] = 'admin/css/post-chapters-admin' . $direction . $extension;
+				$files[] = 'css/paginova' . $direction . $extension;
+				$files[] = 'admin/css/paginova-admin' . $direction . $extension;
 			}
 		}
 
 		foreach ( array( '.css', '.min.css' ) as $extension ) {
-			$files[] = 'inc/admin/tinymce/css/post-chapters' . $extension;
+			$files[] = 'inc/admin/tinymce/css/paginova' . $extension;
 		}
 		foreach ( array( '.js', '.min.js' ) as $extension ) {
 			$files[] = 'inc/admin/tinymce/js/plugin' . $extension;
