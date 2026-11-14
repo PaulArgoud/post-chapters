@@ -28,10 +28,10 @@ i.mce-i-subpage {
 	color: #444;
 }
 
-.settings_page_paginova-advanced .mpp-rebuild-form {
+.settings_page_paginova-advanced .pchap-rebuild-form {
 	margin: 1em 0 2em;
 }
 
-.settings_page_paginova-advanced .mpp-rebuild-pending {
+.settings_page_paginova-advanced .pchap-rebuild-pending {
 	font-style: italic;
 }

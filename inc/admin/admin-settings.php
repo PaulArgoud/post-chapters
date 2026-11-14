@@ -147,7 +147,7 @@ function pchap_get_settings_sections() {
  */
 function pchap_get_settings_fields() {
 	return array(
-		'mpp-hide-intro-title'            => array(
+		'pchap-hide-intro-title'            => array(
 			'section' => 'pchap_main',
 			'title'   => __( 'Intro', 'paginova' ),
 			'control' => 'checkbox',
@@ -155,7 +155,7 @@ function pchap_get_settings_fields() {
 			'label'   => __( 'Hide the default intro title', 'paginova' ),
 			'value'   => 'pchap_hide_intro_title',
 		),
-		'mpp-comments-on-page'            => array(
+		'pchap-comments-on-page'            => array(
 			'section' => 'pchap_main',
 			'title'   => __( 'Display comments on', 'paginova' ),
 			'control' => 'radio',
@@ -163,14 +163,14 @@ function pchap_get_settings_fields() {
 			'label'   => __( 'Display comments on', 'paginova' ),
 			'value'   => 'pchap_get_comments_on_page',
 		),
-		'mpp-continue-or-prev-next'       => array(
+		'pchap-continue-or-prev-next'       => array(
 			'section' => 'pchap_pagination',
 			'title'   => __( 'Navigation type', 'paginova' ),
 			'control' => 'select',
 			'id'      => 'continue-or-prev-next',
 			'value'   => 'pchap_get_continue_or_prev_next',
 		),
-		'mpp-disable-standard-pagination' => array(
+		'pchap-disable-standard-pagination' => array(
 			'section'     => 'pchap_pagination',
 			'title'       => __( 'Disable the standard pagination', 'paginova' ),
 			'control'     => 'checkbox',
@@ -179,7 +179,7 @@ function pchap_get_settings_fields() {
 			'description' => __( 'By default, WordPress displays a pagination with only numbers on posts split into pages. Uncheck this if you still want this standard pagination to be displayed.', 'paginova' ),
 			'value'       => 'pchap_disable_standard_pagination',
 		),
-		'mpp-toc-only-on-the-first-page'  => array(
+		'pchap-toc-only-on-the-first-page'  => array(
 			'section' => 'pchap_toc',
 			'title'   => __( 'Only on the first page', 'paginova' ),
 			'control' => 'checkbox',
@@ -187,14 +187,14 @@ function pchap_get_settings_fields() {
 			'label'   => __( 'Display the table of contents only on the first page of the post', 'paginova' ),
 			'value'   => 'pchap_toc_only_on_the_first_page',
 		),
-		'mpp-toc-position'                => array(
+		'pchap-toc-position'                => array(
 			'section' => 'pchap_toc',
 			'title'   => __( 'Position', 'paginova' ),
 			'control' => 'select',
 			'id'      => 'toc-position',
 			'value'   => 'pchap_get_toc_position',
 		),
-		'mpp-toc-row-labels'              => array(
+		'pchap-toc-row-labels'              => array(
 			'section' => 'pchap_toc',
 			'title'   => __( 'Row labels', 'paginova' ),
 			'control' => 'radio',
@@ -202,7 +202,7 @@ function pchap_get_settings_fields() {
 			'label'   => __( 'Row labels', 'paginova' ),
 			'value'   => 'pchap_get_toc_row_labels',
 		),
-		'mpp-hide-toc-header'             => array(
+		'pchap-hide-toc-header'             => array(
 			'section' => 'pchap_toc',
 			'title'   => __( 'Hide header', 'paginova' ),
 			'control' => 'checkbox',
@@ -210,7 +210,7 @@ function pchap_get_settings_fields() {
 			'label'   => __( 'Hide the table of contents header', 'paginova' ),
 			'value'   => 'pchap_hide_toc_header',
 		),
-		'mpp-comments-toc-link'           => array(
+		'pchap-comments-toc-link'           => array(
 			'section'     => 'pchap_toc',
 			'title'       => __( 'Comments link', 'paginova' ),
 			'control'     => 'checkbox',
@@ -219,7 +219,7 @@ function pchap_get_settings_fields() {
 			'description' => __( 'If comments are enabled, this will display, inside the table of contents, a link for the comments list.', 'paginova' ),
 			'value'       => 'pchap_comments_toc_link',
 		),
-		'_mpp-rewrite-title-priority'     => array(
+		'pchap-rewrite-title-priority'      => array(
 			'section'     => 'pchap_advanced',
 			'title'       => __( 'Rewrite Title Priority', 'paginova' ),
 			'control'     => 'select',
@@ -227,7 +227,7 @@ function pchap_get_settings_fields() {
 			'description' => __( 'Some plugins need this higher in order to correctly show the chapter title instead of "Page # of #". If the title works good please leave this to normal.', 'paginova' ),
 			'value'       => 'pchap_get_rewrite_title_priority',
 		),
-		'_mpp-rewrite-content-priority'   => array(
+		'pchap-rewrite-content-priority'    => array(
 			'section'     => 'pchap_advanced',
 			'title'       => __( 'Rewrite Content Priority', 'paginova' ),
 			'control'     => 'select',
@@ -239,7 +239,7 @@ function pchap_get_settings_fields() {
 			),
 			'value'       => 'pchap_get_rewrite_content_priority',
 		),
-		'mpp-disable-tinymce-buttons'     => array(
+		'pchap-disable-tinymce-buttons'     => array(
 			'section'     => 'pchap_advanced',
 			'title'       => __( 'Disable TinyMCE Buttons', 'paginova' ),
 			'control'     => 'checkbox',
@@ -344,7 +344,7 @@ function pchap_admin_settings_callback_toc_section() { }
 function pchap_admin_settings_callback_hide_intro_title() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-hide-intro-title' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-hide-intro-title' ) );
 }
 
 /**
@@ -356,7 +356,7 @@ function pchap_admin_settings_callback_hide_intro_title() {
 function pchap_admin_settings_callback_comments_on_page() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-comments-on-page' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-comments-on-page' ) );
 }
 
 /**
@@ -368,7 +368,7 @@ function pchap_admin_settings_callback_comments_on_page() {
 function pchap_admin_settings_callback_continue_or_prev_next() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-continue-or-prev-next' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-continue-or-prev-next' ) );
 }
 
 /**
@@ -380,7 +380,7 @@ function pchap_admin_settings_callback_continue_or_prev_next() {
 function pchap_admin_settings_callback_disable_standard_pagination() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-disable-standard-pagination' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-disable-standard-pagination' ) );
 }
 
 /**
@@ -392,7 +392,7 @@ function pchap_admin_settings_callback_disable_standard_pagination() {
 function pchap_admin_settings_callback_toc_only_on_the_first_page() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-toc-only-on-the-first-page' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-toc-only-on-the-first-page' ) );
 }
 
 /**
@@ -404,7 +404,7 @@ function pchap_admin_settings_callback_toc_only_on_the_first_page() {
 function pchap_admin_settings_callback_toc_position() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-toc-position' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-toc-position' ) );
 }
 
 /**
@@ -416,7 +416,7 @@ function pchap_admin_settings_callback_toc_position() {
 function pchap_admin_settings_callback_toc_row_labels() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-toc-row-labels' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-toc-row-labels' ) );
 }
 
 /**
@@ -428,7 +428,7 @@ function pchap_admin_settings_callback_toc_row_labels() {
 function pchap_admin_settings_callback_hide_toc_header() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-hide-toc-header' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-hide-toc-header' ) );
 }
 
 /**
@@ -440,7 +440,7 @@ function pchap_admin_settings_callback_hide_toc_header() {
 function pchap_admin_settings_callback_comments_toc_link() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-comments-toc-link' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-comments-toc-link' ) );
 }
 
 /** Settings Page *************************************************************/

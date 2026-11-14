@@ -33,7 +33,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 	class PChap_CLI_Command {
 
 		/**
-		 * Rebuild the chapter index (`_mpp_data` post meta) of every post.
+		 * Rebuild the chapter index (`_pchap_data` post meta) of every post.
 		 *
 		 * Parses every post containing a Paginova chapter (Subpage) block or a
 		 * [nextpage] shortcode, updates its index, and deletes the index of
@@ -177,7 +177,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 			$format = \WP_CLI\Utils\get_flag_value( $assoc_args, 'format', 'table' );
 			$stats  = pchap_get_postmeta_index_stats();
 			$state  = pchap_get_postmeta_rebuild_state();
-			$built  = (int) get_option( '_mpp-postmeta-built', 0 );
+			$built  = (int) get_option( 'pchap-postmeta-built', 0 );
 			$next   = wp_next_scheduled( pchap_get_rebuild_cron_hook() );
 
 			$data = array(
@@ -191,7 +191,7 @@ if ( ! class_exists( 'PChap_CLI_Command' ) ) {
 				'next_background_run'   => $next ? gmdate( 'Y-m-d H:i:s', (int) $next ) . ' UTC' : '-',
 				'rebuild_running'       => pchap_is_rebuild_locked() ? 'yes' : 'no',
 				'last_rebuild'          => $built > DAY_IN_SECONDS ? gmdate( 'Y-m-d H:i:s', $built ) . ' UTC' : ( $built > 0 ? 'unknown date' : 'never' ),
-				'db_version'            => (int) get_option( '_mpp_db_version', 0 ),
+				'db_version'            => (int) get_option( 'pchap-db-version', 0 ),
 			);
 
 			if ( 'table' === $format ) {

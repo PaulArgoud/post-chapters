@@ -102,7 +102,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * "next-previous" navigation.
 	 */
 	public function test_next_previous_navigation() {
-		$this->set_options( array( 'mpp-continue-or-prev-next' => 'next-previous' ) );
+		$this->set_options( array( 'pchap-continue-or-prev-next' => 'next-previous' ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 1 );
@@ -124,7 +124,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * Hidden navigation.
 	 */
 	public function test_hidden_navigation() {
-		$this->set_options( array( 'mpp-continue-or-prev-next' => 'hidden' ) );
+		$this->set_options( array( 'pchap-continue-or-prev-next' => 'hidden' ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		foreach ( array( 1, 2, 3 ) as $page ) {
@@ -144,7 +144,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * @param string $position TOC position.
 	 */
 	public function test_toc_position_above_content( $position ) {
-		$this->set_options( array( 'mpp-toc-position' => $position ) );
+		$this->set_options( array( 'pchap-toc-position' => $position ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 2 );
@@ -171,7 +171,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * TOC at the bottom: after the content, before the navigation.
 	 */
 	public function test_toc_position_bottom() {
-		$this->set_options( array( 'mpp-toc-position' => 'bottom' ) );
+		$this->set_options( array( 'pchap-toc-position' => 'bottom' ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 2 );
@@ -187,7 +187,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * Hidden TOC.
 	 */
 	public function test_toc_position_hidden() {
-		$this->set_options( array( 'mpp-toc-position' => 'hidden' ) );
+		$this->set_options( array( 'pchap-toc-position' => 'hidden' ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 1 );
@@ -202,7 +202,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * TOC only on the first page.
 	 */
 	public function test_toc_only_on_the_first_page() {
-		$this->set_options( array( 'mpp-toc-only-on-the-first-page' => 1 ) );
+		$this->set_options( array( 'pchap-toc-only-on-the-first-page' => 1 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->assertStringContainsString( 'mpp-toc-container', $this->render_subpage( $post_id, 1 ) );
@@ -219,17 +219,17 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	public function test_toc_row_labels() {
 		$post_id = $this->create_post( self::CLASSIC );
 
-		$this->set_options( array( 'mpp-toc-row-labels' => 'number' ) );
+		$this->set_options( array( 'pchap-toc-row-labels' => 'number' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 1 ) );
 		$this->assertStringContainsString( '<li>1. <span', $toc );
 		$this->assertStringContainsString( '<li>2. <a', $toc );
 
-		$this->set_options( array( 'mpp-toc-row-labels' => 'page' ) );
+		$this->set_options( array( 'pchap-toc-row-labels' => 'page' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 1 ) );
 		$this->assertStringContainsString( '<li>Chapter 1: <span', $toc );
 		$this->assertStringContainsString( '<li>Chapter 3: <a', $toc );
 
-		$this->set_options( array( 'mpp-toc-row-labels' => 'hidden' ) );
+		$this->set_options( array( 'pchap-toc-row-labels' => 'hidden' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 1 ) );
 		$this->assertStringContainsString( '<li><span class="current"', $toc );
 		$this->assertStringContainsString( '<li><a ', $toc );
@@ -241,7 +241,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * Hidden TOC header.
 	 */
 	public function test_hide_toc_header() {
-		$this->set_options( array( 'mpp-hide-toc-header' => 1 ) );
+		$this->set_options( array( 'pchap-hide-toc-header' => 1 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 1 );
@@ -255,7 +255,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * Hidden intro title: only on the intro page.
 	 */
 	public function test_hide_intro_title() {
-		$this->set_options( array( 'mpp-hide-intro-title' => 1 ) );
+		$this->set_options( array( 'pchap-hide-intro-title' => 1 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$html = $this->render_subpage( $post_id, 1 );
@@ -270,7 +270,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * Hidden intro title does not hide the title of a first page that is not an intro.
 	 */
 	public function test_hide_intro_title_keeps_titled_first_page() {
-		$this->set_options( array( 'mpp-hide-intro-title' => 1 ) );
+		$this->set_options( array( 'pchap-hide-intro-title' => 1 ) );
 		$post_id = $this->create_post( "[nextpage title=\"Un\"]\n\nBODY-1\n\n[nextpage title=\"Deux\"]\n\nBODY-2" );
 
 		$this->assertStringContainsString( '<h2>Un</h2>', $this->render_subpage( $post_id, 1 ) );
@@ -287,18 +287,18 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 
 		$this->set_options(
 			array(
-				'mpp-comments-toc-link' => 1,
-				'mpp-comments-on-page'  => 'all',
+				'pchap-comments-toc-link' => 1,
+				'pchap-comments-on-page'  => 'all',
 			)
 		);
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 2 ) );
 		$this->assertStringContainsString( '<li><a href="#comments">Comments</a></li>', $toc );
 
-		$this->set_options( array( 'mpp-comments-on-page' => 'first-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'first-page' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 2 ) );
 		$this->assertStringContainsString( '<a ' . $this->href( $post_id, 1, 'comments' ) . '>Comments</a>', $toc );
 
-		$this->set_options( array( 'mpp-comments-on-page' => 'last-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'last-page' ) );
 		$toc = $this->toc_html( $this->render_subpage( $post_id, 2 ) );
 		$this->assertStringContainsString( '<a ' . $this->href( $post_id, 3, 'comments' ) . '>Comments</a>', $toc );
 	}
@@ -345,7 +345,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 * The standard page links are displayed when the setting allows them.
 	 */
 	public function test_standard_pagination_can_be_enabled() {
-		$this->set_options( array( 'mpp-disable-standard-pagination' => 0 ) );
+		$this->set_options( array( 'pchap-disable-standard-pagination' => 0 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 2 );
@@ -354,7 +354,7 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 		$links = wp_link_pages( array( 'echo' => 0 ) );
 		$this->assertStringContainsString( 'post-nav-links', $links );
 
-		$this->set_options( array( 'mpp-disable-standard-pagination' => 1 ) );
+		$this->set_options( array( 'pchap-disable-standard-pagination' => 1 ) );
 		$this->go_to_subpage( $post_id, 2 );
 		the_post();
 
@@ -715,10 +715,10 @@ class Test_PChap_Rendering extends PChap_UnitTestCase {
 	 *
 	 * @dataProvider data_content_priorities
 	 *
-	 * @param int $priority Priority of the the_content filter (_mpp-rewrite-content-priority).
+	 * @param int $priority Priority of the the_content filter (pchap-rewrite-content-priority).
 	 */
 	public function test_nested_the_content_run_decorates_once( $priority ) {
-		$this->set_options( array( '_mpp-rewrite-content-priority' => $priority ) );
+		$this->set_options( array( 'pchap-rewrite-content-priority' => $priority ) );
 
 		add_shortcode(
 			'pchap_test_box',

@@ -29,7 +29,7 @@ function pchap_admin_advanced_settings_callback_main_section() { }
 function pchap_admin_advanced_callback_rewrite_title_priority() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => '_mpp-rewrite-title-priority' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-rewrite-title-priority' ) );
 }
 
 /**
@@ -41,7 +41,7 @@ function pchap_admin_advanced_callback_rewrite_title_priority() {
 function pchap_admin_advanced_callback_rewrite_content_priority() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => '_mpp-rewrite-content-priority' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-rewrite-content-priority' ) );
 }
 
 /**
@@ -53,7 +53,7 @@ function pchap_admin_advanced_callback_rewrite_content_priority() {
 function pchap_admin_advanced_callback_disable_tinymce_buttons() {
 	_deprecated_function( __FUNCTION__, '2.1.0', 'pchap_admin_render_option_field()' );
 
-	pchap_admin_render_option_field( array( 'option_name' => 'mpp-disable-tinymce-buttons' ) );
+	pchap_admin_render_option_field( array( 'option_name' => 'pchap-disable-tinymce-buttons' ) );
 }
 
 /**
@@ -76,7 +76,7 @@ function pchap_admin_advanced_callback_build_mpp_postmeta_data() {
  * @since 1.7.0
  */
 function pchap_admin_rebuild_postmeta_section() {
-	$built = (int) get_option( '_mpp-postmeta-built', 0 );
+	$built = (int) get_option( 'pchap-postmeta-built', 0 );
 	$state = pchap_get_postmeta_rebuild_state();
 
 	// Self-healing: a pending rebuild must always have a scheduled event.
@@ -96,14 +96,14 @@ function pchap_admin_rebuild_postmeta_section() {
 		$built_text = __( 'The chapter index has never been rebuilt on this site.', 'paginova' );
 	}
 	?>
-	<h2 id="mpp-subpage-index"><?php esc_html_e( 'Chapter index', 'paginova' ); ?></h2>
+	<h2 id="pchap-subpage-index"><?php esc_html_e( 'Chapter index', 'paginova' ); ?></h2>
 
 	<p><?php esc_html_e( 'Paginova stores the list of chapters of each post when the post is saved. Rebuild this index after an update, an import, or if the table of contents of a post looks out of date. Posts are processed in batches; on large sites the remaining posts are processed in the background.', 'paginova' ); ?></p>
 
-	<p class="mpp-rebuild-status"><?php echo esc_html( $built_text ); ?></p>
+	<p class="pchap-rebuild-status"><?php echo esc_html( $built_text ); ?></p>
 
 	<?php if ( false !== $state ) : ?>
-		<p class="mpp-rebuild-status mpp-rebuild-pending">
+		<p class="pchap-rebuild-status pchap-rebuild-pending">
 			<?php
 			echo esc_html(
 				sprintf(
@@ -121,10 +121,10 @@ function pchap_admin_rebuild_postmeta_section() {
 		</p>
 	<?php endif; ?>
 
-	<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" class="mpp-rebuild-form">
+	<form action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" method="post" class="pchap-rebuild-form">
 		<input type="hidden" name="action" value="pchap_rebuild_postmeta" />
 		<?php wp_nonce_field( 'pchap_rebuild_postmeta' ); ?>
-		<?php submit_button( __( 'Rebuild chapter index', 'paginova' ), 'secondary', 'mpp-rebuild-submit', false ); ?>
+		<?php submit_button( __( 'Rebuild chapter index', 'paginova' ), 'secondary', 'pchap-rebuild-submit', false ); ?>
 	</form>
 	<?php
 }
@@ -151,7 +151,7 @@ function pchap_admin_rebuild_postmeta_handler() {
 	$args = array( 'page' => 'paginova-advanced' );
 
 	if ( ! pchap_rebuild_acquire_lock() ) {
-		$args['mpp-rebuild'] = 'locked';
+		$args['pchap-rebuild'] = 'locked';
 	} else {
 
 		/**
@@ -170,23 +170,23 @@ function pchap_admin_rebuild_postmeta_handler() {
 
 			if ( $stats['lock_lost'] ) {
 				// Another process took the rebuild over: it owns the state now.
-				$args['mpp-rebuild'] = 'locked';
+				$args['pchap-rebuild'] = 'locked';
 			} elseif ( $stats['done'] ) {
 				pchap_complete_postmeta_rebuild( $stats );
-				$args['mpp-rebuild'] = 'done';
+				$args['pchap-rebuild'] = 'done';
 			} else {
 				pchap_save_postmeta_rebuild_state( $stats );
 				wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 				pchap_ensure_postmeta_rebuild_event();
-				$args['mpp-rebuild'] = 'partial';
+				$args['pchap-rebuild'] = 'partial';
 			}
 		} finally {
 			pchap_rebuild_release_lock();
 		}
 
-		$args['mpp-processed'] = (int) $stats['processed'];
-		$args['mpp-updated']   = (int) $stats['updated'];
-		$args['mpp-deleted']   = (int) $stats['deleted'];
+		$args['pchap-processed'] = (int) $stats['processed'];
+		$args['pchap-updated']   = (int) $stats['updated'];
+		$args['pchap-deleted']   = (int) $stats['deleted'];
 	}
 
 	wp_safe_redirect( add_query_arg( $args, admin_url( 'options-general.php' ) ) );
@@ -204,15 +204,15 @@ function pchap_admin_rebuild_postmeta_handler() {
 function pchap_admin_rebuild_postmeta_notice() {
 	// phpcs:disable WordPress.Security.NonceVerification.Recommended -- Display only.
 	$page   = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
-	$status = isset( $_GET['mpp-rebuild'] ) ? sanitize_key( wp_unslash( $_GET['mpp-rebuild'] ) ) : '';
+	$status = isset( $_GET['pchap-rebuild'] ) ? sanitize_key( wp_unslash( $_GET['pchap-rebuild'] ) ) : '';
 
 	if ( 'paginova-advanced' !== $page || '' === $status ) {
 		return;
 	}
 
-	$processed = isset( $_GET['mpp-processed'] ) ? absint( $_GET['mpp-processed'] ) : 0;
-	$updated   = isset( $_GET['mpp-updated'] ) ? absint( $_GET['mpp-updated'] ) : 0;
-	$deleted   = isset( $_GET['mpp-deleted'] ) ? absint( $_GET['mpp-deleted'] ) : 0;
+	$processed = isset( $_GET['pchap-processed'] ) ? absint( $_GET['pchap-processed'] ) : 0;
+	$updated   = isset( $_GET['pchap-updated'] ) ? absint( $_GET['pchap-updated'] ) : 0;
+	$deleted   = isset( $_GET['pchap-deleted'] ) ? absint( $_GET['pchap-deleted'] ) : 0;
 	// phpcs:enable
 
 	if ( 'done' === $status || 'partial' === $status ) {
@@ -264,7 +264,7 @@ function pchap_admin_rebuild_postmeta_notice() {
 			return;
 	}
 
-	add_settings_error( 'mpp-rebuild', 'mpp-rebuild-' . $status, $message, $type );
+	add_settings_error( 'pchap-rebuild', 'pchap-rebuild-' . $status, $message, $type );
 }
 
 /**
@@ -276,7 +276,7 @@ function pchap_admin_rebuild_postmeta_notice() {
  * @return string[]
  */
 function pchap_admin_removable_query_args( $args ) {
-	return array_merge( (array) $args, array( 'mpp-rebuild', 'mpp-processed', 'mpp-updated', 'mpp-deleted' ) );
+	return array_merge( (array) $args, array( 'pchap-rebuild', 'pchap-processed', 'pchap-updated', 'pchap-deleted' ) );
 }
 
 /** Advanced settings Page ****************************************************/

@@ -5,6 +5,23 @@ All notable changes to Paginova (named Multipage, slug `sgr-nextpage-titles`, up
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-11-14
+
+The data of the plugin take Paginova names, at the request of the WordPress.org plugin review team (the `mpp` prefix inherited from Multipage is too short). Content needs no change; the settings are moved and the chapter index is rebuilt in the background.
+
+### Changed
+
+- The options are renamed from `mpp-*` / `_mpp-*` to `pchap-*`: the 12 settings (`pchap-toc-position`...), the database version `pchap-db-version` (db version 2300) and the rebuild state `pchap-postmeta-built`, `pchap-rebuild-state`, `pchap-rebuild-last`, `pchap-rebuild-lock`. `pchap_migrate_legacy_options()` moves them while Paginova loads, as long as no Paginova database version is stored, so the settings are in place before anything reads them (the update routines only run on `admin_init`); a value already stored under a new name is kept, the old options are deleted
+- The chapter index meta is renamed from `_mpp_data` to `_pchap_data`: the 2.3 update routine deletes `_mpp_data` and rebuilds the index in the background. Code reading the old names directly must use the new ones (or the option getters)
+- `[nextpage]` is no longer registered as a shortcode: it is a content format, read by the parser like the `<!--nextpage-->` break of core. Where the content is not split, `PChap_Shortcodes::remove_markers()` removes the markers on `the_content` (priority 8, before `wpautop` and `do_shortcode`) and on the rendering of a Chapter block, and the `strip_shortcodes_tagnames` filter lets `strip_shortcodes()` remove them from excerpts. `PChap_Shortcodes::nextpage()` is deprecated
+- The admin action, query arguments, settings error codes and HTML ids of the settings screens use the `pchap` prefix (`admin-post.php?action=pchap_rebuild_postmeta`, `pchap-rebuild`...); the `.mpp-*` CSS classes of the frontend are unchanged
+- The "Page %s" string of WordPress core, removed from the titles printed by SEO plugins, is read from the core translations (`get_translations_for_domain( 'default' )`) instead of a `__()` call with the `default` text domain
+- Uninstalling Paginova removes its own data only: the `mpp-*` options, `_mpp_data` meta, legacy `multipage` option and `mpp_rebuild_postmeta_batch` event of Multipage and Post Chapters are left to these plugins
+
+### Fixed
+
+- The **Rebuild chapter index** button did nothing since 2.0.0: the form posted the `pchap_rebuild_postmeta` action, while the handler was still hooked to `admin_post_mpp_rebuild_postmeta`
+
 ## [2.2.0] - 2026-11-13
 
 Post Chapters becomes **Paginova**, at the request of the WordPress.org plugin review team ("Post Chapters" is too generic a name for the directory). Content and settings need no change; no database upgrade.

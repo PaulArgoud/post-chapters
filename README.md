@@ -1,6 +1,6 @@
 # Paginova for WordPress
 
-[![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)](https://github.com/PaulArgoud/paginova/releases/tag/2.2.0)
+[![Version](https://img.shields.io/badge/version-2.3.0-blue.svg)](https://github.com/PaulArgoud/paginova/releases/tag/2.3.0)
 [![CI](https://github.com/PaulArgoud/paginova/actions/workflows/ci.yml/badge.svg)](https://github.com/PaulArgoud/paginova/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-0073aa.svg)](https://wordpress.org/)
@@ -66,11 +66,11 @@ Paginova is not on WordPress.org yet. Its header declares `Update URI: https://g
 
 ## Coming from Post Chapters
 
-Paginova is Post Chapters 2.x under a new name, asked for by the WordPress.org plugin review team. Since the slug changed (`post-chapters` to `paginova`), WordPress sees it as a new plugin: install it next to Post Chapters, then switch. The content, the settings (`mpp-*` options), the chapter index (`_mpp_data`), the hooks and the `pchap` functions are the same, so nothing needs to be converted.
+Paginova is Post Chapters 2.x under a new name, asked for by the WordPress.org plugin review team. Since the slug changed (`post-chapters` to `paginova`), WordPress sees it as a new plugin: install it next to Post Chapters, then switch. The content, the hooks and the `pchap` functions are the same. The settings (`mpp-*` options) and the chapter index (`_mpp_data` meta) move to their Paginova names (`pchap-*`, `_pchap_data`) on the first page load: the settings are kept and the index is rebuilt in the background.
 
 1. Install and activate Paginova. While Post Chapters is active, Paginova stays idle and shows a notice (both declare the same functions and classes, so only one of them can run)
 2. **Deactivate** Post Chapters. Paginova takes over on the next page load
-3. Remove Post Chapters by **deleting its folder** (`wp-content/plugins/post-chapters/`) over FTP or SSH. Do not use **Delete** on the Plugins screen: Post Chapters then runs its uninstall routine, which erases the settings and the index that Paginova uses
+3. Remove Post Chapters by **deleting its folder** (`wp-content/plugins/post-chapters/`) over FTP or SSH. **Delete** on the Plugins screen runs its uninstall routine, which erases its settings if Paginova has not moved them yet
 
 What changes:
 
@@ -78,16 +78,17 @@ What changes:
 - The WP-CLI command is now `wp paginova` (`wp post-chapters` and `wp multipage` still work)
 - Text domain `paginova`; theme stylesheet `css/paginova.css` (`css/post-chapters.css` and `css/multipage.css` still work)
 - Third-party settings fields registered with `register_setting()` use the option groups `paginova` / `paginova-advanced` (were `post-chapters` / `post-chapters-advanced`)
+- Since 2.3.0, the options are named `pchap-*` (were `mpp-*` and `_mpp-*`) and the chapter index meta `_pchap_data` (was `_mpp_data`): code reading them directly must use the new names, or better the getters (`pchap_get_toc_position()`...)
 
 See the [changelog](CHANGELOG.md#220---2026-11-13) for the details.
 
 ## Coming from Multipage
 
-Paginova reads the same content and settings as Multipage (1.5.12 from WordPress.org, or the 1.5.13 to 1.7.1 releases of this repository): the `[nextpage]` shortcodes, the Subpage blocks (`multipage/subpage`), the options and the subpage index (`_mpp_data`) are reused as they are.
+Paginova reads the same content and settings as Multipage (1.5.12 from WordPress.org, or the 1.5.13 to 1.7.1 releases of this repository): the `[nextpage]` shortcodes and the Subpage blocks (`multipage/subpage`) are reused as they are; the options (`mpp-*`) and the subpage index (`_mpp_data`) move to their Paginova names (`pchap-*`, `_pchap_data`) on the first page load.
 
 1. Install and activate Paginova. While Multipage is active, Paginova stays idle and shows a notice
-2. **Deactivate** Multipage. Paginova takes over on the next page load and moves a pending index rebuild to its own background task
-3. Remove Multipage by **deleting its folder** (`wp-content/plugins/sgr-nextpage-titles/`) over FTP or SSH. Do not use **Delete** on the Plugins screen: Multipage 1.5.15 and later then run their uninstall routine, which erases the settings and the index that Paginova uses
+2. **Deactivate** Multipage. Paginova takes over on the next page load, keeps the settings and rebuilds the index in the background
+3. Remove Multipage by **deleting its folder** (`wp-content/plugins/sgr-nextpage-titles/`) over FTP or SSH. **Delete** on the Plugins screen runs the uninstall routine of Multipage 1.5.15 and later, which erases its settings if Paginova has not moved them yet
 
 What changes for visitors and editors:
 
@@ -100,6 +101,7 @@ What changes for developers (see the [changelog](CHANGELOG.md#200---2026-11-09))
 
 - Functions, classes and constants use the `pchap` prefix: `mpp_toc()` is `pchap_toc()`, `Multipage` is `PChap`, `multipage()` is `pchap()`, `MPP_VERSION` is `PCHAP_VERSION`. The old names are gone (they would collide with Multipage)
 - Hooks use the `pchap_` prefix. Callbacks attached to the old `mpp_*` names still run, as deprecated hooks
+- Options are named `pchap-*` and the subpage index meta `_pchap_data`
 - Text domain `paginova`; theme stylesheet `css/paginova.css` (`css/multipage.css` still works)
 
 ## Usage

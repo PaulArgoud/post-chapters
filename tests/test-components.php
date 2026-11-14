@@ -33,7 +33,7 @@ class Test_PChap_Components extends PChap_UnitTestCase {
 	 */
 	public function test_components_register_the_view_hooks() {
 		$post_id = $this->create_post( self::CONTENT );
-		$this->set_options( array( 'mpp-comments-on-page' => 'first-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'first-page' ) );
 		$this->go_to_subpage( $post_id, 2 );
 
 		$this->assertSame( 10, has_action( 'wp_head', array( pchap()->seo, 'print_rel_links' ) ) );
@@ -108,7 +108,7 @@ class Test_PChap_Components extends PChap_UnitTestCase {
 		$this->setExpectedDeprecated( 'PChap::' . $method );
 
 		$post_id = $this->create_post( self::CONTENT );
-		$this->set_options( array( 'mpp-comments-on-page' => 'first-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'first-page' ) );
 		$this->go_to_subpage( $post_id, 2 );
 
 		$pchap = pchap();

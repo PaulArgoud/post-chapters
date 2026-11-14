@@ -303,8 +303,8 @@ class PChap_SEO {
 
 		$number = $this->pchap->get_current_page();
 		$tokens = array(
-			/* translators: %s: page number. */
-			sprintf( __( 'Page %s', 'default' ), $number ), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- The string of WordPress core, as the SEO plugins print it.
+			// The "Page %s" of WordPress core, as the SEO plugins print it in the site language.
+			sprintf( get_translations_for_domain( 'default' )->translate( 'Page %s' ), $number ),
 			sprintf( 'Page %s', $number ),
 		);
 

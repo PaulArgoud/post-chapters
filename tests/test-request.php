@@ -59,7 +59,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 	 * The title rewrite priority setting is used for the document title filter.
 	 */
 	public function test_document_title_priority_setting() {
-		$this->set_options( array( '_mpp-rewrite-title-priority' => 50 ) );
+		$this->set_options( array( 'pchap-rewrite-title-priority' => 50 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 2 );
@@ -71,7 +71,7 @@ class Test_PChap_Request extends PChap_UnitTestCase {
 	 * The content rewrite priority setting is used for the_content.
 	 */
 	public function test_content_priority_setting() {
-		$this->set_options( array( '_mpp-rewrite-content-priority' => 5 ) );
+		$this->set_options( array( 'pchap-rewrite-content-priority' => 5 ) );
 		$post_id = $this->create_post( self::CLASSIC );
 
 		$this->go_to_subpage( $post_id, 2 );

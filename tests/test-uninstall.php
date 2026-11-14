@@ -24,7 +24,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 	public function test_uninstall_removes_plugin_data() {
 		$option_names = array_merge(
 			array_keys( pchap_get_option_definitions() ),
-			array( '_mpp_db_version', '_mpp-postmeta-built', '_mpp-rebuild-state', '_mpp-rebuild-last', '_mpp-rebuild-lock', 'multipage' )
+			array( 'pchap-db-version', 'pchap-postmeta-built', 'pchap-rebuild-state', 'pchap-rebuild-last', 'pchap-rebuild-lock' )
 		);
 		foreach ( $option_names as $option_name ) {
 			update_option( $option_name, 'x' );
@@ -32,7 +32,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 		update_option( 'unrelated-option', 'kept' );
 
 		$post_id = $this->create_post( "Intro\n\n[nextpage title=\"Deux\"]\n\nTwo" );
-		$this->assertNotEmpty( get_post_meta( $post_id, '_mpp_data', true ) );
+		$this->assertNotEmpty( get_post_meta( $post_id, '_pchap_data', true ) );
 		add_post_meta( $post_id, '_unrelated_meta', 'kept' );
 
 		wp_schedule_single_event( time() + 100, 'pchap_rebuild_postmeta_batch' );
@@ -45,7 +45,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 		}
 		$this->assertSame( 'kept', get_option( 'unrelated-option' ) );
 
-		$this->assertSame( array(), get_post_meta( $post_id, '_mpp_data', false ) );
+		$this->assertSame( array(), get_post_meta( $post_id, '_pchap_data', false ) );
 		$this->assertSame( 'kept', get_post_meta( $post_id, '_unrelated_meta', true ) );
 		$this->assertFalse( wp_next_scheduled( 'pchap_rebuild_postmeta_batch' ) );
 	}
@@ -83,12 +83,12 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 		$post_id = $this->create_post( "Intro\n\n[nextpage title=\"Deux\"]\n\nTwo" );
 
 		// Fill the post meta cache, as any page view does.
-		$this->assertNotEmpty( get_post_meta( $post_id, '_mpp_data', true ) );
+		$this->assertNotEmpty( get_post_meta( $post_id, '_pchap_data', true ) );
 		$this->assertNotFalse( wp_cache_get( $post_id, 'post_meta' ) );
 
 		$this->uninstall();
 
-		$this->assertSame( array(), get_post_meta( $post_id, '_mpp_data', false ), 'The index is still readable from the cache.' );
+		$this->assertSame( array(), get_post_meta( $post_id, '_pchap_data', false ), 'The index is still readable from the cache.' );
 	}
 
 	/**
@@ -96,14 +96,33 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 	 */
 	public function test_uninstall_unschedules_events_with_arguments() {
 		wp_schedule_single_event( time() + 100, 'pchap_rebuild_postmeta_batch', array( 'a' ) );
-		wp_schedule_single_event( time() + 200, 'mpp_rebuild_postmeta_batch', array( 'b', 'c' ) );
 		wp_schedule_single_event( time() + 300, 'unrelated_hook', array( 'kept' ) );
 
 		$this->uninstall();
 
 		$this->assertFalse( wp_next_scheduled( 'pchap_rebuild_postmeta_batch', array( 'a' ) ) );
-		$this->assertFalse( wp_next_scheduled( 'mpp_rebuild_postmeta_batch', array( 'b', 'c' ) ) );
 		$this->assertNotFalse( wp_next_scheduled( 'unrelated_hook', array( 'kept' ) ) );
+	}
+
+	/**
+	 * The data of Multipage and Post Chapters (old names) are left alone: they
+	 * belong to these plugins when Paginova never took them over.
+	 */
+	public function test_uninstall_keeps_multipage_data() {
+		update_option( 'mpp-toc-position', 'bottom' );
+		update_option( '_mpp_db_version', 1700 );
+		update_option( 'multipage', array( 'toc-position' => 'bottom' ) );
+		$post_id = $this->create_post( 'Content' );
+		add_post_meta( $post_id, '_mpp_data', array( 'intro' => 'Intro' ) );
+		wp_schedule_single_event( time() + 200, 'mpp_rebuild_postmeta_batch' );
+
+		$this->uninstall();
+
+		$this->assertSame( 'bottom', get_option( 'mpp-toc-position' ) );
+		$this->assertSame( 1700, (int) get_option( '_mpp_db_version' ) );
+		$this->assertIsArray( get_option( 'multipage' ) );
+		$this->assertNotEmpty( get_post_meta( $post_id, '_mpp_data', true ) );
+		$this->assertNotFalse( wp_next_scheduled( 'mpp_rebuild_postmeta_batch' ) );
 	}
 
 	/**
@@ -159,11 +178,11 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 		pchap_rebuild_acquire_lock();
 		pchap_schedule_postmeta_rebuild();
 
-		$this->assertNotEmpty( get_post_meta( $page_id, '_mpp_data', true ) );
+		$this->assertNotEmpty( get_post_meta( $page_id, '_pchap_data', true ) );
 
 		$this->uninstall();
 
-		$pattern = '(^|[_-])(mpp|pchap)([_-]|$)|^multipage$|paginova|nextpage-titles';
+		$pattern = '(^|[_-])pchap([_-]|$)|paginova';
 		$tables  = array(
 			$wpdb->options     => 'option_name',
 			$wpdb->postmeta    => 'meta_key',
@@ -178,7 +197,7 @@ class Test_PChap_Uninstall extends PChap_UnitTestCase {
 		}
 
 		$this->assertSame( array(), $wpdb->get_col( "SHOW TABLES LIKE '%pchap%'" ), 'The plugin created no table.' ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
-		$this->assertDoesNotMatchRegularExpression( '/pchap|mpp_rebuild/', (string) wp_json_encode( _get_cron_array() ), 'No event of the plugin is left in the cron.' );
-		$this->assertSame( array(), get_post_meta( $page_id, '_mpp_data', false ) );
+		$this->assertDoesNotMatchRegularExpression( '/pchap/', (string) wp_json_encode( _get_cron_array() ), 'No event of the plugin is left in the cron.' );
+		$this->assertSame( array(), get_post_meta( $page_id, '_pchap_data', false ) );
 	}
 }

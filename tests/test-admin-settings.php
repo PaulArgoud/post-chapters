@@ -73,9 +73,9 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 	public function test_label_for() {
 		global $wp_settings_fields;
 
-		$this->assertArrayNotHasKey( 'label_for', $wp_settings_fields['paginova']['pchap_main']['mpp-comments-on-page']['args'] );
-		$this->assertSame( 'hide-intro-title', $wp_settings_fields['paginova']['pchap_main']['mpp-hide-intro-title']['args']['label_for'] );
-		$this->assertSame( 'rewrite-title-priority', $wp_settings_fields['paginova-advanced']['pchap_advanced']['_mpp-rewrite-title-priority']['args']['label_for'] );
+		$this->assertArrayNotHasKey( 'label_for', $wp_settings_fields['paginova']['pchap_main']['pchap-comments-on-page']['args'] );
+		$this->assertSame( 'hide-intro-title', $wp_settings_fields['paginova']['pchap_main']['pchap-hide-intro-title']['args']['label_for'] );
+		$this->assertSame( 'rewrite-title-priority', $wp_settings_fields['paginova-advanced']['pchap_advanced']['pchap-rewrite-title-priority']['args']['label_for'] );
 	}
 
 	/**
@@ -84,25 +84,25 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 	public function test_fields_show_the_saved_values() {
 		$this->set_options(
 			array(
-				'mpp-hide-intro-title'        => true,
-				'mpp-comments-on-page'        => 'last-page',
-				'mpp-toc-position'            => 'bottom',
-				'_mpp-rewrite-title-priority' => 50,
+				'pchap-hide-intro-title'       => true,
+				'pchap-comments-on-page'       => 'last-page',
+				'pchap-toc-position'           => 'bottom',
+				'pchap-rewrite-title-priority' => 50,
 			)
 		);
 
-		$checkbox = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'mpp-hide-intro-title' ) ) );
-		$this->assertStringContainsString( 'name="mpp-hide-intro-title"', $checkbox );
+		$checkbox = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'pchap-hide-intro-title' ) ) );
+		$this->assertStringContainsString( 'name="pchap-hide-intro-title"', $checkbox );
 		$this->assertStringContainsString( "checked='checked'", $checkbox );
 
-		$radio = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'mpp-comments-on-page' ) ) );
+		$radio = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'pchap-comments-on-page' ) ) );
 		$this->assertMatchesRegularExpression( '/value="last-page"\s+checked=\'checked\'/', $radio );
 		$this->assertStringContainsString( '<legend class="screen-reader-text"><span>Display comments on</span></legend>', $radio );
 
-		$select = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'mpp-toc-position' ) ) );
+		$select = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'pchap-toc-position' ) ) );
 		$this->assertMatchesRegularExpression( '/<option value="bottom"\s+selected=\'selected\'>/', $select );
 
-		$priority = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => '_mpp-rewrite-title-priority' ) ) );
+		$priority = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'pchap-rewrite-title-priority' ) ) );
 		$this->assertMatchesRegularExpression( '/<option value="50"\s+selected=\'selected\'>/', $priority );
 		$this->assertStringContainsString( 'aria-describedby="rewrite-title-priority-description"', $priority );
 		$this->assertStringContainsString( '<p id="rewrite-title-priority-description" class="description">', $priority );
@@ -112,7 +112,7 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 	 * The description of the content priority keeps its code and link markup.
 	 */
 	public function test_description_markup() {
-		$output = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => '_mpp-rewrite-content-priority' ) ) );
+		$output = $this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => 'pchap-rewrite-content-priority' ) ) );
 
 		$this->assertStringContainsString( '<code><a href="https://developer.wordpress.org/reference/hooks/the_content/" target="_blank">the_content</a></code>', $output );
 	}
@@ -132,18 +132,18 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 	 */
 	public function data_deprecated_callbacks() {
 		return array(
-			array( 'pchap_admin_settings_callback_hide_intro_title', 'mpp-hide-intro-title' ),
-			array( 'pchap_admin_settings_callback_comments_on_page', 'mpp-comments-on-page' ),
-			array( 'pchap_admin_settings_callback_continue_or_prev_next', 'mpp-continue-or-prev-next' ),
-			array( 'pchap_admin_settings_callback_disable_standard_pagination', 'mpp-disable-standard-pagination' ),
-			array( 'pchap_admin_settings_callback_toc_only_on_the_first_page', 'mpp-toc-only-on-the-first-page' ),
-			array( 'pchap_admin_settings_callback_toc_position', 'mpp-toc-position' ),
-			array( 'pchap_admin_settings_callback_toc_row_labels', 'mpp-toc-row-labels' ),
-			array( 'pchap_admin_settings_callback_hide_toc_header', 'mpp-hide-toc-header' ),
-			array( 'pchap_admin_settings_callback_comments_toc_link', 'mpp-comments-toc-link' ),
-			array( 'pchap_admin_advanced_callback_rewrite_title_priority', '_mpp-rewrite-title-priority' ),
-			array( 'pchap_admin_advanced_callback_rewrite_content_priority', '_mpp-rewrite-content-priority' ),
-			array( 'pchap_admin_advanced_callback_disable_tinymce_buttons', 'mpp-disable-tinymce-buttons' ),
+			array( 'pchap_admin_settings_callback_hide_intro_title', 'pchap-hide-intro-title' ),
+			array( 'pchap_admin_settings_callback_comments_on_page', 'pchap-comments-on-page' ),
+			array( 'pchap_admin_settings_callback_continue_or_prev_next', 'pchap-continue-or-prev-next' ),
+			array( 'pchap_admin_settings_callback_disable_standard_pagination', 'pchap-disable-standard-pagination' ),
+			array( 'pchap_admin_settings_callback_toc_only_on_the_first_page', 'pchap-toc-only-on-the-first-page' ),
+			array( 'pchap_admin_settings_callback_toc_position', 'pchap-toc-position' ),
+			array( 'pchap_admin_settings_callback_toc_row_labels', 'pchap-toc-row-labels' ),
+			array( 'pchap_admin_settings_callback_hide_toc_header', 'pchap-hide-toc-header' ),
+			array( 'pchap_admin_settings_callback_comments_toc_link', 'pchap-comments-toc-link' ),
+			array( 'pchap_admin_advanced_callback_rewrite_title_priority', 'pchap-rewrite-title-priority' ),
+			array( 'pchap_admin_advanced_callback_rewrite_content_priority', 'pchap-rewrite-content-priority' ),
+			array( 'pchap_admin_advanced_callback_disable_tinymce_buttons', 'pchap-disable-tinymce-buttons' ),
 		);
 	}
 
@@ -162,5 +162,17 @@ class Test_PChap_Admin_Settings extends PChap_UnitTestCase {
 			$this->render( 'pchap_admin_render_option_field', array( array( 'option_name' => $option_name ) ) ),
 			$this->render( $callback )
 		);
+	}
+
+	/**
+	 * The "Rebuild chapter index" form posts to an admin-post action the plugin handles.
+	 */
+	public function test_rebuild_form_action_is_handled() {
+		ob_start();
+		pchap_admin_rebuild_postmeta_section();
+		$html = ob_get_clean();
+
+		$this->assertSame( 1, preg_match( '/name="action" value="([a-z_]+)"/', $html, $matches ) );
+		$this->assertSame( 10, has_action( 'admin_post_' . $matches[1], 'pchap_admin_rebuild_postmeta_handler' ) );
 	}
 }

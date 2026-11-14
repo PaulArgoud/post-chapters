@@ -34,73 +34,73 @@ defined( 'ABSPATH' ) || exit;
  */
 function pchap_get_option_definitions() {
 	$definitions = array(
-		'mpp-hide-intro-title'            => array(
+		'pchap-hide-intro-title'            => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
 			'group'   => 'paginova',
 		),
-		'mpp-comments-on-page'            => array(
+		'pchap-comments-on-page'            => array(
 			'type'    => 'string',
 			'default' => 'all',
 			'choices' => array( 'all', 'first-page', 'last-page' ),
 			'group'   => 'paginova',
 		),
-		'mpp-continue-or-prev-next'       => array(
+		'pchap-continue-or-prev-next'       => array(
 			'type'    => 'string',
 			'default' => 'continue',
 			'choices' => array( 'continue', 'next-previous', 'hidden' ),
 			'group'   => 'paginova',
 		),
-		'mpp-disable-standard-pagination' => array(
+		'pchap-disable-standard-pagination' => array(
 			'type'    => 'boolean',
 			'default' => true,
 			'choices' => array(),
 			'group'   => 'paginova',
 		),
-		'mpp-toc-only-on-the-first-page'  => array(
+		'pchap-toc-only-on-the-first-page'  => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
 			'group'   => 'paginova',
 		),
-		'mpp-toc-position'                => array(
+		'pchap-toc-position'                => array(
 			'type'    => 'string',
 			'default' => 'top-right',
 			'choices' => array( 'top-left', 'top-right', 'top', 'bottom', 'hidden' ),
 			'group'   => 'paginova',
 		),
-		'mpp-toc-row-labels'              => array(
+		'pchap-toc-row-labels'              => array(
 			'type'    => 'string',
 			'default' => 'number',
 			'choices' => array( 'number', 'page', 'hidden' ),
 			'group'   => 'paginova',
 		),
-		'mpp-hide-toc-header'             => array(
+		'pchap-hide-toc-header'             => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
 			'group'   => 'paginova',
 		),
-		'mpp-comments-toc-link'           => array(
+		'pchap-comments-toc-link'           => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
 			'group'   => 'paginova',
 		),
-		'_mpp-rewrite-title-priority'     => array(
+		'pchap-rewrite-title-priority'      => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
 			'group'   => 'paginova-advanced',
 		),
-		'_mpp-rewrite-content-priority'   => array(
+		'pchap-rewrite-content-priority'    => array(
 			'type'    => 'priority',
 			'default' => 20,
 			'choices' => array( 100, 50, 20, 10, 5 ),
 			'group'   => 'paginova-advanced',
 		),
-		'mpp-disable-tinymce-buttons'     => array(
+		'pchap-disable-tinymce-buttons'     => array(
 			'type'    => 'boolean',
 			'default' => false,
 			'choices' => array(),
@@ -175,30 +175,30 @@ function pchap_get_option_choice_labels( $option_name = '' ) {
 	);
 
 	$labels = array(
-		'mpp-comments-on-page'          => array(
+		'pchap-comments-on-page'         => array(
 			'all'        => __( 'All pages — Display comments on all post pages', 'paginova' ),
 			'first-page' => __( 'First page — Display comments only on the first page', 'paginova' ),
 			'last-page'  => __( 'Last page — Display comments only on the last page', 'paginova' ),
 		),
-		'mpp-continue-or-prev-next'     => array(
+		'pchap-continue-or-prev-next'    => array(
 			'continue'      => __( 'Continue or back to intro', 'paginova' ),
 			'next-previous' => __( 'Next and previous', 'paginova' ),
 			'hidden'        => __( 'Hidden', 'paginova' ),
 		),
-		'mpp-toc-position'              => array(
+		'pchap-toc-position'             => array(
 			'top-left'  => __( 'above the post content, align left', 'paginova' ),
 			'top-right' => __( 'above the post content, align right', 'paginova' ),
 			'top'       => __( 'above the post content', 'paginova' ),
 			'bottom'    => __( 'below the post content', 'paginova' ),
 			'hidden'    => __( 'hidden', 'paginova' ),
 		),
-		'mpp-toc-row-labels'            => array(
+		'pchap-toc-row-labels'           => array(
 			'number' => __( 'number — Display numbers before the chapter title', 'paginova' ),
 			'page'   => __( 'chapter # — Display "Chapter #" before the chapter title', 'paginova' ),
 			'hidden' => __( 'hidden — Hide the labels, display only the chapter title', 'paginova' ),
 		),
-		'_mpp-rewrite-title-priority'   => $priority_labels,
-		'_mpp-rewrite-content-priority' => $priority_labels,
+		'pchap-rewrite-title-priority'   => $priority_labels,
+		'pchap-rewrite-content-priority' => $priority_labels,
 	);
 
 	// Make sure every allowed value has a label (e.g. values added by a filter).
@@ -375,7 +375,7 @@ function pchap_sanitize_option( $value, $option_name ) {
 		$reported[ $option_name ] = true;
 		add_settings_error(
 			$option_name,
-			'mpp-invalid-' . $option_name,
+			'pchap-invalid-' . $option_name,
 			sprintf(
 				/* translators: %s: setting label, as displayed on the settings screen (e.g. "Navigation type"). */
 				__( 'An invalid value was submitted for the %s setting. The previous value was kept.', 'paginova' ),
@@ -435,7 +435,7 @@ function pchap_get_option_field_label( $option_name ) {
  *
  * @since 1.5.13
  *
- * @param string $option_name The option name (with mpp- prefix).
+ * @param string $option_name The option name (with the pchap- prefix).
  * @param mixed  $default     Default value if not set.
  * @return mixed The option value.
  */
@@ -519,7 +519,7 @@ function pchap_hide_intro_title( $default = false ) {
 	 *
 	 * @param bool $value Whether the intro title is hidden.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_hideintro_title', (bool) pchap_get_valid_option( 'mpp-hide-intro-title', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hideintro_title', (bool) pchap_get_valid_option( 'pchap-hide-intro-title', (bool) $default ) );
 }
 
 /**
@@ -550,7 +550,7 @@ function pchap_get_comments_on_page( $default = 'all' ) {
 	 *
 	 * @param string $value The pages where to display comments.
 	 */
-	return pchap_apply_filters( 'pchap_get_comments_on_page', pchap_get_valid_option( 'mpp-comments-on-page', $default ) );
+	return pchap_apply_filters( 'pchap_get_comments_on_page', pchap_get_valid_option( 'pchap-comments-on-page', $default ) );
 }
 
 /**
@@ -581,7 +581,7 @@ function pchap_get_continue_or_prev_next( $default = 'continue' ) {
 	 *
 	 * @param string $value The navigation type.
 	 */
-	return pchap_apply_filters( 'pchap_get_continue_or_prev_next', pchap_get_valid_option( 'mpp-continue-or-prev-next', $default ) );
+	return pchap_apply_filters( 'pchap_get_continue_or_prev_next', pchap_get_valid_option( 'pchap-continue-or-prev-next', $default ) );
 }
 
 /**
@@ -602,7 +602,7 @@ function pchap_disable_standard_pagination( $default = true ) {
 	 *
 	 * @param bool $value Whether the standard pagination is disabled.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_disable_standard_pagination', (bool) pchap_get_valid_option( 'mpp-disable-standard-pagination', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_standard_pagination', (bool) pchap_get_valid_option( 'pchap-disable-standard-pagination', (bool) $default ) );
 }
 
 /**
@@ -623,7 +623,7 @@ function pchap_toc_only_on_the_first_page( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is only on the first page.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_toc_only_on_the_first_page', (bool) pchap_get_valid_option( 'mpp-toc-only-on-the-first-page', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_toc_only_on_the_first_page', (bool) pchap_get_valid_option( 'pchap-toc-only-on-the-first-page', (bool) $default ) );
 }
 
 /**
@@ -654,7 +654,7 @@ function pchap_get_toc_position( $default = 'top-right' ) {
 	 *
 	 * @param string $value The table of contents position.
 	 */
-	return pchap_apply_filters( 'pchap_get_toc_position', pchap_get_valid_option( 'mpp-toc-position', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_position', pchap_get_valid_option( 'pchap-toc-position', $default ) );
 }
 
 /**
@@ -685,7 +685,7 @@ function pchap_get_toc_row_labels( $default = 'number' ) {
 	 *
 	 * @param string $value The table of contents row labels type.
 	 */
-	return pchap_apply_filters( 'pchap_get_toc_row_labels', pchap_get_valid_option( 'mpp-toc-row-labels', $default ) );
+	return pchap_apply_filters( 'pchap_get_toc_row_labels', pchap_get_valid_option( 'pchap-toc-row-labels', $default ) );
 }
 
 /**
@@ -706,7 +706,7 @@ function pchap_hide_toc_header( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents header is hidden.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_hide_toc_header', (bool) pchap_get_valid_option( 'mpp-hide-toc-header', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_hide_toc_header', (bool) pchap_get_valid_option( 'pchap-hide-toc-header', (bool) $default ) );
 }
 
 /**
@@ -727,7 +727,7 @@ function pchap_comments_toc_link( $default = false ) {
 	 *
 	 * @param bool $value Whether the table of contents is including a link for comments.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_comments_toc_link', (bool) pchap_get_valid_option( 'mpp-comments-toc-link', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_comments_toc_link', (bool) pchap_get_valid_option( 'pchap-comments-toc-link', (bool) $default ) );
 }
 
 /**
@@ -758,7 +758,7 @@ function pchap_get_rewrite_title_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite titles priority.
 	 */
-	return (int) pchap_apply_filters( 'pchap_get_rewrite_title_priority', (int) pchap_get_valid_option( '_mpp-rewrite-title-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_title_priority', (int) pchap_get_valid_option( 'pchap-rewrite-title-priority', $default ) );
 }
 
 /**
@@ -789,7 +789,7 @@ function pchap_get_rewrite_content_priority( $default = 20 ) {
 	 *
 	 * @param int $value The rewrite content priority.
 	 */
-	return (int) pchap_apply_filters( 'pchap_get_rewrite_content_priority', (int) pchap_get_valid_option( '_mpp-rewrite-content-priority', $default ) );
+	return (int) pchap_apply_filters( 'pchap_get_rewrite_content_priority', (int) pchap_get_valid_option( 'pchap-rewrite-content-priority', $default ) );
 }
 
 /**
@@ -810,5 +810,5 @@ function pchap_disable_tinymce_buttons( $default = false ) {
 	 *
 	 * @param bool $value Whether TinyMCE Buttons are disabled.
 	 */
-	return (bool) pchap_apply_filters( 'pchap_disable_tinymce_buttons', (bool) pchap_get_valid_option( 'mpp-disable-tinymce-buttons', (bool) $default ) );
+	return (bool) pchap_apply_filters( 'pchap_disable_tinymce_buttons', (bool) pchap_get_valid_option( 'pchap-disable-tinymce-buttons', (bool) $default ) );
 }

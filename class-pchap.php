@@ -308,7 +308,7 @@ class PChap {
 		// Versions.
 
 		$this->version    = PCHAP_VERSION;
-		$this->db_version = 2000;
+		$this->db_version = 2300;
 
 		// Paths.
 
@@ -359,6 +359,9 @@ class PChap {
 		require_once $this->plugin_dir . 'inc/pchap-blocks.php';
 		require_once $this->plugin_dir . 'inc/pchap-cli.php';
 
+		// Settings of Multipage and Post Chapters: move them to their Paginova names before any is read.
+		pchap_migrate_legacy_options();
+
 		// Bundled translations: GitHub build only (see inc/pchap-l10n.php).
 		if ( file_exists( $this->plugin_dir . 'inc/pchap-l10n.php' ) ) {
 			require_once $this->plugin_dir . 'inc/pchap-l10n.php';
@@ -407,7 +410,7 @@ class PChap {
 	/**
 	 * Load the multipage data of the main query (idempotent).
 	 *
-	 * Parses the live post content (the single source of truth; the `_mpp_data` meta is
+	 * Parses the live post content (the single source of truth; the `_pchap_data` meta is
 	 * only kept for backward compatibility) and computes the current subpage. Used by
 	 * pre_handle_404, redirect_canonical and the "wp" action, so the plugin keeps working
 	 * when another plugin short-circuits one of them.
@@ -768,7 +771,7 @@ class PChap {
 	}
 
 	/**
-	 * Store the subpages of a post in the `_mpp_data` meta (backward compatibility).
+	 * Store the subpages of a post in the `_pchap_data` meta (chapter index for third-party code).
 	 *
 	 * @since 0.6
 	 *
@@ -780,22 +783,22 @@ class PChap {
 			return;
 		}
 
-		$key  = '_mpp_data';
+		$key  = '_pchap_data';
 		$post = get_post( $post_id );
 		if ( ! $post ) {
 			return;
 		}
 
-		$_mpp_data = PChap_Parser::multipage_return_array( $post->post_content );
+		$index = PChap_Parser::multipage_return_array( $post->post_content );
 
-		if ( empty( $_mpp_data ) ) {
+		if ( empty( $index ) ) {
 			delete_post_meta( $post_id, $key );
 			return;
 		}
 
 		// Add the post meta. update_metadata() unslashes the value, so slash it
 		// first to preserve backslashes in subpage titles.
-		update_post_meta( $post_id, $key, wp_slash( $_mpp_data ) );
+		update_post_meta( $post_id, $key, wp_slash( $index ) );
 	}
 
 	/**

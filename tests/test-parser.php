@@ -444,7 +444,7 @@ class Test_PChap_Parser extends PChap_UnitTestCase {
 	}
 
 	/**
-	 * Method multipage_return_array() is the slug => title format of the 1.6 `_mpp_data` meta.
+	 * Method multipage_return_array() is the slug => title format of the 1.6 `_pchap_data` meta.
 	 */
 	public function test_multipage_return_array_format() {
 		$content = "Intro\n\n[nextpage title=\"Deux\"]\n\nA\n\n[nextpage]\n\nB";

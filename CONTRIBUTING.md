@@ -45,7 +45,7 @@ paginova/                       # Repository (also the plugin folder of the rele
   blocks/subpage/               # Subpage block: block.json, index.js, index.asset.php, editor.css
   classes/
     class-pchap-admin.php         # Admin: menus, Settings API, editor buttons
-    class-pchap-shortcodes.php    # [nextpage] shortcode handler
+    class-pchap-shortcodes.php    # Removes the [nextpage] markers outside split views
   inc/
     pchap-parser.php              # PChap_Parser: content splitting
     pchap-template.php            # Titles, navigation & TOC rendering

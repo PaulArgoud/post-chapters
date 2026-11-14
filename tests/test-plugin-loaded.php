@@ -38,10 +38,10 @@ class PChap_Test_Plugin_Loaded extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The legacy [nextpage] shortcode is registered.
+	 * No `nextpage` shortcode is registered (the markers are a content format).
 	 */
-	public function test_nextpage_shortcode_is_registered() {
-		$this->assertTrue( shortcode_exists( 'nextpage' ) );
+	public function test_nextpage_shortcode_is_not_registered() {
+		$this->assertFalse( shortcode_exists( 'nextpage' ) );
 	}
 
 	/**

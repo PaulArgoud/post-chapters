@@ -113,9 +113,9 @@ class Test_PChap_Blocks extends PChap_UnitTestCase {
 	 * Rendering the block on its own (outside a multipage view) outputs no shortcode text.
 	 */
 	public function test_block_render_outside_multipage_view() {
-		$html = do_shortcode( do_blocks( PChap_Test_Corpus::block( 'Deux' ) ) );
-
-		$this->assertStringNotContainsString( '[nextpage', $html );
-		$this->assertStringNotContainsString( 'Deux', $html );
+		foreach ( array( do_blocks( PChap_Test_Corpus::block( 'Deux' ) ), render_block( parse_blocks( PChap_Test_Corpus::block( 'Deux' ) )[0] ) ) as $html ) {
+			$this->assertStringNotContainsString( '[nextpage', $html );
+			$this->assertStringNotContainsString( 'Deux', $html );
+		}
 	}
 }

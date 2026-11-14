@@ -169,16 +169,16 @@ class Test_PChap_Post_Types extends PChap_UnitTestCase {
 	 */
 	public function test_index_meta( $post_type ) {
 		$post_id = $this->create_chapters_post( $post_type );
-		$index   = get_post_meta( $post_id, '_mpp_data', true );
+		$index   = get_post_meta( $post_id, '_pchap_data', true );
 
 		$this->assertSame( 'Un', $index['un'] );
 		$this->assertSame( 'Deux', $index['deux'] );
 
-		delete_post_meta( $post_id, '_mpp_data' );
+		delete_post_meta( $post_id, '_pchap_data' );
 		$stats = pchap_process_postmeta_batch( 0, 1000 );
 
 		$this->assertGreaterThanOrEqual( 1, $stats['updated'] );
-		$this->assertSame( 'Un', get_post_meta( $post_id, '_mpp_data', true )['un'] );
+		$this->assertSame( 'Un', get_post_meta( $post_id, '_pchap_data', true )['un'] );
 	}
 
 	/**

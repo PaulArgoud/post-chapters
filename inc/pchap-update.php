@@ -3,7 +3,7 @@
  * Paginova Updater.
  *
  * Install/update routines, activation/deactivation hooks and the subpage
- * index (post meta `_mpp_data`) rebuild, run in batches either synchronously
+ * index (post meta `_pchap_data`) rebuild, run in batches either synchronously
  * (admin action, WP-CLI) or in the background through WP-Cron.
  *
  * @package Paginova
@@ -21,24 +21,24 @@ defined( 'ABSPATH' ) || exit;
  *
  * Combines the raw version detected by PChap::versions() (999 for a
  * legacy 1.3 install still holding the `multipage` option) with the version
- * stored in `_mpp_db_version` by pchap_version_bump() (1000 for 1.4 to 1.6).
+ * stored in `pchap-db-version` by pchap_version_bump() (1000 for 1.4 to 1.6).
  *
  * @since 1.7.0
  *
  * @return int The installed database version, 0 on a fresh install.
  */
 function pchap_get_installed_db_version() {
-	return max( (int) pchap_get_db_version_raw(), (int) get_option( '_mpp_db_version', 0 ) );
+	return max( (int) pchap_get_db_version_raw(), (int) get_option( 'pchap-db-version', 0 ) );
 }
 
 /**
  * Is this a fresh installation of Paginova?
  *
  * If no database version is found (neither the legacy settings nor the
- * stored `_mpp_db_version`), we infer that this is the first installation.
+ * stored `pchap-db-version`), we infer that this is the first installation.
  *
  * @since 1.4
- * @since 1.7.0 Also checks the stored `_mpp_db_version`, so 1.4+ sites are
+ * @since 1.7.0 Also checks the stored `pchap-db-version`, so 1.4+ sites are
  *              detected as updates.
  *
  * @return bool True if this is a fresh install, otherwise false.
@@ -61,7 +61,7 @@ function pchap_is_install() {
 function pchap_is_update() {
 
 	// Current DB version of this site (per site in a multisite network).
-	$current_db   = (int) get_option( '_mpp_db_version', 0 );
+	$current_db   = (int) get_option( 'pchap-db-version', 0 );
 	$current_live = (int) pchap_get_db_version();
 
 	return $current_db < $current_live;
@@ -123,7 +123,7 @@ function pchap_is_deactivation( $basename = '' ) {
  * @since 1.4
  */
 function pchap_version_bump() {
-	update_option( '_mpp_db_version', pchap_get_db_version() );
+	update_option( 'pchap-db-version', pchap_get_db_version() );
 }
 
 /**
@@ -181,9 +181,14 @@ function pchap_version_updater() {
 			pchap_update_to_1_7();
 		}
 
-		// Version 2.0 (Multipage becomes Paginova).
+		// Version 2.0 (Multipage becomes Post Chapters).
 		if ( $raw_db_version < 2000 ) {
 			pchap_update_to_2_0();
+		}
+
+		// Version 2.3 (the data are renamed after Paginova).
+		if ( $raw_db_version < 2300 ) {
+			pchap_update_to_2_3();
 		}
 
 		/**
@@ -258,11 +263,11 @@ function pchap_convert_legacy_settings( $old_settings ) {
 		'hidden'  => 'hidden',
 	);
 	$direct_keys = array(
-		'toc-oofp'                => 'mpp-toc-only-on-the-first-page',
-		'toc-position'            => 'mpp-toc-position',
-		'toc-hide-header'         => 'mpp-hide-toc-header',
-		'toc-comments-link'       => 'mpp-comments-toc-link',
-		'disable-tinymce-buttons' => 'mpp-disable-tinymce-buttons',
+		'toc-oofp'                => 'pchap-toc-only-on-the-first-page',
+		'toc-position'            => 'pchap-toc-position',
+		'toc-hide-header'         => 'pchap-hide-toc-header',
+		'toc-comments-link'       => 'pchap-comments-toc-link',
+		'disable-tinymce-buttons' => 'pchap-disable-tinymce-buttons',
 	);
 
 	foreach ( $old_settings as $option_key => $option_value ) {
@@ -270,28 +275,28 @@ function pchap_convert_legacy_settings( $old_settings ) {
 			continue;
 		}
 
-		if ( 'comments-oofp' === $option_key && false === get_option( 'mpp-comments-on-page', false ) ) {
-			add_option( 'mpp-comments-on-page', 'first-page' );
+		if ( 'comments-oofp' === $option_key && false === get_option( 'pchap-comments-on-page', false ) ) {
+			add_option( 'pchap-comments-on-page', 'first-page' );
 		}
 
-		if ( 'unhide-pagination' === $option_key && false === get_option( 'mpp-disable-standard-pagination', false ) && $option_value ) {
-			add_option( 'mpp-disable-standard-pagination', 0 );
+		if ( 'unhide-pagination' === $option_key && false === get_option( 'pchap-disable-standard-pagination', false ) && $option_value ) {
+			add_option( 'pchap-disable-standard-pagination', 0 );
 		}
 
 		if ( isset( $direct_keys[ $option_key ] ) && false === get_option( $direct_keys[ $option_key ], false ) ) {
 			add_option( $direct_keys[ $option_key ], $option_value );
 		}
 
-		if ( 'toc-page-labels' === $option_key && false === get_option( 'mpp-toc-row-labels', false ) && is_string( $option_value ) && isset( $row_labels[ $option_value ] ) ) {
-			add_option( 'mpp-toc-row-labels', $row_labels[ $option_value ] );
+		if ( 'toc-page-labels' === $option_key && false === get_option( 'pchap-toc-row-labels', false ) && is_string( $option_value ) && isset( $row_labels[ $option_value ] ) ) {
+			add_option( 'pchap-toc-row-labels', $row_labels[ $option_value ] );
 		}
 
-		if ( 'rewrite-title-priority' === $option_key && false === get_option( '_mpp-rewrite-title-priority', false ) && is_string( $option_value ) && isset( $priorities[ $option_value ] ) ) {
-			add_option( '_mpp-rewrite-title-priority', $priorities[ $option_value ] );
+		if ( 'rewrite-title-priority' === $option_key && false === get_option( 'pchap-rewrite-title-priority', false ) && is_string( $option_value ) && isset( $priorities[ $option_value ] ) ) {
+			add_option( 'pchap-rewrite-title-priority', $priorities[ $option_value ] );
 		}
 
-		if ( 'rewrite-content-priority' === $option_key && false === get_option( '_mpp-rewrite-content-priority', false ) && is_string( $option_value ) && isset( $priorities[ $option_value ] ) ) {
-			add_option( '_mpp-rewrite-content-priority', $priorities[ $option_value ] );
+		if ( 'rewrite-content-priority' === $option_key && false === get_option( 'pchap-rewrite-content-priority', false ) && is_string( $option_value ) && isset( $priorities[ $option_value ] ) ) {
+			add_option( 'pchap-rewrite-content-priority', $priorities[ $option_value ] );
 		}
 	}
 }
@@ -312,16 +317,100 @@ function pchap_update_to_1_7() {
 /**
  * 2.0 update routine.
  *
- * Multipage became Paginova: the options and the `_mpp_data` meta keep
- * their names, but the WP-Cron event of the background rebuild was renamed
- * from mpp_rebuild_postmeta_batch to pchap_rebuild_postmeta_batch. Drop the
- * old event and schedule the new one when a rebuild is still pending.
+ * Multipage became Post Chapters: the WP-Cron event of the background rebuild
+ * was renamed from mpp_rebuild_postmeta_batch to pchap_rebuild_postmeta_batch.
+ * Drop the old event and schedule the new one when a rebuild is still pending.
  *
  * @since 2.0.0
  */
 function pchap_update_to_2_0() {
 	wp_clear_scheduled_hook( 'mpp_rebuild_postmeta_batch' );
 	pchap_ensure_postmeta_rebuild_event();
+}
+
+/**
+ * 2.3 update routine.
+ *
+ * The chapter index meta was renamed from `_mpp_data` to `_pchap_data`
+ * (the options were renamed by pchap_migrate_legacy_options()): delete the
+ * old meta and rebuild the index under its new name, in the background.
+ *
+ * @since 2.3.0
+ */
+function pchap_update_to_2_3() {
+	delete_post_meta_by_key( '_mpp_data' );
+	pchap_schedule_postmeta_rebuild();
+}
+
+/**
+ * Return the options named by Multipage and Post Chapters, with their new names.
+ *
+ * @since 2.3.0
+ * @access private
+ *
+ * @return array Old option name => new option name, or false when the old
+ *               option is only deleted.
+ */
+function pchap_get_legacy_option_names() {
+	return array(
+		'mpp-hide-intro-title'            => 'pchap-hide-intro-title',
+		'mpp-comments-on-page'            => 'pchap-comments-on-page',
+		'mpp-continue-or-prev-next'       => 'pchap-continue-or-prev-next',
+		'mpp-disable-standard-pagination' => 'pchap-disable-standard-pagination',
+		'mpp-toc-only-on-the-first-page'  => 'pchap-toc-only-on-the-first-page',
+		'mpp-toc-position'                => 'pchap-toc-position',
+		'mpp-toc-row-labels'              => 'pchap-toc-row-labels',
+		'mpp-hide-toc-header'             => 'pchap-hide-toc-header',
+		'mpp-comments-toc-link'           => 'pchap-comments-toc-link',
+		'mpp-disable-tinymce-buttons'     => 'pchap-disable-tinymce-buttons',
+		'_mpp-rewrite-title-priority'     => 'pchap-rewrite-title-priority',
+		'_mpp-rewrite-content-priority'   => 'pchap-rewrite-content-priority',
+		'_mpp_db_version'                 => 'pchap-db-version',
+		// The 2.3 update routine starts a new rebuild of the index.
+		'_mpp-postmeta-built'             => false,
+		'_mpp-rebuild-state'              => false,
+		'_mpp-rebuild-last'               => false,
+		'_mpp-rebuild-lock'               => false,
+	);
+}
+
+/**
+ * Move the options of Multipage and Post Chapters (`mpp-*`, `_mpp-*`) to their
+ * Paginova names (`pchap-*`).
+ *
+ * Runs while Paginova loads, as long as no Paginova database version is
+ * stored, so the settings are in place before any of them is read (the
+ * update routines only run on admin_init). An option already holding a value
+ * under its new name keeps it. The old options are deleted.
+ *
+ * @since 2.3.0
+ *
+ * @return bool Whether legacy options were found.
+ */
+function pchap_migrate_legacy_options() {
+	if ( false !== get_option( 'pchap-db-version', false ) ) {
+		return false;
+	}
+
+	$found = false;
+
+	foreach ( pchap_get_legacy_option_names() as $old_name => $new_name ) {
+		$value = get_option( $old_name, false );
+
+		if ( false === $value ) {
+			continue;
+		}
+
+		$found = true;
+
+		if ( false !== $new_name ) {
+			add_option( $new_name, $value );
+		}
+
+		delete_option( $old_name );
+	}
+
+	return $found;
 }
 
 /** Subpage index (post meta) rebuild ****************************************/
@@ -361,7 +450,7 @@ function pchap_get_rebuild_batch_size() {
 /**
  * Return the values of the SQL condition matching the posts whose subpage index
  * must be (re)built: posts containing a Paginova marker and posts already
- * holding a `_mpp_data` meta (stale meta is deleted).
+ * holding a `_pchap_data` meta (stale meta is deleted).
  *
  * The condition itself is written out in pchap_count_postmeta_rebuild_candidates()
  * and pchap_process_postmeta_batch(), so that every query is a literal string
@@ -381,7 +470,7 @@ function pchap_rebuild_candidates_args() {
 		'auto-draft',
 		'%' . $wpdb->esc_like( '[nextpage' ) . '%',
 		'%' . $wpdb->esc_like( 'wp:multipage/subpage' ) . '%',
-		'_mpp_data',
+		'_pchap_data',
 	);
 }
 
@@ -404,7 +493,7 @@ function pchap_count_postmeta_rebuild_candidates( $after_id = 0 ) {
  * Process one batch of the subpage index rebuild.
  *
  * Parses the content of up to `$batch_size` posts (ordered by ID, after
- * `$after_id`) and updates or deletes their `_mpp_data` post meta.
+ * `$after_id`) and updates or deletes their `_pchap_data` post meta.
  *
  * @since 1.7.0
  *
@@ -448,7 +537,7 @@ function pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run = false 
 	// Load the existing meta of the batch in one query, without priming the meta cache.
 	$ids          = array_map( 'intval', wp_list_pluck( $posts, 'ID' ) );
 	$placeholders = implode( ', ', array_fill( 0, count( $ids ), '%d' ) );
-	$meta_args    = array_merge( array( '_mpp_data' ), $ids );
+	$meta_args    = array_merge( array( '_pchap_data' ), $ids );
 
 	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery -- $placeholders only holds %d placeholders.
 	$meta_rows = $wpdb->get_results( $wpdb->prepare( "SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s AND post_id IN ( {$placeholders} )", $meta_args ) );
@@ -473,7 +562,7 @@ function pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run = false 
 				continue;
 			}
 			if ( ! $dry_run ) {
-				delete_post_meta( $post_id, '_mpp_data' );
+				delete_post_meta( $post_id, '_pchap_data' );
 			}
 			++$stats['deleted'];
 			continue;
@@ -487,9 +576,9 @@ function pchap_process_postmeta_batch( $after_id, $batch_size, $dry_run = false 
 		if ( ! $dry_run ) {
 			if ( count( $old_rows ) > 1 ) {
 				// Duplicated rows: start again from a single one.
-				delete_post_meta( $post_id, '_mpp_data' );
+				delete_post_meta( $post_id, '_pchap_data' );
 			}
-			update_post_meta( $post_id, '_mpp_data', wp_slash( $new_data ) );
+			update_post_meta( $post_id, '_pchap_data', wp_slash( $new_data ) );
 		}
 		++$stats['updated'];
 	}
@@ -612,14 +701,14 @@ function pchap_run_postmeta_rebuild( $args = array() ) {
  * @since 1.4
  * @since 1.7.0 Runs in batches, deletes stale meta and returns statistics.
  *
- * @param bool $update_option Whether to update the '_mpp-postmeta-built' option. Default true.
+ * @param bool $update_option Whether to update the 'pchap-postmeta-built' option. Default true.
  * @return array Totals: processed, updated, deleted, unchanged, batches, cursor and done.
  */
 function pchap_add_post_multipage_meta( $update_option = true ) {
 	$stats = pchap_run_postmeta_rebuild();
 
 	if ( true === $update_option ) {
-		update_option( '_mpp-postmeta-built', time() );
+		update_option( 'pchap-postmeta-built', time() );
 	}
 
 	return $stats;
@@ -634,7 +723,7 @@ function pchap_add_post_multipage_meta( $update_option = true ) {
  *                     batches, started), or false when no rebuild is pending.
  */
 function pchap_get_postmeta_rebuild_state() {
-	$state = get_option( '_mpp-rebuild-state', false );
+	$state = get_option( 'pchap-rebuild-state', false );
 
 	if ( ! is_array( $state ) ) {
 		return false;
@@ -673,7 +762,7 @@ function pchap_save_postmeta_rebuild_state( $stats ) {
 		'started'   => ( $previous && ! empty( $previous['started'] ) ) ? (int) $previous['started'] : time(),
 	);
 
-	update_option( '_mpp-rebuild-state', $state, false );
+	update_option( 'pchap-rebuild-state', $state, false );
 }
 
 /**
@@ -688,7 +777,7 @@ function pchap_save_postmeta_rebuild_state( $stats ) {
 function pchap_schedule_postmeta_rebuild( $restart = true ) {
 	if ( $restart || false === pchap_get_postmeta_rebuild_state() ) {
 		update_option(
-			'_mpp-rebuild-state',
+			'pchap-rebuild-state',
 			array(
 				'cursor'    => 0,
 				'processed' => 0,
@@ -735,9 +824,9 @@ function pchap_ensure_postmeta_rebuild_event( $delay = 0 ) {
  * @param array $stats Totals returned by pchap_run_postmeta_rebuild().
  */
 function pchap_complete_postmeta_rebuild( $stats ) {
-	update_option( '_mpp-postmeta-built', time() );
+	update_option( 'pchap-postmeta-built', time() );
 	update_option(
-		'_mpp-rebuild-last',
+		'pchap-rebuild-last',
 		array(
 			'time'      => time(),
 			'processed' => isset( $stats['processed'] ) ? (int) $stats['processed'] : 0,
@@ -746,7 +835,7 @@ function pchap_complete_postmeta_rebuild( $stats ) {
 		),
 		false
 	);
-	delete_option( '_mpp-rebuild-state' );
+	delete_option( 'pchap-rebuild-state' );
 	wp_clear_scheduled_hook( pchap_get_rebuild_cron_hook() );
 }
 
@@ -838,7 +927,7 @@ function pchap_rebuild_new_lock_value( $token = '' ) {
 function pchap_rebuild_acquire_lock() {
 	global $wpdb;
 
-	$lock  = '_mpp-rebuild-lock';
+	$lock  = 'pchap-rebuild-lock';
 	$value = pchap_rebuild_new_lock_value();
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
@@ -888,7 +977,7 @@ function pchap_rebuild_refresh_lock() {
 		return false;
 	}
 
-	$lock  = '_mpp-rebuild-lock';
+	$lock  = 'pchap-rebuild-lock';
 	$parts = explode( '|', $held, 2 );
 	$token = isset( $parts[1] ) ? $parts[1] : '';
 	$value = pchap_rebuild_new_lock_value( $token );
@@ -936,7 +1025,7 @@ function pchap_rebuild_release_lock() {
 	}
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
-	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", '_mpp-rebuild-lock', $held ) );
+	$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s", 'pchap-rebuild-lock', $held ) );
 
 	pchap_rebuild_held_lock( false );
 }
@@ -952,7 +1041,7 @@ function pchap_is_rebuild_locked() {
 	global $wpdb;
 
 	// phpcs:ignore WordPress.DB.DirectDatabaseQuery -- Atomic rebuild lock: the Options API has no compare-and-swap and its cache must be bypassed.
-	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", '_mpp-rebuild-lock' ) );
+	$current = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM {$wpdb->options} WHERE option_name = %s", 'pchap-rebuild-lock' ) );
 
 	return null !== $current && pchap_rebuild_lock_time( $current ) > time() - pchap_get_rebuild_lock_ttl();
 }
@@ -1032,9 +1121,9 @@ add_action( 'pchap_rebuild_postmeta_batch', 'pchap_cron_rebuild_postmeta' );
  *
  * @return array {
  *     @type int $multipage_posts Posts containing a Paginova marker.
- *     @type int $indexed_posts   Posts holding a `_mpp_data` meta.
- *     @type int $missing_index   Posts containing a marker but no `_mpp_data` meta.
- *     @type int $stale_index     Posts holding a `_mpp_data` meta but no marker.
+ *     @type int $indexed_posts   Posts holding a `_pchap_data` meta.
+ *     @type int $missing_index   Posts containing a marker but no `_pchap_data` meta.
+ *     @type int $stale_index     Posts holding a `_pchap_data` meta but no marker.
  * }
  */
 function pchap_get_postmeta_index_stats() {
@@ -1046,7 +1135,7 @@ function pchap_get_postmeta_index_stats() {
 		'%' . $wpdb->esc_like( 'wp:multipage/subpage' ) . '%'
 	);
 	$base    = $wpdb->prepare( 'p.post_type <> %s AND p.post_status <> %s', 'revision', 'auto-draft' );
-	$has_key = $wpdb->prepare( "EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s )", '_mpp_data' );
+	$has_key = $wpdb->prepare( "EXISTS ( SELECT 1 FROM {$wpdb->postmeta} pm WHERE pm.post_id = p.ID AND pm.meta_key = %s )", '_pchap_data' );
 
 	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery -- Fragments are prepared above.
 	$stats = array(

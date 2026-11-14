@@ -24,5 +24,5 @@ return array(
 		'wp-plugins',
 		'wp-primitives',
 	),
-	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.2.0',
+	'version'      => defined( 'PCHAP_VERSION' ) ? PCHAP_VERSION : '2.3.0',
 );

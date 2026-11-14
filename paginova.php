@@ -4,7 +4,7 @@
  * Plugin URI:        https://github.com/PaulArgoud/paginova
  * Description:       Split long posts into chapters, each on its own page with its own URL and title, with a table of contents and chapter navigation. Works with the block editor and the classic editor. Formerly Post Chapters, successor of Multipage.
  * Author:            Paul ARGOUD, based on Multipage by SGr33n (aka Sergio De Falco, Envire Web Solutions).
- * Version:           2.2.0
+ * Version:           2.3.0
  * Author URI:        https://paul.argoud.net
  * Text Domain:       paginova
  * Domain Path:       /languages/
@@ -90,7 +90,7 @@ if ( function_exists( 'pchap' ) || defined( 'PCHAP_VERSION' ) || pchap_is_post_c
 	return;
 }
 
-define( 'PCHAP_VERSION', '2.2.0' );
+define( 'PCHAP_VERSION', '2.3.0' );
 define( 'PCHAP__PLUGIN_FILE', __FILE__ );
 
 // Everything Post Chapters 2.x also declares lives in this file, compiled only

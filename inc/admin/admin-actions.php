@@ -17,7 +17,7 @@ add_action( 'pchap_admin_init', 'pchap_register_admin_settings' );
 add_action( 'pchap_admin_init', 'pchap_admin_rebuild_postmeta_notice' );
 
 // Subpage index rebuild action (admin-post.php).
-add_action( 'admin_post_mpp_rebuild_postmeta', 'pchap_admin_rebuild_postmeta_handler' );
+add_action( 'admin_post_pchap_rebuild_postmeta', 'pchap_admin_rebuild_postmeta_handler' );
 add_filter( 'removable_query_args', 'pchap_admin_removable_query_args' );
 
 /**

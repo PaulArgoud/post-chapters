@@ -53,7 +53,7 @@ class Test_PChap_Comments extends PChap_UnitTestCase {
 	 * @param bool[] $visible  Visibility on pages 1, 2 and 3.
 	 */
 	public function test_comments_template( $setting, $visible ) {
-		$this->set_options( array( 'mpp-comments-on-page' => $setting ) );
+		$this->set_options( array( 'pchap-comments-on-page' => $setting ) );
 		$post_id  = $this->create_post( self::CLASSIC );
 		$template = '/theme/comments.php';
 
@@ -85,7 +85,7 @@ class Test_PChap_Comments extends PChap_UnitTestCase {
 	 * @param bool[] $visible  Visibility on pages 1, 2 and 3.
 	 */
 	public function test_comment_blocks( $setting, $visible ) {
-		$this->set_options( array( 'mpp-comments-on-page' => $setting ) );
+		$this->set_options( array( 'pchap-comments-on-page' => $setting ) );
 		$post_id = $this->create_post( self::CLASSIC, array( 'comment_status' => 'open' ) );
 
 		foreach ( $visible as $index => $is_visible ) {
@@ -125,7 +125,7 @@ class Test_PChap_Comments extends PChap_UnitTestCase {
 	 * Other blocks are never hidden, and the comment blocks of other posts neither.
 	 */
 	public function test_other_blocks_and_posts_are_not_hidden() {
-		$this->set_options( array( 'mpp-comments-on-page' => 'first-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'first-page' ) );
 		$post_id  = $this->create_post( self::CLASSIC );
 		$other_id = $this->create_post( 'Other', array( 'post_title' => 'Other' ) );
 
@@ -144,7 +144,7 @@ class Test_PChap_Comments extends PChap_UnitTestCase {
 	 * Comments are not hidden on posts that are not multipage.
 	 */
 	public function test_plain_post_comments_are_not_hidden() {
-		$this->set_options( array( 'mpp-comments-on-page' => 'last-page' ) );
+		$this->set_options( array( 'pchap-comments-on-page' => 'last-page' ) );
 		$post_id = $this->create_post( 'Plain' );
 
 		$this->go_to_subpage( $post_id, 1 );

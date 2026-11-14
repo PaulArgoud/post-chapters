@@ -4,7 +4,7 @@ Tags: chapters, pagination, nextpage, page break, long posts
 Requires at least: 6.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.2.0
+Stable tag: 2.3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -108,6 +108,16 @@ WordPress redirects the visitor to the first page of the post, as it does for po
 
 == Changelog ==
 
+= 2.3.0 =
+Release Date: November 14th, 2026
+
+Existing content needs no change; the settings are kept.
+
+* The settings and the chapter index are stored under Paginova names (`pchap-*` options, `_pchap_data` meta), moved automatically from the `mpp-*` names of Multipage and Post Chapters.
+* `[nextpage]` is no longer registered as a shortcode: chapter markers are removed from feeds, excerpts and the REST API by content filters.
+* Fixed: the **Rebuild chapter index** button did nothing.
+* Uninstalling Paginova no longer removes the data of Multipage or Post Chapters.
+
 = 2.2.0 =
 Release Date: November 13th, 2026
 
@@ -161,6 +171,9 @@ Multipage by Sergio De Falco, on WordPress.org.
 The full history is in [CHANGELOG.md](https://github.com/PaulArgoud/paginova/blob/main/CHANGELOG.md).
 
 == Upgrade Notice ==
+
+= 2.3.0 =
+Settings are moved to new option names and the chapter index is rebuilt in the background. Code reading the `mpp-*` options or the `_mpp_data` meta directly must use the `pchap-*` and `_pchap_data` names.
 
 = 2.2.0 =
 Post Chapters is now Paginova. Content and settings are kept. Deactivate Post Chapters after activating Paginova, and delete its folder rather than using Delete on the Plugins screen.

@@ -84,14 +84,14 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 	public function test_invalid_value_notice_uses_the_field_label() {
 		$this->register_fields();
 
-		update_option( 'mpp-comments-on-page', 'last-page' );
-		$this->assertSame( 'last-page', pchap_sanitize_option( 'nope', 'mpp-comments-on-page' ) );
+		update_option( 'pchap-comments-on-page', 'last-page' );
+		$this->assertSame( 'last-page', pchap_sanitize_option( 'nope', 'pchap-comments-on-page' ) );
 
-		$errors = $this->errors( 'mpp-comments-on-page' );
-		$this->assertArrayHasKey( 'mpp-invalid-mpp-comments-on-page', $errors );
+		$errors = $this->errors( 'pchap-comments-on-page' );
+		$this->assertArrayHasKey( 'pchap-invalid-pchap-comments-on-page', $errors );
 		$this->assertSame(
 			array( 'An invalid value was submitted for the Display comments on setting. The previous value was kept.', 'error' ),
-			$errors['mpp-invalid-mpp-comments-on-page']
+			$errors['pchap-invalid-pchap-comments-on-page']
 		);
 	}
 
@@ -102,12 +102,12 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 	public function test_invalid_value_notice_falls_back_to_the_option_name() {
 		$GLOBALS['wp_settings_fields'] = array();
 
-		$this->assertSame( 20, pchap_sanitize_option( 'abc', '_mpp-rewrite-content-priority' ) );
+		$this->assertSame( 20, pchap_sanitize_option( 'abc', 'pchap-rewrite-content-priority' ) );
 
-		$errors = $this->errors( '_mpp-rewrite-content-priority' );
+		$errors = $this->errors( 'pchap-rewrite-content-priority' );
 		$this->assertSame(
-			'An invalid value was submitted for the _mpp-rewrite-content-priority setting. The previous value was kept.',
-			$errors['mpp-invalid-_mpp-rewrite-content-priority'][0]
+			'An invalid value was submitted for the pchap-rewrite-content-priority setting. The previous value was kept.',
+			$errors['pchap-invalid-pchap-rewrite-content-priority'][0]
 		);
 	}
 
@@ -118,15 +118,15 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 		$GLOBALS['wp_settings_fields'] = array(
 			'paginova' => array(
 				'pchap_toc' => array(
-					'mpp-hide-intro-title' => array( 'title' => '<b>Intro</b> &amp; "more"' ),
+					'pchap-hide-intro-title' => array( 'title' => '<b>Intro</b> &amp; "more"' ),
 				),
 			),
 		);
 
-		$this->assertSame( 'Intro & "more"', pchap_get_option_field_label( 'mpp-hide-intro-title' ) );
+		$this->assertSame( 'Intro & "more"', pchap_get_option_field_label( 'pchap-hide-intro-title' ) );
 
-		$GLOBALS['wp_settings_fields']['paginova']['pchap_toc']['mpp-hide-intro-title']['title'] = '<script>alert(1)</script>';
-		$this->assertSame( 'mpp-hide-intro-title', pchap_get_option_field_label( 'mpp-hide-intro-title' ), 'A label without text falls back to the option name.' );
+		$GLOBALS['wp_settings_fields']['paginova']['pchap_toc']['pchap-hide-intro-title']['title'] = '<script>alert(1)</script>';
+		$this->assertSame( 'pchap-hide-intro-title', pchap_get_option_field_label( 'pchap-hide-intro-title' ), 'A label without text falls back to the option name.' );
 	}
 
 	/**
@@ -143,7 +143,7 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 
 		pchap_admin_rebuild_postmeta_notice();
 
-		$errors = array_values( $this->errors( 'mpp-rebuild' ) );
+		$errors = array_values( $this->errors( 'pchap-rebuild' ) );
 		$this->assertCount( 1, $errors );
 		$this->assertSame( array( $expected, $type ), $errors[0] );
 	}
@@ -157,50 +157,50 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 		return array(
 			'done, singular'       => array(
 				array(
-					'mpp-rebuild'   => 'done',
-					'mpp-processed' => '1',
-					'mpp-updated'   => '1',
-					'mpp-deleted'   => '1',
+					'pchap-rebuild'   => 'done',
+					'pchap-processed' => '1',
+					'pchap-updated'   => '1',
+					'pchap-deleted'   => '1',
 				),
 				'success',
 				'Chapter index rebuilt: 1 post checked, 1 post updated, 1 stale entry removed.',
 			),
 			'done, plural'         => array(
 				array(
-					'mpp-rebuild'   => 'done',
-					'mpp-processed' => '1234',
-					'mpp-updated'   => '2',
-					'mpp-deleted'   => '0',
+					'pchap-rebuild'   => 'done',
+					'pchap-processed' => '1234',
+					'pchap-updated'   => '2',
+					'pchap-deleted'   => '0',
 				),
 				'success',
 				'Chapter index rebuilt: 1,234 posts checked, 2 posts updated, 0 stale entries removed.',
 			),
 			'done, missing counts' => array(
-				array( 'mpp-rebuild' => 'done' ),
+				array( 'pchap-rebuild' => 'done' ),
 				'success',
 				'Chapter index rebuilt: 0 posts checked, 0 posts updated, 0 stale entries removed.',
 			),
 			'partial'              => array(
 				array(
-					'mpp-rebuild'   => 'partial',
-					'mpp-processed' => '1',
-					'mpp-updated'   => '0',
-					'mpp-deleted'   => '1',
+					'pchap-rebuild'   => 'partial',
+					'pchap-processed' => '1',
+					'pchap-updated'   => '0',
+					'pchap-deleted'   => '1',
 				),
 				'info',
 				'Chapter index rebuild started: 1 post checked, 0 posts updated, 1 stale entry removed so far. The remaining posts are processed in the background.',
 			),
 			'locked'               => array(
-				array( 'mpp-rebuild' => 'locked' ),
+				array( 'pchap-rebuild' => 'locked' ),
 				'warning',
 				'A chapter index rebuild is already running. Please try again in a few minutes.',
 			),
 			'negative counts'      => array(
 				array(
-					'mpp-rebuild'   => 'done',
-					'mpp-processed' => '-3',
-					'mpp-updated'   => 'x',
-					'mpp-deleted'   => '1',
+					'pchap-rebuild'   => 'done',
+					'pchap-processed' => '-3',
+					'pchap-updated'   => 'x',
+					'pchap-deleted'   => '1',
 				),
 				'success',
 				'Chapter index rebuilt: 3 posts checked, 0 posts updated, 1 stale entry removed.',
@@ -215,24 +215,24 @@ class Test_PChap_Admin_Notices extends PChap_UnitTestCase {
 		foreach (
 			array(
 				array(),
-				array( 'mpp-rebuild' => 'done' ),
+				array( 'pchap-rebuild' => 'done' ),
 				array(
-					'page'        => 'paginova',
-					'mpp-rebuild' => 'done',
+					'page'          => 'paginova',
+					'pchap-rebuild' => 'done',
 				),
 				array(
-					'page'        => 'paginova-advanced',
-					'mpp-rebuild' => 'unknown',
+					'page'          => 'paginova-advanced',
+					'pchap-rebuild' => 'unknown',
 				),
 				array(
-					'page'        => 'paginova-advanced',
-					'mpp-rebuild' => '',
+					'page'          => 'paginova-advanced',
+					'pchap-rebuild' => '',
 				),
 			) as $query
 		) {
 			$_GET = $query;
 			pchap_admin_rebuild_postmeta_notice();
-			$this->assertSame( array(), get_settings_errors( 'mpp-rebuild' ), wp_json_encode( $query ) );
+			$this->assertSame( array(), get_settings_errors( 'pchap-rebuild' ), wp_json_encode( $query ) );
 		}
 	}
 }
