@@ -187,7 +187,7 @@ For these four languages the bundled files are used even when a language pack is
 
 ## Development
 
-The plugin itself needs no build step. The development tools are installed with Composer and the tests run in [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (Docker and Node.js 22.13+ required). Clone the repository into a folder named `post-chapters` (the name of the repository, which wp-env mounts as `wp-content/plugins/post-chapters`).
+The plugin itself needs no build step. The development tools are installed with Composer and the tests run in [wp-env](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/) (Docker and Node.js 22.13+ required). Clone the repository into a folder named `paginova` (the name of the repository, which wp-env mounts as `wp-content/plugins/paginova`).
 
 ```bash
 composer install          # PHPCS, WPCS, PHPCompatibilityWP, PHPUnit (dev only)

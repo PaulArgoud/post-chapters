@@ -47,7 +47,7 @@
 			"@php ./vendor/bin/phpunit"
 		],
 		"test:wp-env": [
-			"npx -y @wordpress/env@12 run cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit"
+			"npx -y @wordpress/env@12 run cli --env-cwd=wp-content/plugins/paginova vendor/bin/phpunit"
 		]
 	},
 	"scripts-descriptions": {

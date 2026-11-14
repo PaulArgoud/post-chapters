@@ -28,7 +28,7 @@ if ! curl -fsS -o /dev/null "${BASE}/"; then
 fi
 
 echo "Preparing the demo post..."
-run "wp rewrite structure '/%postname%/' --hard >/dev/null; wp theme activate twentytwentyfive >/dev/null 2>&1; wp plugin activate post-chapters >/dev/null 2>&1; \
+run "wp rewrite structure '/%postname%/' --hard >/dev/null; wp theme activate twentytwentyfive >/dev/null 2>&1; wp plugin activate paginova >/dev/null 2>&1; \
 for p in wordpress-seo seo-by-rank-math wp-seopress all-in-one-seo-pack autodescription; do wp plugin deactivate \$p >/dev/null 2>&1; done; \
 wp option update rank_math_registration_skip 1 >/dev/null; wp option update rank_math_is_configured 1 >/dev/null; \
 wp post delete \$(wp post list --name=${SLUG} --post_status=any --format=ids) --force >/dev/null 2>&1; \

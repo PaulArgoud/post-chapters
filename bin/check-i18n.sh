@@ -20,7 +20,7 @@
 #               WP_CLI_BIN="php wp-cli.phar" or a wp-env wrapper. It is run
 #               from the plugin root with paths relative to it, and its working
 #               directory must be the plugin root (true for wp-env with
-#               --env-cwd=wp-content/plugins/post-chapters).
+#               --env-cwd=wp-content/plugins/paginova).
 #   PHP_BIN     PHP CLI used for the semantic comparisons (default: "php").
 #
 # Refresh workflow (after changing strings), from the plugin root:

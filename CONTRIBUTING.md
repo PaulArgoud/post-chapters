@@ -18,10 +18,10 @@ The plugin has no JavaScript or CSS build step: `blocks/subpage/index.js` is pla
 ## Getting Started
 
 1. Fork the repository on GitHub
-2. Clone your fork into a folder named `post-chapters`, the name of the repository (wp-env mounts it under that name, and `composer test:wp-env` runs in `wp-content/plugins/post-chapters`):
+2. Clone your fork into a folder named `paginova`, the name of the repository (wp-env mounts it under that name, and `composer test:wp-env` runs in `wp-content/plugins/paginova`):
    ```bash
-   git clone https://github.com/<your-username>/post-chapters.git
-   cd post-chapters
+   git clone https://github.com/<your-username>/paginova.git
+   cd paginova
    ```
 3. Install the development tools:
    ```bash
@@ -38,7 +38,7 @@ You can also use another local environment (Local, DDEV...): symlink or copy the
 ## Project Structure
 
 ```
-post-chapters/                  # Repository (the plugin folder is named paginova/ in the release zip)
+paginova/                       # Repository (also the plugin folder of the release zip)
   paginova.php                  # Plugin entry point (header, PCHAP_VERSION), Post Chapters / Multipage guards
   class-pchap.php                 # PChap class: request setup, rendering, SEO
   uninstall.php                 # Data cleanup (multisite aware)
@@ -101,15 +101,15 @@ The suite uses PHPUnit 9.6 and the WordPress test library. It runs inside wp-env
 npx @wordpress/env@12 start
 composer test:wp-env
 # A subset:
-npx @wordpress/env@12 run cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --filter Test_PChap_Split_Html
-npx @wordpress/env@12 run cli --env-cwd=wp-content/plugins/post-chapters vendor/bin/phpunit --group parser
+npx @wordpress/env@12 run cli --env-cwd=wp-content/plugins/paginova vendor/bin/phpunit --filter Test_PChap_Split_Html
+npx @wordpress/env@12 run cli --env-cwd=wp-content/plugins/paginova vendor/bin/phpunit --group parser
 ```
 
 - The configuration is strict: PHP notices, warnings and deprecations, risky tests and unexpected output fail the run
 - Test classes extend `PChap_UnitTestCase` (`tests/includes/class-pchap-unittestcase.php`), which resets the `PChap` singleton between simulated requests and provides helpers (`create_post()`, `go_to_subpage()`, `render_subpage()`, `set_options()`...)
 - Content cases shared by several tests live in `PChap_Test_Corpus` (`tests/includes/class-pchap-test-corpus.php`); add a case there when you fix a parsing bug
 - Splitting changes must keep every page balanced (tags and block delimiters) and must not leave empty elements: see `tests/test-split-html.php` and `tests/test-request-invariant.php`
-- Many sites run a persistent object cache. CI runs the suite once more with Redis (Redis Object Cache drop-in): to do the same locally, start a Redis container on the wp-env network (`docker network ls` shows `wp-env-post-chapters-…_default`; `docker run -d --name pchap-redis --network <network> --network-alias redis redis:7-alpine`), put `{ "config": { "WP_REDIS_HOST": "redis" } }` in `.wp-env.override.json`, run `npx @wordpress/env@12 start --update`, then in the `cli` container `wp plugin install redis-cache` and copy `wp-content/plugins/redis-cache/includes/object-cache.php` to `wp-content/object-cache.php`
+- Many sites run a persistent object cache. CI runs the suite once more with Redis (Redis Object Cache drop-in): to do the same locally, start a Redis container on the wp-env network (`docker network ls` shows `wp-env-paginova-…_default`; `docker run -d --name pchap-redis --network <network> --network-alias redis redis:7-alpine`), put `{ "config": { "WP_REDIS_HOST": "redis" } }` in `.wp-env.override.json`, run `npx @wordpress/env@12 start --update`, then in the `cli` container `wp plugin install redis-cache` and copy `wp-content/plugins/redis-cache/includes/object-cache.php` to `wp-content/object-cache.php`
 - CI runs the suite on WordPress 6.3 / PHP 7.4, WordPress 7.1.4 / PHP 7.4 and WordPress 7.1.4 / PHP 8.4. To reproduce a pair locally, set `WP_ENV_CORE` (e.g. `https://downloads.wordpress.org/release/wordpress-6.3.zip`) and `WP_ENV_PHP_VERSION` before `npx @wordpress/env@12 start`
 
 Also check your change by hand in the browser: the block editor, the classic editor (Classic Editor plugin), a block theme (Twenty Twenty-Five) and a classic theme (Twenty Twenty-One).

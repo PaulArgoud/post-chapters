@@ -5,7 +5,7 @@ This document describes the internal structure and data flow of the Paginova plu
 ## File Tree
 
 ```
-paginova/                            # Folder of the release zip (the repository clone is named post-chapters/)
+paginova/                            # Plugin folder (repository clone and release zip)
 │
 ├── paginova.php                     # Plugin entry point: header (incl. Update URI), Post Chapters / Multipage guards,
 │                                    #   PCHAP_VERSION / PCHAP__PLUGIN_FILE, loads class-pchap.php
